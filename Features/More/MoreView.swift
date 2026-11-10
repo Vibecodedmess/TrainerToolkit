@@ -34,4 +34,5 @@ struct MoreView: View {
 
 #Preview {
     MoreView()
+        .environment(DataCenter())
 }

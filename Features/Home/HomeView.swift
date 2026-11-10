@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct HomeView: View {
+    @Environment(DataCenter.self) private var dataCenter
+
     var body: some View {
         NavigationStack {
             PlaceholderView(
@@ -8,6 +10,11 @@ struct HomeView: View {
                 systemImage: "house",
                 message: "Active events, current raid bosses, the next Community Day countdown and your planner goals will show here."
             )
+            .safeAreaInset(edge: .top) {
+                if let warning = dataCenter.warning {
+                    WarningBanner(text: warning)
+                }
+            }
             .navigationTitle("Home")
         }
     }
@@ -15,4 +22,5 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
+        .environment(DataCenter())
 }

@@ -12,7 +12,10 @@ let package = Package(
     ],
     targets: [
         .target(name: "GameMath"),
-        .target(name: "DataSources"),
+        .target(
+            name: "DataSources",
+            resources: [.copy("Snapshots")]
+        ),
         .testTarget(name: "GameMathTests", dependencies: ["GameMath"]),
         .testTarget(name: "DataSourcesTests", dependencies: ["DataSources"]),
     ]

@@ -3,7 +3,7 @@
 A personal-use iOS companion app for trainers: search string builder, power-up planner, raid and Rocket counters, event checklists and trade planning.
 It is sideloaded, never published.
 
-**Status:** Phase 0, the app skeleton and build pipeline. Every screen is a placeholder for now.
+**Status:** Phase 1, the data layer. Community data is fetched, validated, cached and bundled, and the counts are shown under More > Data sources. Feature screens are still placeholders.
 
 ## Ground rules
 
@@ -23,6 +23,8 @@ It is sideloaded, never published.
 | `Shared/` | Reusable SwiftUI views |
 | `Persistence/` | On-device storage (SwiftData from Phase 1 on) |
 | `Packages/TrainerKit/` | Pure-Swift modules `GameMath` and `DataSources`, with unit tests |
+| `Packages/TrainerKit/Sources/DataSources/Snapshots/` | Bundled offline copy of every dataset (see `DATA_SOURCES.md`) |
+| `scripts/update-snapshots.sh` | Refreshes the bundled snapshots |
 | `.github/workflows/build.yml` | macOS CI: tests, then an unsigned `.ipa` artifact |
 
 ## Building
