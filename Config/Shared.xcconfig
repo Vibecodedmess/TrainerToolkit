@@ -1,0 +1,9 @@
+// The one place to change the app's identity.
+//
+// APP_BUNDLE_ID: change this to something unique to you (for example
+// com.yourname.trainertoolkit) if Sideloadly reports that the App ID is
+// unavailable. Once you have installed the app, keep it the same:
+// a different bundle ID installs as a separate app with empty data.
+APP_BUNDLE_ID = com.example.trainertoolkit
+APP_DISPLAY_NAME = Trainer Toolkit
+APP_VERSION = 0.0.1

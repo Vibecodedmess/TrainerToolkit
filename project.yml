@@ -1,0 +1,55 @@
+# XcodeGen spec. CI runs `xcodegen generate` to create TrainerToolkit.xcodeproj.
+# The generated .xcodeproj is not committed (see .gitignore).
+# Bundle ID, display name and version live in Config/Shared.xcconfig.
+name: TrainerToolkit
+
+options:
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+
+configFiles:
+  Debug: Config/Shared.xcconfig
+  Release: Config/Shared.xcconfig
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+
+packages:
+  TrainerKit:
+    path: Packages/TrainerKit
+
+targets:
+  TrainerToolkit:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Features
+      - path: Shared
+      - path: Persistence
+    dependencies:
+      - package: TrainerKit
+        product: GameMath
+      - package: TrainerKit
+        product: DataSources
+    settings:
+      base:
+        PRODUCT_NAME: TrainerToolkit
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID)
+        MARKETING_VERSION: $(APP_VERSION)
+        CURRENT_PROJECT_VERSION: "1"
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: $(APP_DISPLAY_NAME)
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        ENABLE_PREVIEWS: YES
+
+schemes:
+  TrainerToolkit:
+    build:
+      targets:
+        TrainerToolkit: all

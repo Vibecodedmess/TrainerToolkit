@@ -1,0 +1,82 @@
+name: Build unsigned IPA
+
+# Runs only when you ask for it (Actions tab > Run workflow) or when you push a v* tag,
+# to keep macOS runner minutes low. Add `push: branches: [main]` if you want every push built.
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write # needed only to attach the IPA to a Release on v* tags
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+  HOMEBREW_NO_INSTALL_CLEANUP: "1"
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain versions
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Unit tests (TrainerKit package)
+        run: swift test --package-path Packages/TrainerKit
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build app (unsigned)
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project TrainerToolkit.xcodeproj \
+            -scheme TrainerToolkit \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            build
+
+      - name: Package IPA
+        run: |
+          APP=build/Build/Products/Release-iphoneos/TrainerToolkit.app
+          test -d "$APP"
+          mkdir -p dist/Payload
+          cp -R "$APP" dist/Payload/
+          cd dist
+          zip -qry TrainerToolkit.ipa Payload
+          ls -lh TrainerToolkit.ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TrainerToolkit-ipa-${{ github.run_number }}
+          path: dist/TrainerToolkit.ipa
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Attach IPA to GitHub Release (v* tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/TrainerToolkit.ipa \
+            --title "$GITHUB_REF_NAME" --generate-notes
