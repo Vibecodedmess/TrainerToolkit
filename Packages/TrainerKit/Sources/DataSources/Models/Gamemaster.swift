@@ -99,6 +99,7 @@ public struct GMMove: Decodable, Sendable, Hashable, Identifiable {
     public let turns: Int?
 
     public var id: String { moveId }
-    /// Fast moves generate energy, charged moves cost it.
-    public var isFastMove: Bool { (energyGain ?? 0) > 0 }
+    /// Fast moves generate energy, charged moves cost it. A move that does neither
+    /// (e.g. Transform) counts as fast.
+    public var isFastMove: Bool { (energyGain ?? 0) > 0 || (energy ?? 0) == 0 }
 }

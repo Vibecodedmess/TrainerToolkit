@@ -25,7 +25,7 @@ jobs:
     runs-on: macos-15-intel
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Toolchain versions
         run: |
@@ -68,7 +68,7 @@ jobs:
           ls -lh TrainerToolkit.ipa
 
       - name: Upload IPA artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: TrainerToolkit-ipa-${{ github.run_number }}
           path: dist/TrainerToolkit.ipa

@@ -17,3 +17,7 @@ xcuserdata/
 
 # Source image for the app icon (generated icon lives in Resources/)
 icon-source.*
+
+# Personal export samples (never commit: private collection data)
+samples/
+*.csv

@@ -6,6 +6,7 @@ public struct GamemasterLookup: Sendable {
     private let byId: [String: GMPokemon]
     private let byKey: [String: GMPokemon]
     private let moveNames: [String: String]
+    private let movesById: [String: GMMove]
 
     public init(_ gamemaster: Gamemaster) {
         var byId: [String: GMPokemon] = [:]
@@ -21,6 +22,33 @@ public struct GamemasterLookup: Sendable {
         self.byId = byId
         self.byKey = byKey
         moveNames = Dictionary(gamemaster.moves.map { ($0.moveId, $0.name) }, uniquingKeysWith: { a, _ in a })
+        movesById = Dictionary(gamemaster.moves.map { ($0.moveId, $0) }, uniquingKeysWith: { a, _ in a })
+    }
+
+    public func move(_ id: String) -> GMMove? { movesById[id] }
+
+    public struct MoveOption: Hashable, Sendable, Identifiable {
+        public let id: String
+        public let name: String
+        public let type: String
+        /// Elite (Elite TM / event-only) or legacy move per PvPoke.
+        public let isSpecial: Bool
+    }
+
+    /// Fast and charged moves a Pokémon can know, per PvPoke (including elite and legacy moves,
+    /// which are flagged). Sorted by name. Unknown move ids are skipped.
+    public func moveOptions(for pokemon: GMPokemon) -> (fast: [MoveOption], charged: [MoveOption]) {
+        let special = Set(pokemon.eliteMoves + pokemon.legacyMoves)
+        var seen: Set<String> = []
+        var fast: [MoveOption] = []
+        var charged: [MoveOption] = []
+        for id in pokemon.fastMoves + pokemon.chargedMoves + pokemon.eliteMoves + pokemon.legacyMoves {
+            guard !seen.contains(id), let move = movesById[id] else { continue }
+            seen.insert(id)
+            let option = MoveOption(id: id, name: move.name, type: move.type, isSpecial: special.contains(id))
+            if move.isFastMove { fast.append(option) } else { charged.append(option) }
+        }
+        return (fast.sorted { $0.name < $1.name }, charged.sorted { $0.name < $1.name })
     }
 
     public func pokemon(id: String) -> GMPokemon? { byId[id] }

@@ -3,7 +3,7 @@
 A personal-use iOS companion app for trainers: search string builder, power-up planner, raid and Rocket counters, event checklists and trade planning.
 It is sideloaded, never published.
 
-**Status:** Phase 4, Events. The data layer, Search, Planner and Events (with checklists and local reminders) work. Collection, Raids, Rocket, Trades and Home are still placeholders.
+**Status:** Phase 5, My Collection (manual entry). The data layer, Search, Planner, Events and Collection work. CSV import (Poke Genie) is next, once a sample export is in `samples/`, a folder that git ignores. Raids, Rocket, Trades and Home are still placeholders.
 
 ## Ground rules
 

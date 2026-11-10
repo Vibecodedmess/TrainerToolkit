@@ -168,6 +168,18 @@ final class GamemasterLookupTests: XCTestCase {
         XCTAssertTrue(line.contains("kingambit"))
     }
 
+    func testMoveOptionsSplitFastAndCharged() throws {
+        let l = try lookup()
+        let p = try XCTUnwrap(l.pokemon(named: "Bulbasaur"))
+        let options = l.moveOptions(for: p)
+        XCTAssertFalse(options.fast.isEmpty)
+        XCTAssertFalse(options.charged.isEmpty)
+        XCTAssertTrue(options.fast.allSatisfy { l.move($0.id)?.isFastMove == true })
+        XCTAssertTrue(options.charged.allSatisfy { l.move($0.id)?.isFastMove == false })
+        XCTAssertTrue(options.fast.contains { $0.id == "VINE_WHIP" })
+        XCTAssertTrue(options.charged.contains { $0.id == "SLUDGE_BOMB" })
+    }
+
     func testMoveName() throws {
         let l = try lookup()
         XCTAssertEqual(l.moveName("SHADOW_BALL"), "Shadow Ball")
