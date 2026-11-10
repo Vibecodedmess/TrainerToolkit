@@ -139,19 +139,44 @@ final class SearchQueryBuilderTests: XCTestCase {
         XCTAssertEqual(try preset("Caught today"), "age0")
     }
 
-    func testUnverifiedNotes() {
+    func testUnverifiedNotes() throws {
+        // Small test catalog: the real one currently has no unconfirmed entries.
+        let json = """
+        {"version":1,"source":{"title":"t","url":"u","checked":"c"},
+         "operators":{"and":"&","andAlternatives":[],"or":",","orAlternatives":[],"not":"!",
+                      "notes":[{"text":"ok","verified":true},{"text":"precedence?","verified":false}]},
+         "groups":[{"id":"g","title":"G","filters":[
+            {"id":"sure","kind":"flag","label":"Sure","term":"sure"},
+            {"id":"maybe","kind":"flag","label":"Maybe","term":"maybe","verified":false,"note":"unconfirmed"},
+            {"id":"opts","kind":"options","label":"Opts","options":[
+               {"id":"a","label":"A","term":"a"},{"id":"b","label":"B","term":"b","verified":false}]}
+         ]}],
+         "presets":[]}
+        """
+        let test = try JSONDecoder().decode(SearchCatalog.self, from: Data(json.utf8))
+
         var state = SearchState()
-        XCTAssertTrue(SearchQueryBuilder.unverifiedNotes(for: state, in: catalog).isEmpty)
+        XCTAssertTrue(SearchQueryBuilder.unverifiedNotes(for: state, in: test).isEmpty)
 
-        state.flags["shiny"] = .include
-        XCTAssertTrue(SearchQueryBuilder.unverifiedNotes(for: state, in: catalog).isEmpty, "verified term, no OR")
+        state.flags["sure"] = .include
+        XCTAssertTrue(SearchQueryBuilder.unverifiedNotes(for: state, in: test).isEmpty, "verified term, no OR")
 
+        state.flags["maybe"] = .exclude
+        XCTAssertEqual(SearchQueryBuilder.unverifiedNotes(for: state, in: test).count, 1)
+
+        state.options["opts"] = ["a": .include, "b": .include]
+        let notes = SearchQueryBuilder.unverifiedNotes(for: state, in: test)
+        XCTAssertEqual(notes.count, 3, "unverified option + precedence note")
+        XCTAssertEqual(SearchQueryBuilder.build(state, in: test), "sure&!maybe&a,b")
+    }
+
+    func testRealCatalogHasNoUnconfirmedTermsLeft() {
+        var state = SearchState()
         state.flags["anytag"] = .exclude
-        XCTAssertEqual(SearchQueryBuilder.unverifiedNotes(for: state, in: catalog).count, 1)
-
+        state.ranges["age"] = RangeValue(min: 0, max: 7)
+        state.ranges["distance"] = RangeValue(min: 100)
         state.options["stars"] = ["0": .include, "1": .include]
-        let notes = SearchQueryBuilder.unverifiedNotes(for: state, in: catalog)
-        XCTAssertEqual(notes.count, 2, "adds the AND/OR precedence note")
+        XCTAssertTrue(SearchQueryBuilder.unverifiedNotes(for: state, in: catalog).isEmpty)
     }
 
     func testStateRoundTripsThroughJSON() throws {

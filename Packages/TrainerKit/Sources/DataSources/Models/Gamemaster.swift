@@ -55,13 +55,17 @@ public struct GMPokemon: Decodable, Sendable, Hashable, Identifiable {
     public let tags: [String]
     public let released: Bool
     public let family: Family?
+    /// PvPoke's CP at level 25 with 0/0/0 IVs (not present for every entry).
+    public let level25CP: Int?
+    /// PvPoke's rank-1 league IVs: "cp500"/"cp1500"/"cp2500" -> [level, atk, def, sta].
+    public let defaultIVs: [String: [Double]]?
 
     public var id: String { speciesId }
     public var realTypes: [String] { types.filter { $0 != "none" } }
 
     enum CodingKeys: String, CodingKey {
         case dex, speciesId, speciesName, baseStats, types, fastMoves, chargedMoves
-        case eliteMoves, legacyMoves, tags, released, family
+        case eliteMoves, legacyMoves, tags, released, family, level25CP, defaultIVs
     }
 
     public init(from decoder: Decoder) throws {
@@ -78,6 +82,8 @@ public struct GMPokemon: Decodable, Sendable, Hashable, Identifiable {
         tags = try c.decodeIfPresent([String].self, forKey: .tags) ?? []
         released = try c.decodeIfPresent(Bool.self, forKey: .released) ?? true
         family = try c.decodeIfPresent(Family.self, forKey: .family)
+        level25CP = try? c.decodeIfPresent(Int.self, forKey: .level25CP)
+        defaultIVs = try? c.decodeIfPresent([String: [Double]].self, forKey: .defaultIVs)
     }
 }
 

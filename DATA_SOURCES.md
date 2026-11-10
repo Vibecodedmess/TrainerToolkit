@@ -44,12 +44,35 @@ Files on 2026-11-10: events 53, raid bosses 12, research tasks 39, Rocket lineup
 | Used for | Every search keyword and operator in `Packages/TrainerKit/Sources/SearchBuilder/Resources/search-terms.json` |
 
 Terms are kept in that JSON file, not in code, so they can be added or fixed without code changes.
-Entries with `"verified": false` are not in the article and are marked in the app with an orange question mark:
+Any entry marked `"verified": false` gets an orange question mark in the app. There are none right now.
 
-- `#` on its own meaning "has any tag". The article only documents `#tagname`. Used by the "Safe to transfer" preset as `!#`.
-- Age ranges such as `age0-7`. The article only shows `age0` and `age1`.
-- `distance1000` without a space. The article writes `distance 1000`.
-- Precedence when mixing `&` and `,`. The app assumes the commas are applied first, so `0*,1*&shiny` means (0★ or 1★) and shiny. The app never puts a `!` term inside a comma list, which avoids ambiguity.
+These four are not in the article, but were **confirmed in the game on 2026-11-10**:
+
+- `#` on its own matches any tag, so `!#` hides tagged Pokémon. The "Safe to transfer" preset uses this.
+- Age ranges such as `age0-7`.
+- `distance100-` written without a space.
+- When mixing `&` and `,`, the commas are applied first: `0*,1*&shiny` gives only shiny 0★ and 1★ Pokémon. The app also never puts a `!` term inside a comma list.
+
+### PokeMiners game master: level and power-up tables
+
+| | |
+| --- | --- |
+| Source | https://github.com/PokeMiners/game_masters, file `latest/latest.json` (~19.5 MB). A community datamine of the game's public game master |
+| Pinned to | commit `8e227be44f288d34463e23bf04e9b564d3c16f79`, extracted 2026-11-10 (the repo's last update was 2026-08-29) |
+| License | None stated. Used with your approval; only small numeric tables are kept |
+| Extracted by | `scripts/update-level-tables.ps1` into `Packages/TrainerKit/Sources/GameMath/Resources/level-tables.json` (the file records its source commit) |
+| Templates | `PLAYER_LEVEL_SETTINGS` (CP multiplier per whole level), `POKEMON_UPGRADE_SETTINGS` (stardust / candy / XL Candy per level, shadow and purified multipliers, max level 50, Best Buddy +1), `LUCKY_POKEMON_SETTINGS` (lucky stardust ×0.5) |
+
+Not in the game master, so these are community-documented formulas (e.g. Bulbapedia "Combat Power", GamePress):
+
+- CP = floor((Atk+IV) × √(Def+IV) × √(Sta+IV) × CPM² / 10), minimum 10.
+- Half-level CPM = √((CPM(L)² + CPM(L+1)²) / 2).
+
+Both are **checked in unit tests against PvPoke's own numbers**:
+- `level25CP` matches for 483 of 484 non-Mega species. The odd one out is Hisuian Electrode, where PvPoke's value looks stale.
+- None of 5,256 PvPoke rank-1 league IV sets exceeds its league CP cap.
+
+`TODO: verify`: the game master gives the shadow (×1.2), purified (×0.9) and lucky (×0.5) multipliers, but not how fractional results are rounded. The app rounds **up** per power-up (for example, 1 Candy becomes 2 for a shadow). It also assumes a lucky purified Pokémon gets both stardust discounts.
 
 ## How the app uses them
 
@@ -63,11 +86,8 @@ Entries with `"verified": false` are not in the article and are marked in the ap
 
 ## Open questions (decisions needed before later phases)
 
-1. **PvE move stats, CP multipliers, power-up costs (Phases 3 and 6).** These are not in PvPoke's gamemaster. Candidates, both live on 2026-11-10:
-   - **PokeMiners `game_masters`** (`latest/latest.json`, ~19.5 MB, last updated 2026-08-29): the datamined game master. Has PvE move stats, the CP multiplier per level and stardust/candy costs per level. It is large and has no license file.
-   - **pokemon-go-api** (`pokemon-go-api.github.io/pokemon-go-api/api/pokedex.json`, ~14.9 MB, updated 2026-11-10): a JSON API generated from the game master.
-   - Or a small static table file per value set, each citing its source.
-2. **Trade stardust costs and type effectiveness / weather boosts:** to be decided with (1), each with a cited source.
+1. **PvE move stats (Phase 6):** planned to come from the same PokeMiners game master, extracted the same way. You approved PokeMiners as the source on 2026-11-10.
+2. **Type effectiveness and weather boosts (Phase 6), trade stardust costs (Phase 8):** each will have a cited source, checked before use.
 
 ## Not used
 

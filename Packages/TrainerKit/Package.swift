@@ -12,7 +12,10 @@ let package = Package(
         .library(name: "SearchBuilder", targets: ["SearchBuilder"]),
     ],
     targets: [
-        .target(name: "GameMath"),
+        .target(
+            name: "GameMath",
+            resources: [.copy("Resources/level-tables.json")]
+        ),
         .target(
             name: "DataSources",
             resources: [.copy("Snapshots")]
@@ -21,7 +24,8 @@ let package = Package(
             name: "SearchBuilder",
             resources: [.copy("Resources/search-terms.json")]
         ),
-        .testTarget(name: "GameMathTests", dependencies: ["GameMath"]),
+        // DataSources is a test-only dependency: tests cross-check CP math against PvPoke's data.
+        .testTarget(name: "GameMathTests", dependencies: ["GameMath", "DataSources"]),
         .testTarget(name: "DataSourcesTests", dependencies: ["DataSources"]),
         .testTarget(name: "SearchBuilderTests", dependencies: ["SearchBuilder"]),
     ]

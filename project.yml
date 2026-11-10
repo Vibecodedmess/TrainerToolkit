@@ -33,7 +33,7 @@ targets:
         optional: true
     dependencies:
       - package: TrainerKit
-        product: GameMath
+        product: GameMath # level tables + CP / cost math
       - package: TrainerKit
         product: DataSources
       - package: TrainerKit

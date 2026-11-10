@@ -4,7 +4,7 @@ import SwiftData
 /// The on-device SwiftData store for everything the user creates.
 /// Add new @Model types to `schema` as later phases introduce them.
 enum AppModelContainer {
-    static let schema = Schema([SavedSearchPreset.self])
+    static let schema = Schema([SavedSearchPreset.self, PowerUpGoal.self])
 
     /// Opens the store on disk. If that fails, falls back to an in-memory store so the app
     /// still opens (nothing would be saved in that case, and `usingFallback` says so).

@@ -25,6 +25,11 @@ final class DataCenter {
     }
 
     private(set) var rows: [SourceRow] = []
+    /// Decoded Pokémon & moves currently in use. Nil only until the first load finishes.
+    private(set) var gamemaster: Gamemaster?
+    /// Pokémon that can be picked in the Planner (see `Gamemaster.powerUpCandidates`).
+    private(set) var powerUpCandidates: [GMPokemon] = []
+    private var gamemasterDate: Date?
     private(set) var isRefreshing = false
     /// Result of the last manual refresh, shown under the Refresh now button.
     private(set) var lastRunMessage: String?
@@ -76,6 +81,15 @@ final class DataCenter {
         let states = await store.allStates()
         rows = DataSourceID.allCases.map {
             SourceRow(descriptor: $0.descriptor, state: states[$0] ?? SourceState(origin: .missing))
+        }
+        // Re-decode the gamemaster only when the copy in use changed.
+        let gmState = states[.gamemaster]
+        if gamemaster == nil || gmState?.dataDate != gamemasterDate {
+            if let decoded = await store.decoded(Gamemaster.self, for: .gamemaster) {
+                gamemaster = decoded
+                powerUpCandidates = decoded.powerUpCandidates
+                gamemasterDate = gmState?.dataDate
+            }
         }
     }
 

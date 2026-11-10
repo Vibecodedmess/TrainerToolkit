@@ -13,7 +13,7 @@
     "not": "!",
     "notes": [
       { "text": "& (or |) keeps Pokémon matching all terms. , : or ; keeps Pokémon matching any of them. ! in front of a term excludes it.", "verified": true },
-      { "text": "When & and , are mixed, the game is understood to apply the commas first: 0*,1*&shiny means (0* or 1*) and shiny. Not stated in the help article. The app builds strings in that form.", "verified": false }
+      { "text": "When & and , are mixed, the commas are applied first: 0*,1*&shiny means (0* or 1*) and shiny. Not in the help article; confirmed in the game on 2026-11-10.", "verified": true }
     ]
   },
   "groups": [
@@ -76,8 +76,8 @@
       "title": "Status",
       "filters": [
         { "id": "favorite", "kind": "flag", "label": "Favorite", "term": "favorite" },
-        { "id": "anytag", "kind": "flag", "label": "Has any tag", "term": "#", "verified": false,
-          "note": "A bare # for 'any tag' is not in the help article (only #tagname is)." },
+        { "id": "anytag", "kind": "flag", "label": "Has any tag", "term": "#",
+          "note": "A bare # matches any tag. Not in the help article; confirmed in the game on 2026-11-10." },
         { "id": "defender", "kind": "flag", "label": "Defending a Gym", "term": "defender" },
         { "id": "hatched", "kind": "flag", "label": "Hatched", "term": "hatched" },
         { "id": "traded", "kind": "flag", "label": "Traded", "term": "traded" },
@@ -154,11 +154,11 @@
       "id": "caught",
       "title": "When & where caught",
       "filters": [
-        { "id": "age", "kind": "range", "label": "Days since caught", "prefix": "age", "lowerBound": 0, "verified": false,
-          "note": "age0 (last 24 h) and age1 are in the help article. Ranges like age0-7 are not." },
+        { "id": "age", "kind": "range", "label": "Days since caught", "prefix": "age", "lowerBound": 0,
+          "note": "age0 = caught in the last 24 hours. Ranges like age0-7 confirmed in the game on 2026-11-10." },
         { "id": "year", "kind": "number", "label": "Year caught", "prefix": "year", "placeholder": "2016" },
-        { "id": "distance", "kind": "range", "label": "Distance caught (km)", "prefix": "distance", "lowerBound": 0, "verified": false,
-          "note": "The help article writes 'distance 1000' with a space. The app writes distance1000." },
+        { "id": "distance", "kind": "range", "label": "Distance caught (km)", "prefix": "distance", "lowerBound": 0,
+          "note": "Distance from where you are now. Written without a space (distance100-), confirmed in the game on 2026-11-10." },
         { "id": "region", "kind": "options", "label": "Region", "options": [
           { "id": "kanto", "label": "Kanto", "term": "kanto" },
           { "id": "johto", "label": "Johto", "term": "johto" },

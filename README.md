@@ -3,7 +3,7 @@
 A personal-use iOS companion app for trainers: search string builder, power-up planner, raid and Rocket counters, event checklists and trade planning.
 It is sideloaded, never published.
 
-**Status:** Phase 2, the Search String Builder. The data layer (Phase 1) and the Search tab work. The other feature screens are still placeholders.
+**Status:** Phase 3, the Candy & Stardust Planner. The data layer, the Search tab and the Planner (More > Planner) work. The other feature screens are still placeholders.
 
 ## Ground rules
 
@@ -27,6 +27,7 @@ It is sideloaded, never published.
 | `scripts/update-snapshots.sh` | Refreshes the bundled snapshots |
 | `Packages/TrainerKit/Sources/SearchBuilder/` | Search string builder and `search-terms.json` (the editable term list) |
 | `scripts/make-app-icon.ps1` | Builds `Resources/Assets.xcassets` from an icon image |
+| `scripts/update-level-tables.ps1` | Extracts CP multiplier and power-up cost tables from PokeMiners' game master |
 | `.github/workflows/build.yml` | macOS CI: tests, then an unsigned `.ipa` artifact |
 
 ## Building
