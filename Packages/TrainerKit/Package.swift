@@ -15,7 +15,7 @@ let package = Package(
     targets: [
         .target(
             name: "GameMath",
-            resources: [.copy("Resources/level-tables.json")]
+            resources: [.copy("Resources/level-tables.json"), .copy("Resources/battle-tables.json")]
         ),
         .target(
             name: "DataSources",

@@ -66,6 +66,67 @@ try {
     New-Item -ItemType Directory -Force -Path (Split-Path $outFile) | Out-Null
     [IO.File]::WriteAllText($outFile, $json + "`n", (New-Object System.Text.UTF8Encoding $false))
     Write-Host "Wrote $outFile (PokeMiners commit $commit)"
+
+    # ---- Battle tables (PvE): type chart, weather boosts, multipliers, raid/gym move stats ----
+    # Defender order of each typeEffective.attackScalar row = the game's type enum order.
+    # Verified against the Fire row (0.625 vs Rock/Fire/Water/Dragon, 1.6 vs Bug/Steel/Grass/Ice).
+    $typeOrder = @('normal','fighting','flying','poison','ground','rock','bug','ghost','steel',
+                   'fire','water','grass','electric','psychic','ice','dragon','dark','fairy')
+    function TypeName($t) { ($t -replace '^POKEMON_TYPE_', '').ToLowerInvariant() }
+
+    $chart = [ordered]@{}
+    foreach ($t in ($gm | Where-Object { $_.data.typeEffective })) {
+        $row = $t.data.typeEffective
+        if ($row.attackScalar.Count -ne 18) { throw "Unexpected type row length for $($row.attackType)" }
+        $chart[(TypeName $row.attackType)] = @($row.attackScalar | ForEach-Object { [double]$_ })
+    }
+    if ($chart.Count -ne 18) { throw "Expected 18 attacking types, got $($chart.Count)" }
+
+    $weather = [ordered]@{}
+    foreach ($w in ($gm | Where-Object { $_.data.weatherAffinities })) {
+        $a = $w.data.weatherAffinities
+        $weather[$a.weatherCondition.ToLowerInvariant()] = @($a.pokemonType | ForEach-Object { TypeName $_ })
+    }
+
+    $battle = (Template 'BATTLE_SETTINGS').battleSettings
+    $weatherBonus = (Template 'WEATHER_BONUS_SETTINGS').weatherBonusSettings
+
+    $moves = foreach ($m in ($gm | Where-Object { $_.data.moveSettings })) {
+        $s = $m.data.moveSettings
+        $rawId = [string]$s.movementId
+        $isFast = $rawId.EndsWith('_FAST') -or ([int]$s.energyDelta -gt 0)
+        [ordered]@{
+            id = ($rawId -replace '_FAST$', '')
+            fast = $isFast
+            type = (TypeName $s.pokemonType)
+            power = [double]($s.power ?? 0)
+            durationMs = [int]$s.durationMs
+            damageWindowStartMs = [int]($s.damageWindowStartMs ?? 0)
+            energyDelta = [int]($s.energyDelta ?? 0)
+        }
+    }
+
+    $battleTables = [ordered]@{
+        source = [ordered]@{
+            name = 'PokeMiners game_masters, latest/latest.json'
+            url = $repoUrl
+            commit = $commit
+            extracted = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd')
+            templates = @('POKEMON_TYPE_*', 'WEATHER_AFFINITY_*', 'BATTLE_SETTINGS', 'WEATHER_BONUS_SETTINGS', 'V*_MOVE_*')
+        }
+        typeOrder = $typeOrder
+        typeChart = $chart
+        weatherBoosts = $weather
+        sameTypeAttackBonus = [double]$battle.sameTypeAttackBonusMultiplier
+        weatherAttackBonus = [double]$weatherBonus.attackBonusMultiplier
+        shadowAttackMultiplier = [double]$battle.shadowPokemonAttackBonusMultiplier
+        shadowDefenseMultiplier = [double]$battle.shadowPokemonDefenseBonusMultiplier
+        maximumEnergy = [int]$battle.maximumEnergy
+        moves = @($moves)
+    }
+    $battleFile = Join-Path (Split-Path $outFile) 'battle-tables.json'
+    [IO.File]::WriteAllText($battleFile, ($battleTables | ConvertTo-Json -Depth 6 -Compress) + "`n", (New-Object System.Text.UTF8Encoding $false))
+    Write-Host "Wrote $battleFile ($(@($moves).Count) moves)"
 } finally {
     Remove-Item -Recurse -Force $tmp
 }

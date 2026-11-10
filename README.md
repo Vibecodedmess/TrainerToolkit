@@ -27,7 +27,8 @@ It is sideloaded, never published.
 | `scripts/update-snapshots.sh` | Refreshes the bundled snapshots |
 | `Packages/TrainerKit/Sources/SearchBuilder/` | Search string builder and `search-terms.json` (the editable term list) |
 | `scripts/make-app-icon.ps1` | Builds `Resources/Assets.xcassets` from an icon image |
-| `scripts/update-level-tables.ps1` | Extracts CP multiplier and power-up cost tables from PokeMiners' game master |
+| `scripts/update-level-tables.ps1` | Extracts level/cost tables and battle tables (type chart, weather, PvE moves) from PokeMiners' game master |
+| `Packages/TrainerKit/Sources/CollectionImport/` | CSV reader for collection imports |
 | `.github/workflows/build.yml` | macOS CI: tests, then an unsigned `.ipa` artifact |
 
 ## Building

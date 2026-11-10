@@ -94,10 +94,26 @@ Both are **checked in unit tests against PvPoke's own numbers**:
   A rejected or failed download never replaces the last good copy. The app shows a small warning instead.
 - **No personal data is sent.** Requests carry only a generic `User-Agent: TrainerToolkit/1.0 (personal iOS app)`.
 
+### PokeMiners game master: battle tables (for Raids)
+
+`scripts/update-level-tables.ps1` also writes `Packages/TrainerKit/Sources/GameMath/Resources/battle-tables.json`, from the same pinned commit:
+
+- **Type chart:** from the `POKEMON_TYPE_*` templates (`typeEffective.attackScalar`).
+  - Each row is in the game's internal type order. That order was confirmed against the Fire row, and tests check that the chart is oriented correctly.
+- **Weather boosts:** from `WEATHER_AFFINITY_*`.
+- **Multipliers:**
+  - from `BATTLE_SETTINGS`: same-type ×1.2, shadow attack ×1.2, shadow defense ×0.833
+  - from `WEATHER_BONUS_SETTINGS`: weather ×1.2
+- **PvE moves:** 403 moves from the `V*_MOVE_*` templates, with power, duration, damage window and energy.
+  - The game master's `_FAST` suffix is removed, so the ids match PvPoke's.
+  - 22 moves have numeric ids in the game master and won't match a PvPoke move.
+
+The damage formula (`floor(0.5 × Power × Atk/Def × multipliers) + 1`) and the fast/charged "cycle DPS" model are standard community models, documented in `GameMath/DamageCalculator.swift`. They are not data from the game master.
+
 ## Open questions (decisions needed before later phases)
 
-1. **PvE move stats (Phase 6):** planned to come from the same PokeMiners game master, extracted the same way. You approved PokeMiners as the source on 2026-11-10.
-2. **Type effectiveness and weather boosts (Phase 6), trade stardust costs (Phase 8):** each will have a cited source, checked before use.
+1. **Raid boss HP and boss CP multiplier per tier (Phase 6).** These are **not** in the game master; the game's servers hold them. The "how many trainers" estimate needs them, but DPS rankings don't. The options are a cited community table, marked `TODO: verify`, or leaving the trainer estimate out.
+2. **Trade stardust costs (Phase 8):** will have a cited source, checked before use.
 
 ## Not used
 
