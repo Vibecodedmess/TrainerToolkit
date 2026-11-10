@@ -29,11 +29,15 @@ targets:
       - path: Features
       - path: Shared
       - path: Persistence
+      - path: Resources # app icon asset catalog (scripts/make-app-icon.ps1)
+        optional: true
     dependencies:
       - package: TrainerKit
         product: GameMath
       - package: TrainerKit
         product: DataSources
+      - package: TrainerKit
+        product: SearchBuilder
     settings:
       base:
         PRODUCT_NAME: TrainerToolkit

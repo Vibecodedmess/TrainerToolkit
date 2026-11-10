@@ -3,7 +3,7 @@
 A personal-use iOS companion app for trainers: search string builder, power-up planner, raid and Rocket counters, event checklists and trade planning.
 It is sideloaded, never published.
 
-**Status:** Phase 1, the data layer. Community data is fetched, validated, cached and bundled, and the counts are shown under More > Data sources. Feature screens are still placeholders.
+**Status:** Phase 2, the Search String Builder. The data layer (Phase 1) and the Search tab work. The other feature screens are still placeholders.
 
 ## Ground rules
 
@@ -25,6 +25,8 @@ It is sideloaded, never published.
 | `Packages/TrainerKit/` | Pure-Swift modules `GameMath` and `DataSources`, with unit tests |
 | `Packages/TrainerKit/Sources/DataSources/Snapshots/` | Bundled offline copy of every dataset (see `DATA_SOURCES.md`) |
 | `scripts/update-snapshots.sh` | Refreshes the bundled snapshots |
+| `Packages/TrainerKit/Sources/SearchBuilder/` | Search string builder and `search-terms.json` (the editable term list) |
+| `scripts/make-app-icon.ps1` | Builds `Resources/Assets.xcassets` from an icon image |
 | `.github/workflows/build.yml` | macOS CI: tests, then an unsigned `.ipa` artifact |
 
 ## Building

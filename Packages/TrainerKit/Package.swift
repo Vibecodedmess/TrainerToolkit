@@ -9,6 +9,7 @@ let package = Package(
     products: [
         .library(name: "GameMath", targets: ["GameMath"]),
         .library(name: "DataSources", targets: ["DataSources"]),
+        .library(name: "SearchBuilder", targets: ["SearchBuilder"]),
     ],
     targets: [
         .target(name: "GameMath"),
@@ -16,7 +17,12 @@ let package = Package(
             name: "DataSources",
             resources: [.copy("Snapshots")]
         ),
+        .target(
+            name: "SearchBuilder",
+            resources: [.copy("Resources/search-terms.json")]
+        ),
         .testTarget(name: "GameMathTests", dependencies: ["GameMath"]),
         .testTarget(name: "DataSourcesTests", dependencies: ["DataSources"]),
+        .testTarget(name: "SearchBuilderTests", dependencies: ["SearchBuilder"]),
     ]
 )

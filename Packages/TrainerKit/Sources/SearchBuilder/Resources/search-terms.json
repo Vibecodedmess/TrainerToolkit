@@ -1,0 +1,217 @@
+{
+  "version": 1,
+  "source": {
+    "title": "Niantic / Scopely Help Center: Searching & Filtering your Pokémon Inventory (article 1486)",
+    "url": "https://niantic.helpshift.com/hc/en/6-pokemon-go/faq/1486-searching-filtering-your-pokemon-inventory/",
+    "checked": "2026-11-10"
+  },
+  "operators": {
+    "and": "&",
+    "andAlternatives": ["|"],
+    "or": ",",
+    "orAlternatives": [":", ";"],
+    "not": "!",
+    "notes": [
+      { "text": "& (or |) keeps Pokémon matching all terms. , : or ; keeps Pokémon matching any of them. ! in front of a term excludes it.", "verified": true },
+      { "text": "When & and , are mixed, the game is understood to apply the commas first: 0*,1*&shiny means (0* or 1*) and shiny. Not stated in the help article. The app builds strings in that form.", "verified": false }
+    ]
+  },
+  "groups": [
+    {
+      "id": "appraisal",
+      "title": "Appraisal",
+      "filters": [
+        { "id": "stars", "kind": "options", "label": "Star appraisal", "options": [
+          { "id": "0", "label": "0★", "term": "0*" },
+          { "id": "1", "label": "1★", "term": "1*" },
+          { "id": "2", "label": "2★", "term": "2*" },
+          { "id": "3", "label": "3★", "term": "3*" },
+          { "id": "4", "label": "4★ (perfect)", "term": "4*" }
+        ]},
+        { "id": "attack", "kind": "options", "label": "Attack bar", "options": [
+          { "id": "0", "label": "0", "term": "0attack" },
+          { "id": "1", "label": "1", "term": "1attack" },
+          { "id": "2", "label": "2", "term": "2attack" },
+          { "id": "3", "label": "3", "term": "3attack" },
+          { "id": "4", "label": "4 (full)", "term": "4attack" }
+        ]},
+        { "id": "defense", "kind": "options", "label": "Defense bar", "options": [
+          { "id": "0", "label": "0", "term": "0defense" },
+          { "id": "1", "label": "1", "term": "1defense" },
+          { "id": "2", "label": "2", "term": "2defense" },
+          { "id": "3", "label": "3", "term": "3defense" },
+          { "id": "4", "label": "4 (full)", "term": "4defense" }
+        ]},
+        { "id": "hpbar", "kind": "options", "label": "HP bar", "options": [
+          { "id": "0", "label": "0", "term": "0hp" },
+          { "id": "1", "label": "1", "term": "1hp" },
+          { "id": "2", "label": "2", "term": "2hp" },
+          { "id": "3", "label": "3", "term": "3hp" },
+          { "id": "4", "label": "4 (full)", "term": "4hp" }
+        ]}
+      ]
+    },
+    {
+      "id": "special",
+      "title": "Special Pokémon",
+      "filters": [
+        { "id": "shiny", "kind": "flag", "label": "Shiny", "term": "shiny" },
+        { "id": "lucky", "kind": "flag", "label": "Lucky", "term": "lucky" },
+        { "id": "shadow", "kind": "flag", "label": "Shadow", "term": "shadow" },
+        { "id": "purified", "kind": "flag", "label": "Purified", "term": "purified" },
+        { "id": "legendary", "kind": "flag", "label": "Legendary", "term": "legendary" },
+        { "id": "mythical", "kind": "flag", "label": "Mythical", "term": "mythical" },
+        { "id": "ultrabeast", "kind": "flag", "label": "Ultra Beast", "term": "ultrabeast" },
+        { "id": "costume", "kind": "flag", "label": "Costume (event)", "term": "costume" },
+        { "id": "background", "kind": "flag", "label": "Special background", "term": "background" },
+        { "id": "locationbackground", "kind": "flag", "label": "Location background", "term": "locationbackground" },
+        { "id": "dynamax", "kind": "flag", "label": "Dynamax", "term": "dynamax" },
+        { "id": "gigantamax", "kind": "flag", "label": "Gigantamax", "term": "gigantamax" },
+        { "id": "fusion", "kind": "flag", "label": "Fusion", "term": "fusion" },
+        { "id": "eggsonly", "kind": "flag", "label": "Egg-exclusive", "term": "eggsonly" }
+      ]
+    },
+    {
+      "id": "status",
+      "title": "Status",
+      "filters": [
+        { "id": "favorite", "kind": "flag", "label": "Favorite", "term": "favorite" },
+        { "id": "anytag", "kind": "flag", "label": "Has any tag", "term": "#", "verified": false,
+          "note": "A bare # for 'any tag' is not in the help article (only #tagname is)." },
+        { "id": "defender", "kind": "flag", "label": "Defending a Gym", "term": "defender" },
+        { "id": "hatched", "kind": "flag", "label": "Hatched", "term": "hatched" },
+        { "id": "traded", "kind": "flag", "label": "Traded", "term": "traded" },
+        { "id": "hypertraining", "kind": "flag", "label": "In Hyper Training", "term": "hypertraining" },
+        { "id": "buddy", "kind": "range", "label": "Buddy level", "prefix": "buddy", "lowerBound": 0, "upperBound": 5,
+          "note": "0 = never a buddy, 1 = buddy but not yet Good Buddies, 2-5 = Good to Best Buddies." }
+      ]
+    },
+    {
+      "id": "evolution",
+      "title": "Evolution & Mega",
+      "filters": [
+        { "id": "evolve", "kind": "flag", "label": "Can evolve now", "term": "evolve" },
+        { "id": "evolvenew", "kind": "flag", "label": "Evolves into a new Pokédex entry", "term": "evolvenew" },
+        { "id": "item", "kind": "flag", "label": "Evolves with an item", "term": "item" },
+        { "id": "evolvequest", "kind": "flag", "label": "Evolves with a quest", "term": "evolvequest" },
+        { "id": "tradeevolve", "kind": "flag", "label": "Trade evolution", "term": "tradeevolve" },
+        { "id": "megaevolve", "kind": "flag", "label": "Can Mega Evolve", "term": "megaevolve" },
+        { "id": "mega", "kind": "range", "label": "Mega level", "prefix": "mega", "lowerBound": 1, "upperBound": 3 }
+      ]
+    },
+    {
+      "id": "stats",
+      "title": "CP, HP & size",
+      "filters": [
+        { "id": "cp", "kind": "range", "label": "CP", "prefix": "cp", "lowerBound": 0 },
+        { "id": "hp", "kind": "range", "label": "HP", "prefix": "hp", "lowerBound": 0 },
+        { "id": "size", "kind": "options", "label": "Size", "options": [
+          { "id": "xxs", "label": "XXS", "term": "xxs" },
+          { "id": "xs", "label": "XS", "term": "xs" },
+          { "id": "xl", "label": "XL", "term": "xl" },
+          { "id": "xxl", "label": "XXL", "term": "xxl" }
+        ]}
+      ]
+    },
+    {
+      "id": "types",
+      "title": "Pokémon type",
+      "filters": [
+        { "id": "type", "kind": "options", "label": "Type", "options": [
+          { "id": "normal", "label": "Normal", "term": "normal" },
+          { "id": "fire", "label": "Fire", "term": "fire" },
+          { "id": "water", "label": "Water", "term": "water" },
+          { "id": "grass", "label": "Grass", "term": "grass" },
+          { "id": "electric", "label": "Electric", "term": "electric" },
+          { "id": "ice", "label": "Ice", "term": "ice" },
+          { "id": "fighting", "label": "Fighting", "term": "fighting" },
+          { "id": "poison", "label": "Poison", "term": "poison" },
+          { "id": "ground", "label": "Ground", "term": "ground" },
+          { "id": "flying", "label": "Flying", "term": "flying" },
+          { "id": "psychic", "label": "Psychic", "term": "psychic" },
+          { "id": "bug", "label": "Bug", "term": "bug" },
+          { "id": "rock", "label": "Rock", "term": "rock" },
+          { "id": "ghost", "label": "Ghost", "term": "ghost" },
+          { "id": "dragon", "label": "Dragon", "term": "dragon" },
+          { "id": "dark", "label": "Dark", "term": "dark" },
+          { "id": "steel", "label": "Steel", "term": "steel" },
+          { "id": "fairy", "label": "Fairy", "term": "fairy" }
+        ]}
+      ]
+    },
+    {
+      "id": "moves",
+      "title": "Moves",
+      "filters": [
+        { "id": "move", "kind": "text", "label": "Move or move type", "prefix": "@",
+          "placeholder": "scratch, grass, 3ghost",
+          "note": "@scratch = knows Scratch. @grass = has a Grass-type move. @1/@2/@3 + type = fast / first charged / second charged move of that type." },
+        { "id": "special", "kind": "flag", "label": "Has a special (non-TM) move", "term": "@special" },
+        { "id": "weather", "kind": "flag", "label": "Has a weather-boosted move", "term": "@weather" }
+      ]
+    },
+    {
+      "id": "caught",
+      "title": "When & where caught",
+      "filters": [
+        { "id": "age", "kind": "range", "label": "Days since caught", "prefix": "age", "lowerBound": 0, "verified": false,
+          "note": "age0 (last 24 h) and age1 are in the help article. Ranges like age0-7 are not." },
+        { "id": "year", "kind": "number", "label": "Year caught", "prefix": "year", "placeholder": "2016" },
+        { "id": "distance", "kind": "range", "label": "Distance caught (km)", "prefix": "distance", "lowerBound": 0, "verified": false,
+          "note": "The help article writes 'distance 1000' with a space. The app writes distance1000." },
+        { "id": "region", "kind": "options", "label": "Region", "options": [
+          { "id": "kanto", "label": "Kanto", "term": "kanto" },
+          { "id": "johto", "label": "Johto", "term": "johto" },
+          { "id": "hoenn", "label": "Hoenn", "term": "hoenn" },
+          { "id": "sinnoh", "label": "Sinnoh", "term": "sinnoh" },
+          { "id": "unova", "label": "Unova", "term": "unova" },
+          { "id": "kalos", "label": "Kalos", "term": "kalos" },
+          { "id": "alola", "label": "Alola", "term": "alola" },
+          { "id": "galar", "label": "Galar", "term": "galar" },
+          { "id": "hisui", "label": "Hisui", "term": "hisui" },
+          { "id": "paldea", "label": "Paldea", "term": "paldea" }
+        ]}
+      ]
+    },
+    {
+      "id": "names",
+      "title": "Names, families & tags",
+      "filters": [
+        { "id": "family", "kind": "text", "label": "Evolution family", "prefix": "+", "placeholder": "pikachu",
+          "note": "+pikachu finds Pichu, Pikachu and Raichu." },
+        { "id": "tag", "kind": "text", "label": "Tag", "prefix": "#", "placeholder": "battle" },
+        { "id": "name", "kind": "text", "label": "Name, nickname or Pokédex number", "prefix": "", "placeholder": "pikachu or 25",
+          "note": "Names with punctuation need it in the search (mr. finds Mr. Mime)." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Safe to transfer",
+      "summary": "0-2★ that are not shiny, lucky, shadow, purified, legendary, mythical, Ultra Beast, costume, background, favorite or tagged.",
+      "state": {
+        "options": { "stars": { "0": "include", "1": "include", "2": "include" } },
+        "flags": {
+          "shiny": "exclude", "lucky": "exclude", "shadow": "exclude", "purified": "exclude",
+          "legendary": "exclude", "mythical": "exclude", "ultrabeast": "exclude", "costume": "exclude",
+          "background": "exclude", "favorite": "exclude", "anytag": "exclude"
+        }
+      }
+    },
+    {
+      "name": "New Pokédex evolutions",
+      "summary": "Can evolve right now into a Pokédex entry you don't have (example from the help article).",
+      "state": { "flags": { "evolve": "include", "evolvenew": "include" } }
+    },
+    {
+      "name": "Perfect (4★)",
+      "summary": "Every 4★ appraisal.",
+      "state": { "options": { "stars": { "4": "include" } } }
+    },
+    {
+      "name": "Caught today",
+      "summary": "Caught within the last 24 hours.",
+      "state": { "ranges": { "age": { "min": 0, "max": 0 } } }
+    }
+  ]
+}

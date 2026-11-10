@@ -51,8 +51,7 @@ After re-signing and reinstalling over the existing app:
 - *First launch* should stay the same, and *Launch count* should keep counting up. That means your data survived.
 - If *First launch* reset to now, the install was treated as a new app. Compare the *Bundle ID* with the previous one.
 
-> Status: this is standard iOS update behavior, but it has **not yet been checked on your device**.
-> It is on the Phase 0 test checklist. This file will be updated once you confirm it.
+> Status: **verified on device (2026-11-10).** Build #2 was signed with the same Apple ID and installed over build #1, and *First launch* stayed the same.
 
 ## Changing the bundle ID
 

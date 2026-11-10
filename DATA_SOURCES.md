@@ -35,6 +35,22 @@ Raid and gym (PvE) move stats are different and are **not** in this file. See "O
 Files on 2026-11-10: events 53, raid bosses 12, research tasks 39, Rocket lineups 26 (Giovanni, 3 leaders, 22 grunt types).
 `rocketLineups.json` exists on the data branch but has no wiki page. Its format (`name`, `title`, `type`, `firstPokemon`/`secondPokemon`/`thirdPokemon`) was read from the file itself.
 
+### Niantic help article: in-game search terms
+
+| | |
+| --- | --- |
+| URL | https://niantic.helpshift.com/hc/en/6-pokemon-go/faq/1486-searching-filtering-your-pokemon-inventory/ |
+| Checked | 2026-11-10 (the page said "Last Updated: 83d") |
+| Used for | Every search keyword and operator in `Packages/TrainerKit/Sources/SearchBuilder/Resources/search-terms.json` |
+
+Terms are kept in that JSON file, not in code, so they can be added or fixed without code changes.
+Entries with `"verified": false` are not in the article and are marked in the app with an orange question mark:
+
+- `#` on its own meaning "has any tag". The article only documents `#tagname`. Used by the "Safe to transfer" preset as `!#`.
+- Age ranges such as `age0-7`. The article only shows `age0` and `age1`.
+- `distance1000` without a space. The article writes `distance 1000`.
+- Precedence when mixing `&` and `,`. The app assumes the commas are applied first, so `0*,1*&shiny` means (0★ or 1★) and shiny. The app never puts a `!` term inside a comma list, which avoids ambiguity.
+
 ## How the app uses them
 
 - **Bundled snapshot:** a copy of every file ships in the app (`Packages/TrainerKit/Sources/DataSources/Snapshots`, dates in `manifest.json`), so the app works offline on first launch.
