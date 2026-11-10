@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import DataSources
 
 @main
 struct TrainerToolkitApp: App {
@@ -16,7 +17,12 @@ struct TrainerToolkitApp: App {
         WindowGroup {
             RootTabView()
                 .environment(dataCenter)
-                .task { await dataCenter.start() }
+                .task {
+                    await dataCenter.start()
+                    // Event times may have changed since last launch: rebuild local reminders.
+                    await ReminderScheduler.sync(context: modelContainer.mainContext,
+                                                 events: EventCalendar.resolve(dataCenter.events))
+                }
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .active {
                         Task { await dataCenter.refreshIfStale() }

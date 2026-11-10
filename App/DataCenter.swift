@@ -29,7 +29,12 @@ final class DataCenter {
     private(set) var gamemaster: Gamemaster?
     /// Pokémon that can be picked in the Planner (see `Gamemaster.powerUpCandidates`).
     private(set) var powerUpCandidates: [GMPokemon] = []
+    /// Name / evolution lookups on the gamemaster.
+    private(set) var lookup: GamemasterLookup?
     private var gamemasterDate: Date?
+    /// Events from the feed currently in use (entries in an unexpected format are skipped).
+    private(set) var events: [SDEvent] = []
+    private var eventsDate: Date?
     private(set) var isRefreshing = false
     /// Result of the last manual refresh, shown under the Refresh now button.
     private(set) var lastRunMessage: String?
@@ -88,7 +93,15 @@ final class DataCenter {
             if let decoded = await store.decoded(Gamemaster.self, for: .gamemaster) {
                 gamemaster = decoded
                 powerUpCandidates = decoded.powerUpCandidates
+                lookup = GamemasterLookup(decoded)
                 gamemasterDate = gmState?.dataDate
+            }
+        }
+        let eventsState = states[.events]
+        if events.isEmpty || eventsState?.dataDate != eventsDate {
+            if let decoded = await store.decoded(LossyArray<SDEvent>.self, for: .events) {
+                events = decoded.elements
+                eventsDate = eventsState?.dataDate
             }
         }
     }

@@ -3,7 +3,7 @@
 A personal-use iOS companion app for trainers: search string builder, power-up planner, raid and Rocket counters, event checklists and trade planning.
 It is sideloaded, never published.
 
-**Status:** Phase 3, the Candy & Stardust Planner. The data layer, the Search tab and the Planner (More > Planner) work. The other feature screens are still placeholders.
+**Status:** Phase 4, Events. The data layer, Search, Planner and Events (with checklists and local reminders) work. Collection, Raids, Rocket, Trades and Home are still placeholders.
 
 ## Ground rules
 

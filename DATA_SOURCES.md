@@ -33,6 +33,16 @@ Raid and gym (PvE) move stats are different and are **not** in this file. See "O
 | Dates | Per the wiki: a time ending in `Z` is the same moment worldwide (UTC). A time without a zone is local wall-clock time in each trainer's own time zone. Handled by `EventTime` (tested) |
 
 Files on 2026-11-10: events 53, raid bosses 12, research tasks 39, Rocket lineups 26 (Giovanni, 3 leaders, 22 grunt types).
+
+What the event feed does and doesn't contain (checked 2026-11-10):
+- **Contains:**
+  - for Community Days: spawns, shinies, bonuses (with disclaimers) and special research steps
+  - for raid battles: bosses and shinies
+  - for Spotlight Hours: the featured Pokémon and the bonus
+  - for Research Breakthroughs: the featured Pokémon
+  - for every event: whether it has spawns or field research
+- **Does not contain:** the Community Day **exclusive move** or the **evolve deadline**. The app never guesses these. The trainer types both in from the official announcement. As a hint, the app shows PvPoke's `eliteMoves` for the evolution line, clearly labelled as candidates.
+- **What to evolve** comes from PvPoke's `family.evolutions`, matching ScrapedDuck names such as "Galarian Meowth" to PvPoke names such as "Meowth (Galarian)".
 `rocketLineups.json` exists on the data branch but has no wiki page. Its format (`name`, `title`, `type`, `firstPokemon`/`secondPokemon`/`thirdPokemon`) was read from the file itself.
 
 ### Niantic help article: in-game search terms
