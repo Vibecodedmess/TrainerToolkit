@@ -17,6 +17,7 @@ struct CollectionView: View {
     @Environment(DataCenter.self) private var dataCenter
     @State private var search = ""
     @State private var showingAdd = false
+    @State private var showingImport = false
     @AppStorage("collection.sort") private var sortRaw = SortOrder.recent.rawValue
     @AppStorage("collection.onlyShiny") private var onlyShiny = false
     @AppStorage("collection.onlyShadow") private var onlyShadow = false
@@ -37,6 +38,7 @@ struct CollectionView: View {
                 } actions: {
                     Button("Add Pokémon") { showingAdd = true }
                         .buttonStyle(.borderedProminent)
+                    Button("Import from CSV") { showingImport = true }
                 }
             } else {
                 list
@@ -46,8 +48,17 @@ struct CollectionView: View {
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 filterMenu
-                Button {
-                    showingAdd = true
+                Menu {
+                    Button {
+                        showingAdd = true
+                    } label: {
+                        Label("Add manually", systemImage: "square.and.pencil")
+                    }
+                    Button {
+                        showingImport = true
+                    } label: {
+                        Label("Import CSV", systemImage: "square.and.arrow.down")
+                    }
                 } label: {
                     Label("Add Pokémon", systemImage: "plus")
                 }
@@ -56,6 +67,13 @@ struct CollectionView: View {
         .sheet(isPresented: $showingAdd) {
             NavigationStack {
                 CollectionEditorView(pokemon: nil)
+            }
+            .environment(dataCenter)
+            .modelContext(modelContext)
+        }
+        .sheet(isPresented: $showingImport) {
+            NavigationStack {
+                CollectionImportView()
             }
             .environment(dataCenter)
             .modelContext(modelContext)

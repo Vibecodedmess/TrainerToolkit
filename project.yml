@@ -38,6 +38,8 @@ targets:
         product: DataSources
       - package: TrainerKit
         product: SearchBuilder
+      - package: TrainerKit
+        product: CollectionImport
     settings:
       base:
         PRODUCT_NAME: TrainerToolkit

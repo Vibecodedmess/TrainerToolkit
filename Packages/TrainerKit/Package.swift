@@ -29,8 +29,8 @@ let package = Package(
         .testTarget(name: "GameMathTests", dependencies: ["GameMath", "DataSources"]),
         .testTarget(name: "DataSourcesTests", dependencies: ["DataSources"]),
         .testTarget(name: "SearchBuilderTests", dependencies: ["SearchBuilder"]),
-        // CSV import for My Collection. The Poke Genie column mapping comes after seeing a real export.
-        .target(name: "CollectionImport"),
-        .testTarget(name: "CollectionImportTests", dependencies: ["CollectionImport"]),
+        // CSV import for My Collection, in the app's own documented format (COLLECTION_IMPORT.md).
+        .target(name: "CollectionImport", dependencies: ["DataSources", "GameMath"]),
+        .testTarget(name: "CollectionImportTests", dependencies: ["CollectionImport", "DataSources", "GameMath"]),
     ]
 )

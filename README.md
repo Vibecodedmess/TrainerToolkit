@@ -3,7 +3,7 @@
 A personal-use iOS companion app for trainers: search string builder, power-up planner, raid and Rocket counters, event checklists and trade planning.
 It is sideloaded, never published.
 
-**Status:** Phase 5, My Collection (manual entry). The data layer, Search, Planner, Events and Collection work. CSV import (Poke Genie) is next, once a sample export is in `samples/`, a folder that git ignores. Raids, Rocket, Trades and Home are still placeholders.
+**Status:** Phase 5, My Collection. The data layer, Search, Planner, Events and Collection (manual entry plus CSV import in the app's own format, see [COLLECTION_IMPORT.md](COLLECTION_IMPORT.md)) work. Raids, Rocket, Trades and Home are still placeholders.
 
 ## Ground rules
 
@@ -28,7 +28,7 @@ It is sideloaded, never published.
 | `Packages/TrainerKit/Sources/SearchBuilder/` | Search string builder and `search-terms.json` (the editable term list) |
 | `scripts/make-app-icon.ps1` | Builds `Resources/Assets.xcassets` from an icon image |
 | `scripts/update-level-tables.ps1` | Extracts level/cost tables and battle tables (type chart, weather, PvE moves) from PokeMiners' game master |
-| `Packages/TrainerKit/Sources/CollectionImport/` | CSV reader for collection imports |
+| `Packages/TrainerKit/Sources/CollectionImport/` | CSV reader and the collection import format |
 | `.github/workflows/build.yml` | macOS CI: tests, then an unsigned `.ipa` artifact |
 
 ## Building

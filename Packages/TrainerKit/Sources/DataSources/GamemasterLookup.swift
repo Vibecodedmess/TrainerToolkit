@@ -27,6 +27,21 @@ public struct GamemasterLookup: Sendable {
 
     public func move(_ id: String) -> GMMove? { movesById[id] }
 
+    /// Move id from a display name ("Mud Shot", "mud shot") or an id ("MUD_SHOT"). Nil if unknown.
+    public func moveId(named text: String) -> String? {
+        let trimmed = text.trimmingCharacters(in: .whitespaces)
+        if movesById[trimmed.uppercased()] != nil { return trimmed.uppercased() }
+        let key = Self.normalize(trimmed.replacingOccurrences(of: "_", with: " "))
+        return movesById.values.first { Self.normalize($0.name) == key }?.moveId
+    }
+
+    /// For a shadow entry ("bulbasaur_shadow") returns the regular entry; otherwise the Pokémon itself.
+    public func regularForm(of pokemon: GMPokemon) -> GMPokemon {
+        guard pokemon.speciesId.hasSuffix("_shadow"),
+              let regular = byId[String(pokemon.speciesId.dropLast("_shadow".count))] else { return pokemon }
+        return regular
+    }
+
     public struct MoveOption: Hashable, Sendable, Identifiable {
         public let id: String
         public let name: String
