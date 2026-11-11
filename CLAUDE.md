@@ -49,7 +49,12 @@ Also:
 
 ## Current state (update this section as work continues)
 
-- Last pushed commit: Phase 5b, CSV import (`ceab27b`). Build #10 was queued on 2026-11-11 because of GitHub runner capacity.
+- Last code commit: Phase 5b, CSV import (`ceab27b`), plus `50b7f94` (runner back to `macos-15`, this file).
+- **No green build of Phase 5b yet.** On 2026-11-11 GitHub had no free macOS runners in either pool:
+  - build #10 (Intel) was never acquired
+  - build #11 (`macos-15`) was still queued at 9+ minutes
+- If the latest run failed with "not acquired", start the workflow again (later in the day helps).
+- The last green build was #9 (`6ecefe9`): Phase 5a manual entry plus the raid groundwork. Its IPA is in `%USERPROFILE%\Downloads\TrainerToolkit-build9`, not yet tested by the user.
 - **Next steps:**
   1. Get a green build of `ceab27b` or later.
   2. The user installs it and tests Phase 5: manual entry and CSV import.
