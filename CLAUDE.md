@@ -49,20 +49,17 @@ Also:
 
 ## Current state (update this section as work continues)
 
-- Last code commit: Phase 5b, CSV import (`ceab27b`), plus `50b7f94` (runner back to `macos-15`, this file).
-- **No green build of Phase 5b yet.** On 2026-11-11 GitHub had no free macOS runners in either pool:
-  - build #10 (Intel) was never acquired
-  - build #11 (`macos-15`) was never acquired
-  - build #12 (`macos-15`, `b42edb7`) was never acquired; the runner was then switched to `macos-15-intel`
-- If the latest run failed with "not acquired", start the workflow again (later in the day helps).
-- The last green build was #9 (`6ecefe9`): Phase 5a manual entry plus the raid groundwork. Its IPA is in `%USERPROFILE%\Downloads\TrainerToolkit-build9`, not yet tested by the user.
+- Last code commit: `a604f13`, a fix for move-name lookup. Normalizing dropped the "+", so "Seed Bomb" could resolve to `SEED_BOMB_PLUS` (random dictionary order). Exact names now match first. Shared names (Air Slash, Psycho Cut, Aura Wheel) prefer the shorter id, and the CSV import prefers moves the Pokémon can learn.
+- **Build #14 (`a604f13`, `macos-15-intel`) is green**: Phase 5a + 5b. Artifact `TrainerToolkit-ipa-14`: `/actions/runs/43023289836/artifacts/13855294463`.
+  - Builds #10–#12 on 2026-11-11 were never acquired (no runner capacity). Build #13 ran but failed on the Seed Bomb test, fixed in `a604f13`.
 - **Next steps:**
-  1. Get a green build of `ceab27b` or later.
-  2. The user installs it and tests Phase 5: manual entry and CSV import.
+  1. Download the build #14 IPA (ask first) and send it with the checklist below.
+  2. The user tests Phase 5: manual entry and CSV import.
   3. Once they reply "All passed", start Phase 6.
 - **Phase 5 phone test checklist** (give it to the user with the IPA):
   - Collection empty state.
   - Add a Pokémon manually: species picker, IVs, level or "Find level from CP", move pickers with ★ for elite moves, flags.
+  - "Find level from CP": one matching level is applied as soon as the CP is typed. With several matches, Save stays disabled (orange hint) until one is picked or the box is cleared. Changing the level stepper clears the box. (Build #14 bug: a typed CP was dropped on Save unless "Use level" was tapped.)
   - The list shows CP, IV % and icons.
   - Search, the filter/sort menu (remembered), edit, and delete with confirmation.
   - Data persists after a force-close.
