@@ -110,10 +110,31 @@ Both are **checked in unit tests against PvPoke's own numbers**:
 
 The damage formula (`floor(0.5 × Power × Atk/Def × multipliers) + 1`) and the fast/charged "cycle DPS" model are standard community models, documented in `GameMath/DamageCalculator.swift`. They are not data from the game master.
 
+### PokeMiners game master: trade tables (for Trades)
+
+`scripts/update-trade-tables.ps1` writes `Packages/TrainerKit/Sources/GameMath/Resources/trade-tables.json` from the same pinned commit (`8e227be`; the script downloads that exact commit, or reuses a local copy with `-GameMaster <path>`):
+
+- **Friendship levels:** from `FRIENDSHIP_LEVEL_0` … `FRIENDSHIP_LEVEL_5` (`friendshipMilestoneSettings`):
+  - `minPointsToReach` (missing on level 0), `relativePointsToReach` (only on level 5), `milestoneXpReward`
+  - `attackBonusPercentage` (despite the name, a multiplier: 1.0 on level 0), `raidBallBonus`
+  - `tradingDiscount` (share taken off the trade's stardust cost; none on levels 0 and 1)
+  - `unlockedTrading`: the trade category ids each level allows, e.g. `REGULAR_IN_POKEDEX`, `LEGENDARY_NON_POKEDEX`
+  - `unlockedLuckyFriendApplicator`
+- **Remote trades:** `REMOTE_TRADE_SETTINGS` (`remoteTradeSettings`), copied as-is (trades per day, time limit, ...).
+- Levels 4 and 5 both have `minPointsToReach` 90 in this data; level 5 also has `relativePointsToReach` 90. The app shows both values as given.
+
+**Not in the game master:**
+- **Friendship level names.** The app numbers the levels as in the template ids.
+- **The base stardust cost of a trade.** No official Niantic source was found either. So the trainer types the base costs in once (Trades > Base trade costs: regular/special, registered or not), copied from the trade screen in the game. They are stored on the device only and empty by default; without them the planner shows "Enter base costs".
+
+The planner's estimate is base cost × (1 − `tradingDiscount`). `TODO: verify`:
+- the rounding (the app rounds to the nearest whole stardust)
+- the mapping of the planner's trade kinds to `unlockedTrading` ids, which is read from the id names (`IN_POKEDEX` = registered, `NON_POKEDEX` = not registered)
+
 ## Open questions (decisions needed before later phases)
 
 1. **Raid boss HP and boss CP multiplier per tier (Phase 6).** These are **not** in the game master; the game's servers hold them. The "how many trainers" estimate needs them, but DPS rankings don't. The options are a cited community table, marked `TODO: verify`, or leaving the trainer estimate out.
-2. **Trade stardust costs (Phase 8):** will have a cited source, checked before use.
+2. **Trade stardust costs (Phase 8):** answered. The discounts come from the game master; the base costs are typed in by the trainer (see "trade tables" above).
 
 ## Not used
 

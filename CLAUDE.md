@@ -41,11 +41,11 @@ Also:
 | 2 | Search String Builder (+ app icon from the user's own image) | Confirmed. All 4 previously unverified terms confirmed in game |
 | 3 | Candy & Stardust Planner (GameMath CP/costs) | Confirmed |
 | 4 | Events, checklist, local reminders | Confirmed |
-| 5 | My Collection: manual entry (5a) + CSV import in the app's **own** format (5b) | Built, **not yet tested on the phone**. See "Current state" |
-| 6 | Raid Counter Picker | **Groundwork only** (battle tables + damage math, tested). No UI yet |
-| 7 | Team Rocket Counter Sheet | Not started |
-| 8 | Trade Planner | Not started |
-| 9 | Home tab + polish, final README | Not started (the app icon already exists) |
+| 5 | My Collection: manual entry (5a) + CSV import in the app's **own** format (5b) | Build #14 on the phone; CP-box bug found and fixed (`8e90321`, build #15 green). Rest of the checklist not reported yet |
+| 6 | Raid Counter Picker | Built 2026-11-11 (user said "build as much as possible", no stop between phases). **Not tested on the phone** |
+| 7 | Team Rocket Counter Sheet | Built 2026-11-11. **Not tested on the phone** |
+| 8 | Trade Planner | Built 2026-11-11 by a helper agent. **Not tested on the phone** |
+| 9 | Home tab + polish, final README | Home tab + README built 2026-11-11. **Not tested on the phone** |
 
 ## Current state (update this section as work continues)
 
@@ -79,13 +79,13 @@ Also:
 - **Collection CSV:** Poke Genie's export needs a subscription, so the user chose the **app's own format** (COLLECTION_IMPORT.md, `CollectionImport/CollectionCSV.swift`). Don't write importers for other apps without a real sample file from the user.
 - **Shadow/purified/lucky cost rounding** is `TODO: verify`: rounded up per power-up, and lucky + purified stack.
 
-## Open question for Phase 6 (ask the user before building the raid UI)
+## Raids and Rocket (Phases 6–7): how they work
 
-**Raid boss HP and boss CP multiplier per tier are not in the game master**, because the game's servers hold them. DPS rankings don't need them. The "how many trainers needed" estimate does. The options are:
-- a community table with a citation, marked `TODO: verify`
-- leaving the trainer estimate out
-
-Phase 6 also needs: the raid boss list from ScrapedDuck `raids.json` (name → GamemasterLookup), the per-boss weaknesses from BattleTables, generic counters (all species at a chosen level, best moveset per DamageCalculator), the user's counters from CollectedPokemon, a party of 6, and a "how this is calculated" note.
+- `Packages/TrainerKit/Sources/Counters/CounterRanker.swift`: generic candidate pool (released PvPoke species, toggles for shadow, mega, elite/legacy moves), ranking by best-moveset DPS (`DamageCalculator`), `rankAgainstAll` (average relative DPS over several defenders, used per Rocket slot), weaknesses/resistances, and feed-name matching ("Mega Charizard X" → "Charizard (Mega X)", "Primal Kyogre" → "Kyogre (Primal)").
+- Defenders (raid bosses, Rocket Pokémon) are modelled at **level 40, 15/15/15** because their real stats are server-side. Only **relative** DPS (% of the best counter) is shown, never absolute DPS. Rocket Pokémon are treated as shadow (shadow defence multiplier).
+- **Open decision (still the user's):** the "how many trainers needed" raid estimate is **left out**, because it needs raid boss HP/CPM per tier, which no approved source has. The options are a cited community table marked `TODO: verify`, or keep leaving it out.
+- App side: `Features/Counters/CounterSupport.swift` (shared settings, rows, method note; settings remembered in `@AppStorage` keys `counters.*`), `Features/Raids/*`, `Features/Rocket/*`. `DataCenter` now also loads `raids` and `rocketLineups`.
+- Weather choices are the game master ids (`clear`, `overcast`, `partly_cloudy`, …), shown as text. The weather that boosts the boss's own types is marked.
 
 ## Where things are
 
@@ -97,6 +97,7 @@ Phase 6 also needs: the raid boss list from ScrapedDuck `raids.json` (name → G
   - `GameMath`: level/battle tables, CP, costs, `DamageCalculator`
   - `SearchBuilder`: `search-terms.json` and the query builder
   - `CollectionImport`: `CSVReader` and `CollectionCSV`
+  - `Counters`: raid/Rocket counter rankings (`CounterRanker`)
 - `scripts/`:
   - `update-snapshots.sh`: bundled feed snapshots
   - `update-level-tables.ps1`: PokeMiners tables

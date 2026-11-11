@@ -11,11 +11,13 @@ let package = Package(
         .library(name: "DataSources", targets: ["DataSources"]),
         .library(name: "SearchBuilder", targets: ["SearchBuilder"]),
         .library(name: "CollectionImport", targets: ["CollectionImport"]),
+        .library(name: "Counters", targets: ["Counters"]),
     ],
     targets: [
         .target(
             name: "GameMath",
-            resources: [.copy("Resources/level-tables.json"), .copy("Resources/battle-tables.json")]
+            resources: [.copy("Resources/level-tables.json"), .copy("Resources/battle-tables.json"),
+                        .copy("Resources/trade-tables.json")]
         ),
         .target(
             name: "DataSources",
@@ -32,5 +34,8 @@ let package = Package(
         // CSV import for My Collection, in the app's own documented format (COLLECTION_IMPORT.md).
         .target(name: "CollectionImport", dependencies: ["DataSources", "GameMath"]),
         .testTarget(name: "CollectionImportTests", dependencies: ["CollectionImport", "DataSources", "GameMath"]),
+        // Raid and Rocket counter rankings (gamemaster species + PvE battle math).
+        .target(name: "Counters", dependencies: ["DataSources", "GameMath"]),
+        .testTarget(name: "CountersTests", dependencies: ["Counters", "DataSources", "GameMath"]),
     ]
 )

@@ -5,7 +5,7 @@ import SwiftData
 /// Add new @Model types to `schema` as later phases introduce them.
 enum AppModelContainer {
     static let schema = Schema([SavedSearchPreset.self, PowerUpGoal.self, EventPlan.self, ChecklistItem.self,
-                                CollectedPokemon.self])
+                                CollectedPokemon.self, TradeFriend.self, TradeWant.self])
 
     /// Opens the store on disk. If that fails, falls back to an in-memory store so the app
     /// still opens (nothing would be saved in that case, and `usingFallback` says so).

@@ -35,6 +35,12 @@ final class DataCenter {
     /// Events from the feed currently in use (entries in an unexpected format are skipped).
     private(set) var events: [SDEvent] = []
     private var eventsDate: Date?
+    /// Current raid bosses from the feed in use.
+    private(set) var raids: [SDRaidBoss] = []
+    private var raidsDate: Date?
+    /// Team GO Rocket lineups from the feed in use.
+    private(set) var rocketLineups: [SDRocketLineup] = []
+    private var rocketDate: Date?
     private(set) var isRefreshing = false
     /// Result of the last manual refresh, shown under the Refresh now button.
     private(set) var lastRunMessage: String?
@@ -102,6 +108,20 @@ final class DataCenter {
             if let decoded = await store.decoded(LossyArray<SDEvent>.self, for: .events) {
                 events = decoded.elements
                 eventsDate = eventsState?.dataDate
+            }
+        }
+        let raidsState = states[.raids]
+        if raids.isEmpty || raidsState?.dataDate != raidsDate {
+            if let decoded = await store.decoded(LossyArray<SDRaidBoss>.self, for: .raids) {
+                raids = decoded.elements
+                raidsDate = raidsState?.dataDate
+            }
+        }
+        let rocketState = states[.rocketLineups]
+        if rocketLineups.isEmpty || rocketState?.dataDate != rocketDate {
+            if let decoded = await store.decoded(LossyArray<SDRocketLineup>.self, for: .rocketLineups) {
+                rocketLineups = decoded.elements
+                rocketDate = rocketState?.dataDate
             }
         }
     }

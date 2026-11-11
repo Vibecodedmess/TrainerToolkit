@@ -1,0 +1,141 @@
+{
+  "source": {
+    "name": "PokeMiners game_masters, latest/latest.json",
+    "url": "https://github.com/PokeMiners/game_masters",
+    "commit": "8e227be44f288d34463e23bf04e9b564d3c16f79",
+    "extracted": "2026-11-11",
+    "templates": [
+      "FRIENDSHIP_LEVEL_*",
+      "REMOTE_TRADE_SETTINGS"
+    ]
+  },
+  "friendshipLevels": [
+    {
+      "level": 0,
+      "minPointsToReach": null,
+      "relativePointsToReach": null,
+      "milestoneXpReward": 1000,
+      "attackBonusPercentage": 1.0,
+      "raidBallBonus": null,
+      "tradingDiscount": null,
+      "unlockedTrading": [
+        "REGULAR_IN_POKEDEX"
+      ],
+      "unlockedLuckyFriendApplicator": false
+    },
+    {
+      "level": 1,
+      "minPointsToReach": 1,
+      "relativePointsToReach": null,
+      "milestoneXpReward": 3000,
+      "attackBonusPercentage": 1.03,
+      "raidBallBonus": null,
+      "tradingDiscount": null,
+      "unlockedTrading": [
+        "REGULAR_IN_POKEDEX",
+        "SPECIAL_IN_POKEDEX",
+        "REGULAR_NON_POKEDEX",
+        "REGIONAL_NON_POKEDEX",
+        "FORM_NON_POKEDEX",
+        "LEGENDARY_NON_POKEDEX",
+        "SHINY_NON_POKEDEX",
+        "GMAX_NON_POKEDEX",
+        "GMAX_IN_POKEDEX"
+      ],
+      "unlockedLuckyFriendApplicator": false
+    },
+    {
+      "level": 2,
+      "minPointsToReach": 7,
+      "relativePointsToReach": null,
+      "milestoneXpReward": 10000,
+      "attackBonusPercentage": 1.05,
+      "raidBallBonus": 1,
+      "tradingDiscount": 0.2,
+      "unlockedTrading": [
+        "REGULAR_IN_POKEDEX",
+        "SPECIAL_IN_POKEDEX",
+        "REGULAR_NON_POKEDEX",
+        "REGIONAL_NON_POKEDEX",
+        "FORM_NON_POKEDEX",
+        "LEGENDARY_NON_POKEDEX",
+        "SHINY_NON_POKEDEX",
+        "GMAX_NON_POKEDEX",
+        "GMAX_IN_POKEDEX"
+      ],
+      "unlockedLuckyFriendApplicator": true
+    },
+    {
+      "level": 3,
+      "minPointsToReach": 30,
+      "relativePointsToReach": null,
+      "milestoneXpReward": 50000,
+      "attackBonusPercentage": 1.07,
+      "raidBallBonus": 2,
+      "tradingDiscount": 0.92,
+      "unlockedTrading": [
+        "REGULAR_IN_POKEDEX",
+        "SPECIAL_IN_POKEDEX",
+        "REGULAR_NON_POKEDEX",
+        "REGIONAL_NON_POKEDEX",
+        "FORM_NON_POKEDEX",
+        "LEGENDARY_NON_POKEDEX",
+        "SHINY_NON_POKEDEX",
+        "GMAX_NON_POKEDEX",
+        "GMAX_IN_POKEDEX"
+      ],
+      "unlockedLuckyFriendApplicator": true
+    },
+    {
+      "level": 4,
+      "minPointsToReach": 90,
+      "relativePointsToReach": null,
+      "milestoneXpReward": 100000,
+      "attackBonusPercentage": 1.1,
+      "raidBallBonus": 4,
+      "tradingDiscount": 0.96,
+      "unlockedTrading": [
+        "REGULAR_IN_POKEDEX",
+        "SPECIAL_IN_POKEDEX",
+        "REGULAR_NON_POKEDEX",
+        "REGIONAL_NON_POKEDEX",
+        "FORM_NON_POKEDEX",
+        "LEGENDARY_NON_POKEDEX",
+        "SHINY_NON_POKEDEX",
+        "GMAX_NON_POKEDEX",
+        "GMAX_IN_POKEDEX"
+      ],
+      "unlockedLuckyFriendApplicator": true
+    },
+    {
+      "level": 5,
+      "minPointsToReach": 90,
+      "relativePointsToReach": 90,
+      "milestoneXpReward": 150000,
+      "attackBonusPercentage": 1.12,
+      "raidBallBonus": 4,
+      "tradingDiscount": 0.96,
+      "unlockedTrading": [
+        "REGULAR_IN_POKEDEX",
+        "SPECIAL_IN_POKEDEX",
+        "REGULAR_NON_POKEDEX",
+        "REGIONAL_NON_POKEDEX",
+        "FORM_NON_POKEDEX",
+        "LEGENDARY_NON_POKEDEX",
+        "SHINY_NON_POKEDEX",
+        "GMAX_NON_POKEDEX",
+        "GMAX_IN_POKEDEX"
+      ],
+      "unlockedLuckyFriendApplicator": true
+    }
+  ],
+  "remoteTrade": {
+    "enabled": true,
+    "requestedPokemonCount": 3,
+    "pokemonUntradableDays": 30,
+    "maxRemoteTradesPerDay": 1,
+    "taggingUnlockPointThreshold": 85,
+    "tradeExpiryReminderMinutes": 1440,
+    "timeLimitMinutes": 2880
+  }
+}

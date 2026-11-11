@@ -40,6 +40,8 @@ targets:
         product: SearchBuilder
       - package: TrainerKit
         product: CollectionImport
+      - package: TrainerKit
+        product: Counters
     settings:
       base:
         PRODUCT_NAME: TrainerToolkit
