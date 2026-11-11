@@ -49,13 +49,19 @@ Also:
 
 ## Current state (update this section as work continues)
 
-- Last code commit: `a604f13`, a fix for move-name lookup. Normalizing dropped the "+", so "Seed Bomb" could resolve to `SEED_BOMB_PLUS` (random dictionary order). Exact names now match first. Shared names (Air Slash, Psycho Cut, Aura Wheel) prefer the shorter id, and the CSV import prefers moves the Pokémon can learn.
-- **Build #14 (`a604f13`, `macos-15-intel`) is green**: Phase 5a + 5b. Artifact `TrainerToolkit-ipa-14`: `/actions/runs/43023289836/artifacts/13855294463`.
-  - Builds #10–#12 on 2026-11-11 were never acquired (no runner capacity). Build #13 ran but failed on the Seed Bomb test, fixed in `a604f13`.
+- Last code commit: `9988d39`, Phases 6–9 (Raids, Rocket, Trades, Home, README). **Build #16 is green** (`macos-15-intel`): artifact `TrainerToolkit-ipa-16`, `/actions/runs/43040528767`.
+  - Earlier on 2026-11-11: `a604f13` fixed the move-name lookup ("Seed Bomb" vs "Seed Bomb+"), and `8e90321` fixed the editor's CP box (build #15 green).
+  - Builds #10–#12 were never acquired (no runner capacity); #13 failed on the Seed Bomb test.
 - **Next steps:**
-  1. Download the build #14 IPA (ask first) and send it with the checklist below.
-  2. The user tests Phase 5: manual entry and CSV import.
-  3. Once they reply "All passed", start Phase 6.
+  1. The user installs build #16 and goes through the Phase 5 checklist below plus the Phases 6–9 checklist.
+  2. Fix whatever fails. Then ask about the open raid decision (trainer estimate, see "Raids and Rocket").
+- **Trade Planner `TODO: verify`** (tell the user): cost rounding (nearest stardust), the mapping of trade kinds to the game master's `unlockedTrading` ids, the attack bonus shown as a multiplier, and the readable category names. Friendship level names aren't in the data, so levels are shown as "Level N" with points.
+- **Phases 6–9 phone test checklist:**
+  - Home: live events, Community Day countdown, top raid tier rows open the boss screen, goals and collection links.
+  - Raids tab: bosses grouped by tier, boss screen with Weak to / Resists, a party of 6 plus more counters. Changing the weather, level and toggles reranks. "My collection" uses your own Pokémon (they need a fast move). The settings are remembered.
+  - More > Rocket: lineups grouped by role; each slot lists its Pokémon (tap to see the top 3 counters and weaknesses) and shows "Good against all of these". Works in airplane mode.
+  - More > Trades: add a friend, want lists, base trade costs, cost check, Friendship levels screen.
+  - Existing data (collection, goals, event checklists) survives installing over the old build (2 new SwiftData models were added).
 - **Phase 5 phone test checklist** (give it to the user with the IPA):
   - Collection empty state.
   - Add a Pokémon manually: species picker, IVs, level or "Find level from CP", move pickers with ★ for elite moves, flags.
