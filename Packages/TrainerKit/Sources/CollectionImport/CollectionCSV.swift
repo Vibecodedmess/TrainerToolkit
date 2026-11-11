@@ -258,7 +258,12 @@ public enum CollectionCSV {
             let known = Set(options.fast.map(\.id) + options.charged.map(\.id))
             func move(_ text: String?, label: String) -> String {
                 guard let text else { return "" }
-                guard let id = lookup.moveId(named: text) else {
+                // Prefer a move this Pokémon knows: some names are shared ("Aura Wheel", "Air Slash").
+                let wanted = text.trimmingCharacters(in: .whitespaces)
+                let ownMove = (options.fast + options.charged).first {
+                    $0.name.caseInsensitiveCompare(wanted) == .orderedSame || $0.id == wanted.uppercased()
+                }
+                guard let id = ownMove?.id ?? lookup.moveId(named: text) else {
                     warnings.append("Unknown \(label) \"\(text)\"; left empty.")
                     return ""
                 }

@@ -7,6 +7,11 @@ public struct GamemasterLookup: Sendable {
     private let byKey: [String: GMPokemon]
     private let moveNames: [String: String]
     private let movesById: [String: GMMove]
+    /// Display name (lowercased, diacritics folded, punctuation kept) → move id.
+    private let moveIdByExactName: [String: String]
+    /// `normalize`d display name → move id. Normalizing drops punctuation, so "Seed Bomb" and
+    /// "Seed Bomb+" collide; the move whose name loses nothing to normalization wins, then the lower id.
+    private let moveIdByLooseName: [String: String]
 
     public init(_ gamemaster: Gamemaster) {
         var byId: [String: GMPokemon] = [:]
@@ -23,6 +28,23 @@ public struct GamemasterLookup: Sendable {
         self.byKey = byKey
         moveNames = Dictionary(gamemaster.moves.map { ($0.moveId, $0.name) }, uniquingKeysWith: { a, _ in a })
         movesById = Dictionary(gamemaster.moves.map { ($0.moveId, $0) }, uniquingKeysWith: { a, _ in a })
+
+        // Sorted so the dictionaries below don't depend on input order: plain names first, then the
+        // shorter id ("AIR_SLASH" before "AEGISLASH_CHARGE_AIR_SLASH", both named "Air Slash"), then by id.
+        let movesInOrder = gamemaster.moves.sorted {
+            let a = Self.isPlainName($0.name), b = Self.isPlainName($1.name)
+            if a != b { return a }
+            if $0.moveId.count != $1.moveId.count { return $0.moveId.count < $1.moveId.count }
+            return $0.moveId < $1.moveId
+        }
+        var exact: [String: String] = [:]
+        var loose: [String: String] = [:]
+        for m in movesInOrder {
+            exact[Self.exactKey(m.name)] = exact[Self.exactKey(m.name)] ?? m.moveId
+            loose[Self.normalize(m.name)] = loose[Self.normalize(m.name)] ?? m.moveId
+        }
+        moveIdByExactName = exact
+        moveIdByLooseName = loose
     }
 
     public func move(_ id: String) -> GMMove? { movesById[id] }
@@ -31,8 +53,19 @@ public struct GamemasterLookup: Sendable {
     public func moveId(named text: String) -> String? {
         let trimmed = text.trimmingCharacters(in: .whitespaces)
         if movesById[trimmed.uppercased()] != nil { return trimmed.uppercased() }
-        let key = Self.normalize(trimmed.replacingOccurrences(of: "_", with: " "))
-        return movesById.values.first { Self.normalize($0.name) == key }?.moveId
+        let spaced = trimmed.replacingOccurrences(of: "_", with: " ")
+        return moveIdByExactName[Self.exactKey(spaced)] ?? moveIdByLooseName[Self.normalize(spaced)]
+    }
+
+    private static func exactKey(_ name: String) -> String {
+        name.lowercased()
+            .folding(options: .diacriticInsensitive, locale: Locale(identifier: "en_US"))
+            .split(separator: " ").joined(separator: " ")
+    }
+
+    /// True when `normalize` only changes case, diacritics or spacing ("Seed Bomb", not "Seed Bomb+").
+    private static func isPlainName(_ name: String) -> Bool {
+        exactKey(name) == normalize(name)
     }
 
     /// For a shadow entry ("bulbasaur_shadow") returns the regular entry; otherwise the Pokémon itself.

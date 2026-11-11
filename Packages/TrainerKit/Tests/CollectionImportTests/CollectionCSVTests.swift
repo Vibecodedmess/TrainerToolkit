@@ -4,12 +4,14 @@ import DataSources
 import GameMath
 
 final class CollectionCSVTests: XCTestCase {
+    private var gamemaster: Gamemaster!
     private var lookup: GamemasterLookup!
     private var levels: LevelTables!
 
     override func setUpWithError() throws {
         let dir = try XCTUnwrap(BundledSnapshots.directory)
         let gm = try JSONDecoder().decode(Gamemaster.self, from: Data(contentsOf: dir.appendingPathComponent("gamemaster.json")))
+        gamemaster = gm
         lookup = GamemasterLookup(gm)
         levels = try LevelTables.bundled()
     }
@@ -140,5 +142,30 @@ final class CollectionCSVTests: XCTestCase {
         XCTAssertEqual(lookup.moveId(named: "Vine Whip"), "VINE_WHIP")
         XCTAssertEqual(lookup.moveId(named: "vine_whip"), "VINE_WHIP")
         XCTAssertNil(lookup.moveId(named: "Nope Nope"))
+    }
+
+    /// Every move whose display name is unique resolves to itself, in any case. This covers the
+    /// "Seed Bomb" / "Seed Bomb+" pairs, which collide once punctuation is dropped. Uses the bundled data.
+    func testEveryUniqueMoveNameResolvesToItsOwnId() {
+        let counts = Dictionary(grouping: gamemaster.moves, by: { $0.name.lowercased() })
+        let unique = gamemaster.moves.filter { counts[$0.name.lowercased()]?.count == 1 }
+        XCTAssertFalse(unique.isEmpty)
+        for m in unique {
+            XCTAssertEqual(lookup.moveId(named: m.name), m.moveId, m.name)
+            XCTAssertEqual(lookup.moveId(named: m.name.uppercased()), m.moveId, m.name)
+        }
+    }
+
+    /// Shared display names resolve to the same move every time, and that move has the name asked for.
+    func testSharedMoveNamesResolveDeterministically() {
+        let shared = Dictionary(grouping: gamemaster.moves, by: { $0.name.lowercased() }).filter { $0.value.count > 1 }
+        for (_, moves) in shared {
+            let name = moves[0].name
+            let first = lookup.moveId(named: name)
+            XCTAssertTrue(moves.map(\.moveId).contains(first ?? ""), name)
+            for _ in 0..<5 {
+                XCTAssertEqual(GamemasterLookup(gamemaster).moveId(named: name), first, name)
+            }
+        }
     }
 }
