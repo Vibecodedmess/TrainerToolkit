@@ -22,7 +22,7 @@ Also:
 - **Phases:** stop after each phase. Tell the user what changed, how to install, a phone test checklist, and any `TODO: verify` items. Wait for "All passed" before starting the next phase.
 - **Git:** commit or push only with the user's OK. The user usually answers "Push and build". Commits end with the `Co-Authored-By` line the session gives.
 - **The user has no Mac.** The only compiler is GitHub Actions on the public repo `Vibecodedmess/TrainerToolkit`, using the workflow `.github/workflows/build.yml`.
-  - It runs on `runs-on: macos-15` (Apple silicon). If a job sits "Queued" for 15 minutes and fails with "not acquired by Runner", that pool is out of capacity, not the code. Switch between `macos-15` and `macos-15-intel`, which needs a commit, so ask the user. The arm64 pool was full on 2026-11-10 and the Intel pool on 2026-11-11.
+  - It currently runs on `runs-on: macos-15-intel` (switched from `macos-15`, Apple silicon, on 2026-11-11). If a job sits "Queued" for 15 minutes and fails with "not acquired by Runner", that pool is out of capacity, not the code. Switch between `macos-15` and `macos-15-intel`, which needs a commit, so ask the user. The arm64 pool was full on 2026-11-10, the Intel pool on 2026-11-11, and arm64 again later on 2026-11-11 (build #12; GitHub's annotation names "capacity constraints" on macOS arm64).
   - The runner is only the build machine. The IPA for the iPhone is identical either way.
   - The workflow only runs on demand (`workflow_dispatch`) or on `v*` tags. Start it in the **built-in browser pane**: Actions > Build unsigned IPA > Run workflow > Run workflow. There is no `gh` CLI here.
   - **The user signs in to GitHub themselves.** Never type a password. If the Run workflow button is missing, the pane has been signed out: open github.com/login and ask the user to sign in.
@@ -52,7 +52,8 @@ Also:
 - Last code commit: Phase 5b, CSV import (`ceab27b`), plus `50b7f94` (runner back to `macos-15`, this file).
 - **No green build of Phase 5b yet.** On 2026-11-11 GitHub had no free macOS runners in either pool:
   - build #10 (Intel) was never acquired
-  - build #11 (`macos-15`) was still queued at 9+ minutes
+  - build #11 (`macos-15`) was never acquired
+  - build #12 (`macos-15`, `b42edb7`) was never acquired; the runner was then switched to `macos-15-intel`
 - If the latest run failed with "not acquired", start the workflow again (later in the day helps).
 - The last green build was #9 (`6ecefe9`): Phase 5a manual entry plus the raid groundwork. Its IPA is in `%USERPROFILE%\Downloads\TrainerToolkit-build9`, not yet tested by the user.
 - **Next steps:**

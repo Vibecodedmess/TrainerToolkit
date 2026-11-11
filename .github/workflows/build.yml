@@ -22,8 +22,8 @@ jobs:
   build:
     # Build machine only; the IPA is identical either way. If jobs sit "Queued" and fail with
     # "not acquired by Runner", that pool is out of capacity: switch between macos-15 (Apple silicon)
-    # and macos-15-intel. 2026-11-10 arm64 was full; 2026-11-11 Intel was full.
-    runs-on: macos-15
+    # and macos-15-intel. 2026-11-10 arm64 was full; 2026-11-11 both pools were full (arm64 again by evening).
+    runs-on: macos-15-intel
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
