@@ -73,10 +73,10 @@ final class ScreenshotImportTests: XCTestCase {
     func testCPIgnoresOverlaysAndStatusBar() {
         let lines = [
             line("100", x: 0.86, y: 0.02, w: 0.06),
-            line("♂L30 93% 13/15/14", x: 0.56, y: 0.085, w: 0.38),
-            line("C2934", x: 0.34, y: 0.055, w: 0.26, h: 0.03),
+            line("♀L21 47% 7/3/11", x: 0.56, y: 0.085, w: 0.38),
+            line("C1718", x: 0.34, y: 0.055, w: 0.26, h: 0.03),
         ]
-        XCTAssertEqual(ScreenshotParser.parse(lines).cp, 2934)
+        XCTAssertEqual(ScreenshotParser.parse(lines).cp, 1718)
     }
 
     func testAppraisalLabelsShadowAndMerge() {
@@ -152,8 +152,8 @@ final class ScreenshotImportTests: XCTestCase {
 
     func testSolverFindsTheTruthAndBarsPinItDown() throws {
         let (_, p) = try evolvedSpecies()
-        let truthLevel = PokemonLevel(27.5)
-        let truth = IVs(attack: 12, defense: 14, stamina: 14)
+        let truthLevel = PokemonLevel(23.5)
+        let truth = IVs(attack: 9, defense: 13, stamina: 6)
         let cp = try XCTUnwrap(CPCalculator.cp(base: base(p), ivs: truth, level: truthLevel, tables: levels))
         let hp = try XCTUnwrap(CPCalculator.hp(base: base(p), ivs: truth, level: truthLevel, tables: levels))
         let dust = PowerUpCalculator.cost(from: truthLevel, to: truthLevel.next, tables: levels).stardust
@@ -166,7 +166,7 @@ final class ScreenshotImportTests: XCTestCase {
         }
 
         let hinted = IVSolver.solve(base: base(p), cp: cp, hp: hp, powerUpStardust: dust, modifiers: .none,
-                                    hints: .init(attack: 12, defense: 14, stamina: 14), tables: levels)
+                                    hints: .init(attack: 9, defense: 13, stamina: 6), tables: levels)
         let first = try XCTUnwrap(hinted.first)
         XCTAssertEqual(first.ivs, truth)
         XCTAssertEqual(first.level, truthLevel)
@@ -198,9 +198,9 @@ final class ScreenshotImportTests: XCTestCase {
 
     func testImporterBySpeciesNameWithBars() throws {
         let (_, p) = try evolvedSpecies()
-        let level = PokemonLevel(30), ivs = IVs(attack: 13, defense: 15, stamina: 14)
+        let level = PokemonLevel(26), ivs = IVs(attack: 4, defense: 15, stamina: 10)
         let r = try reading(for: p, name: p.speciesName, level: level, ivs: ivs)
-        let bars: [AppraisalStat: Double] = [.attack: 13.0 / 15, .defense: 1, .hp: 14.0 / 15]
+        let bars: [AppraisalStat: Double] = [.attack: 4.0 / 15, .defense: 1, .hp: 10.0 / 15]
         let proposal = try XCTUnwrap(ScreenshotImporter.propose(r, barFractions: bars, gamemaster: gamemaster, lookup: lookup, tables: levels))
         let option = try XCTUnwrap(proposal.options.first { $0.pokemon.speciesId == p.speciesId })
         XCTAssertEqual(option.solutions.first?.ivs, ivs)
