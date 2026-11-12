@@ -20,6 +20,11 @@ enum BattleData {
     }
 }
 
+/// Raid tier numbers (community table, unverified) for the trainers-needed estimate.
+enum RaidData {
+    static let table: RaidEstimate.Table? = try? RaidEstimate.Table.bundled()
+}
+
 /// Where counters come from.
 enum CounterPool: String, CaseIterable, Identifiable {
     case generic = "All Pokémon"

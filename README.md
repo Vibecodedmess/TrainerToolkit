@@ -3,7 +3,7 @@
 A personal-use iOS companion app for trainers: search string builder, power-up planner, raid and Rocket counters, event checklists and trade planning.
 It is sideloaded, never published.
 
-**Status:** all planned features are built (Phases 0–13). See "Features" below and `CLAUDE.md` for what has been tested on a phone.
+**Status:** all planned features are built (Phases 0–14). See "Features" below and `CLAUDE.md` for what has been tested on a phone.
 
 ## Features
 
@@ -11,7 +11,7 @@ It is sideloaded, never published.
 | --- | --- |
 | Home | Live events, a countdown to the next Community Day, the top raid tier, your power-up goals and collection size |
 | Search | Builds in-game search strings from filters, with saved presets |
-| Raids | Current raid bosses by tier; per boss: weaknesses, resistances and a ranked party of 6 counters, either from every released Pokémon or from My Collection, with weather |
+| Raids | Current raid bosses by tier; per boss: weaknesses, resistances, a ranked party of 6 counters and a rough "trainers needed" estimate, either from every released Pokémon or from My Collection, with weather |
 | Events | Event calendar with local times, checklists and reminders, Community Day details |
 | More > Planner | Candy, XL candy and stardust needed to power a Pokémon up to a target level |
 | More > Collection | Your own Pokémon: manual entry, from screenshots of one or many Pokémon at once (on-device text recognition reads CP, HP, name, power-up cost, moves and the appraisal bars, then works out level and IVs), or CSV import (see [COLLECTION_IMPORT.md](COLLECTION_IMPORT.md)). Each Pokémon shows what it needs to evolve (item, lure, quest, buddy, time) and how to get the item, and how it would rank among your raid counters if powered up (or evolved), with a one-tap Planner goal |

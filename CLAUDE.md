@@ -49,12 +49,13 @@ Also:
 | 10 | Add to Collection from screenshots (like Poke Genie) | Confirmed on build #18 (2026-11-12), including lucky, and the Shiny switch the user chose (the game's shiny mark isn't readable). See "Screenshot import" |
 | 11 | Bulk screenshot import (many Pokémon at once) | Confirmed on build #19 (2026-11-12) |
 | 12 | Evolution requirements in My Collection (items, lures, quests, buddy, time, gender) + how to get each item | Confirmed on build #20 (2026-11-12). See DATA_SOURCES.md "evolution requirements" |
-| 13 | Collection power-ups: one-tap Planner goal + raid rank by level (and evolved) vs your other counters | Built 2026-11-12. **Not tested on the phone**. `Counters/PowerUpValue.swift`, `Features/Collection/PowerUpValueView.swift` |
+| 13 | Collection power-ups: one-tap Planner goal + raid rank by level (and evolved) vs your other counters | Confirmed on build #21 (2026-11-12). `Counters/PowerUpValue.swift`, `Features/Collection/PowerUpValueView.swift` |
+| 14 | Raid "trainers needed" estimate (community tier table, unverified) | Built 2026-11-12. **Not tested on the phone** |
 
 ## Current state (update this section as work continues)
 
 - **Latest (2026-11-12):** `87d2d9f`, bulk screenshot import. Build #19 is green and confirmed on the phone. Everything through Phase 11 works.
-- **Ideas the user hasn't picked yet:** the raid "trainers needed" estimate (open decision, see "Raids and Rocket"); maintenance (refresh the bundled snapshots, CI Node 20 warnings, docs).
+- **Ideas the user hasn't picked yet:** PvP league IV ranks for the collection; backup and restore (export/import the collection, goals and trade lists); maintenance (refresh the bundled snapshots, CI Node 20 warnings, docs).
 - **Power-up value (Phase 13):** `PowerUpValue.evaluate` ranks the Pokémon at its current level and at 40/45/50 (up to the max upgrade level) against the other collection entries, which stay at their own levels. The boss is chosen from the current raids; there's an optional evolved form (regular moves only, same IVs). Costs come from `PowerUpCalculator` with shadow/purified/lucky. A Pokémon without a saved fast move uses its species' regular moves (the screen says so). Planner hook: `GoalEditorView(prefilled:)` with `GoalDraft(collected:types:target:)`.
 - Earlier: `9988d39`, Phases 6–9 (Raids, Rocket, Trades, Home, README). Build #16 green (`macos-15-intel`).
   - Earlier on 2026-11-11: `a604f13` fixed the move-name lookup ("Seed Bomb" vs "Seed Bomb+"), and `8e90321` fixed the editor's CP box (build #15 green).
@@ -114,7 +115,7 @@ Also:
 
 - `Packages/TrainerKit/Sources/Counters/CounterRanker.swift`: generic candidate pool (released PvPoke species, toggles for shadow, mega, elite/legacy moves), ranking by best-moveset DPS (`DamageCalculator`), `rankAgainstAll` (average relative DPS over several defenders, used per Rocket slot), weaknesses/resistances, and feed-name matching ("Mega Charizard X" → "Charizard (Mega X)", "Primal Kyogre" → "Kyogre (Primal)").
 - Defenders (raid bosses, Rocket Pokémon) are modelled at **level 40, 15/15/15** because their real stats are server-side. Only **relative** DPS (% of the best counter) is shown, never absolute DPS. Rocket Pokémon are treated as shadow (shadow defence multiplier).
-- **Open decision (still the user's):** the "how many trainers needed" raid estimate is **left out**, because it needs raid boss HP/CPM per tier, which no approved source has. The options are a cited community table marked `TODO: verify`, or keep leaving it out.
+- **Trainers needed (2026-11-12, user's choice):** a best-case estimate on each raid boss screen, under the party. It uses a cited community table from Bulbapedia (`Counters/Resources/raid-tiers.json`, CC BY-NC-SA, `TODO: verify`) for boss HP, multiplier and time limit. The game master has none of these. Shadow and Super Mega raids show no estimate (enrage, shields). See DATA_SOURCES.md.
 - App side: `Features/Counters/CounterSupport.swift` (shared settings, rows, method note; settings remembered in `@AppStorage` keys `counters.*`), `Features/Raids/*`, `Features/Rocket/*`. `DataCenter` now also loads `raids` and `rocketLineups`.
 - Weather choices are the game master ids (`clear`, `overcast`, `partly_cloudy`, …), shown as text. The weather that boosts the boss's own types is marked.
 

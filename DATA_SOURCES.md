@@ -153,6 +153,21 @@ The user approved the game's own English text as a source on 2026-11-12.
 - The app shows the source, licence and date, labelled "Not verified". Shop prices are left out.
 - Community guides disagree on some items (for example the Sinnoh Stone), and methods change with events.
 
+### Bulbapedia: raid tier numbers (for the trainers-needed estimate)
+
+The user chose a cited community table on 2026-11-12. It's in `Packages/TrainerKit/Sources/Counters/Resources/raid-tiers.json`, all `TODO: verify`.
+- **What:** boss HP, the boss's Attack/Defense multiplier and the time limit, per raid tier.
+- **Why a community source:** the game's servers hold these; the game master has none of them (`RAID_CLIENT_SETTINGS` only has lobby settings).
+- **Source:** Bulbapedia, retrieved 2026-11-12, licensed CC BY-NC-SA 2.5. Fine for this personal, never-published app, and cited in the app.
+  - [Raid Battle (GO)](https://bulbapedia.bulbagarden.net/wiki/Raid_Battle_(GO)), the "Difficulty" table (page last edited 12 Oct 2026)
+  - [Shadow Raid](https://bulbapedia.bulbagarden.net/wiki/Shadow_Raid)
+  - [Mega Raid](https://bulbapedia.bulbagarden.net/wiki/Mega_Raid)
+- **Not estimated:**
+  - Shadow raids: the boss is enraged at 60% HP, unless Purified Gems are used.
+  - Super Mega raids: shields.
+  - The 3-star Shadow time limit isn't shown separately in the source table.
+- **The estimate** (`Counters/RaidEstimate.swift`) is a best case: boss HP ÷ (the party's average best-moveset DPS × time limit), rounded up. Boss defence uses the tier multiplier with 15 IVs. No fainting, dodging, relobbying, or friendship or Mega bonuses.
+
 ## Open questions (decisions needed before later phases)
 
 1. **Raid boss HP and boss CP multiplier per tier (Phase 6).** These are **not** in the game master; the game's servers hold them. The "how many trainers" estimate needs them, but DPS rankings don't. The options are a cited community table, marked `TODO: verify`, or leaving the trainer estimate out.

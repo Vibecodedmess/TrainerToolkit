@@ -103,10 +103,51 @@ struct RaidBossDetailView: View {
             } footer: {
                 Text("% = estimated damage per second compared with the best counter.")
             }
+            trainersSection
             if results.count > partySize {
                 Section("More counters") {
                     ForEach(Array(results.dropFirst(partySize).prefix(14).enumerated()), id: \.element.id) { index, r in
                         row(index + 1 + partySize, r)
+                    }
+                }
+            }
+        }
+    }
+
+    /// Rough trainers-needed estimate for the suggested party (community tier numbers, unverified).
+    @ViewBuilder
+    private var trainersSection: some View {
+        if let table = RaidData.table, let tier = table.tier(forFeedTier: boss.tier) {
+            Section {
+                if !tier.estimate {
+                    Text(tier.note ?? "This raid type isn't estimated.").foregroundStyle(.secondary)
+                } else if let gmBoss, let battle = BattleData.battle, let levels = PlannerMath.tables,
+                          let result = RaidEstimate.estimate(
+                            party: results.prefix(partySize).map(\.candidate),
+                            bossBase: BaseStats(attack: gmBoss.baseStats.atk, defense: gmBoss.baseStats.def, stamina: gmBoss.baseStats.hp),
+                            bossTypes: bossTypes, tier: tier, weather: weather.isEmpty ? nil : weather,
+                            levels: levels, battle: battle) {
+                    LabeledContent {
+                        Text(result.trainers == 1 ? "1 trainer" : "\(result.trainers) trainers")
+                            .font(.title3.weight(.semibold))
+                    } label: {
+                        Label("At least", systemImage: "person.3")
+                    }
+                    LabeledContent("Boss HP", value: tier.bossHP.formatted())
+                    LabeledContent("Time limit", value: "\(tier.timeLimitSeconds) s")
+                    LabeledContent("Party damage per trainer", value: Int(result.damagePerTrainer).formatted())
+                } else {
+                    Text(gmBoss == nil ? "This boss couldn't be matched to the Pokémon data." : "No estimate for this party.")
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                Text("Trainers needed (rough)")
+            } footer: {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Best case: everyone brings this party, nobody faints or dodges, and the full time limit is used. Real raids usually need more. No friendship or Mega bonuses.")
+                    Text("\(tier.name): boss HP, stat multiplier and time limit are community numbers from \(table.source.name) (\(table.source.license)), retrieved \(table.source.retrieved). Not verified.")
+                    if let url = URL(string: table.source.pages.first ?? "") {
+                        Link("Source: \(table.source.name)", destination: url)
                     }
                 }
             }

@@ -1,0 +1,29 @@
+{
+  "source": {
+    "name": "Bulbapedia",
+    "pages": [
+      "https://bulbapedia.bulbagarden.net/wiki/Raid_Battle_(GO)",
+      "https://bulbapedia.bulbagarden.net/wiki/Shadow_Raid",
+      "https://bulbapedia.bulbagarden.net/wiki/Mega_Raid"
+    ],
+    "retrieved": "2026-11-12",
+    "license": "CC BY-NC-SA 2.5",
+    "note": "Community numbers, not from the game's data. TODO: verify. Raid boss HP, stat multiplier and time limit are held by the game's servers."
+  },
+  "tiers": [
+    { "id": "one_star", "name": "1-star raid", "bossHP": 600, "cpMultiplier": 0.5974, "timeLimitSeconds": 180, "estimate": true, "note": null },
+    { "id": "two_star", "name": "2-star raid (retired)", "bossHP": 1800, "cpMultiplier": 0.67, "timeLimitSeconds": 180, "estimate": true, "note": null },
+    { "id": "three_star", "name": "3-star raid", "bossHP": 3600, "cpMultiplier": 0.73, "timeLimitSeconds": 180, "estimate": true, "note": null },
+    { "id": "four_star", "name": "4-star raid", "bossHP": 9000, "cpMultiplier": 0.79, "timeLimitSeconds": 180, "estimate": true, "note": null },
+    { "id": "five_star", "name": "Legendary (5-star) raid", "bossHP": 15000, "cpMultiplier": 0.79, "timeLimitSeconds": 300, "estimate": true, "note": null },
+    { "id": "ultra_beast", "name": "Ultra Beast raid", "bossHP": 15000, "cpMultiplier": 0.79, "timeLimitSeconds": 300, "estimate": true, "note": null },
+    { "id": "mega", "name": "Mega raid", "bossHP": 9000, "cpMultiplier": 0.79, "timeLimitSeconds": 300, "estimate": true, "note": null },
+    { "id": "mega_legendary", "name": "Legendary Mega raid", "bossHP": 22500, "cpMultiplier": 0.79, "timeLimitSeconds": 300, "estimate": true, "note": null },
+    { "id": "primal", "name": "Primal raid", "bossHP": 22500, "cpMultiplier": 0.79, "timeLimitSeconds": 300, "estimate": true, "note": null },
+    { "id": "elite", "name": "Elite raid", "bossHP": 20000, "cpMultiplier": 0.985, "timeLimitSeconds": 300, "estimate": true, "note": null },
+    { "id": "super_mega", "name": "Super Mega raid", "bossHP": 25000, "cpMultiplier": 0.79, "timeLimitSeconds": 300, "estimate": false, "note": "Super Mega bosses use shields, which this estimate doesn't model." },
+    { "id": "shadow_one_star", "name": "1-star Shadow raid", "bossHP": 600, "cpMultiplier": 0.5974, "timeLimitSeconds": 180, "estimate": false, "note": "Shadow raid bosses become enraged at 60% HP (much stronger unless Purified Gems are used), which this estimate doesn't model." },
+    { "id": "shadow_three_star", "name": "3-star Shadow raid", "bossHP": 4000, "cpMultiplier": 0.76, "timeLimitSeconds": 180, "estimate": false, "note": "Shadow raid bosses become enraged at 60% HP (much stronger unless Purified Gems are used), which this estimate doesn't model. TODO: verify the time limit (not shown separately in the source table)." },
+    { "id": "shadow_five_star", "name": "Legendary Shadow raid", "bossHP": 15000, "cpMultiplier": 0.82, "timeLimitSeconds": 300, "estimate": false, "note": "Shadow raid bosses become enraged at 60% HP (much stronger unless Purified Gems are used), which this estimate doesn't model." }
+  ]
+}
