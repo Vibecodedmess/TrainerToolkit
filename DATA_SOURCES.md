@@ -15,7 +15,7 @@ All sources were checked live on **2026-11-10**.
 | Project | https://github.com/pvpoke/pvpoke |
 | License | MIT, © 2019 pvpoke. The notice is shown in the app under More > Data sources > Credits |
 | Used for | Species, forms, base stats (atk/def/hp), types, fast/charged/elite/legacy move lists, move names and types, families/evolutions, tags (legendary, mythical, shadow-eligible, ...) |
-| Size | ~0.94 MB minified. Identical content to `gamemaster.json` (1.7 MB): both had 1,752 Pokémon entries and 355 moves on 2026-11-10 |
+| Size | ~0.94 MB minified. Identical content to `gamemaster.json` (1.7 MB): both had 1,752 Pokémon entries and 355 moves on 2026-11-10; the snapshot of 2026-11-12 has 1,753 and 357 |
 | Refresh rules | No limit is stated. raw.githubusercontent.com serves `Cache-Control: max-age=300`, so the app never asks more than once per 5 minutes, sends `If-None-Match` (ETag) and by default checks only every 6 hours |
 
 **Limitation:** the move `power`, `energy`, `energyGain`, `cooldown` and `turns` values in this file are **PvP (trainer battle) stats**.
@@ -32,7 +32,7 @@ Raid and gym (PvE) move stats are different and are **not** in this file. See "O
 | Images | The feeds contain LeekDuck image URLs. The app does **not** decode, show or load them (no official artwork) |
 | Dates | Per the wiki: a time ending in `Z` is the same moment worldwide (UTC). A time without a zone is local wall-clock time in each trainer's own time zone. Handled by `EventTime` (tested) |
 
-Files on 2026-11-10: events 53, raid bosses 12, research tasks 39, Rocket lineups 26 (Giovanni, 3 leaders, 22 grunt types).
+Snapshot of 2026-11-12: events 48, raid bosses 12, research tasks 39, Rocket lineups 26 (Giovanni, 3 leaders, 22 grunt types). (2026-11-10: events 53.)
 
 What the event feed does and doesn't contain (checked 2026-11-10):
 - **Contains:**

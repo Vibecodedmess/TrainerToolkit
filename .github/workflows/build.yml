@@ -22,7 +22,7 @@ jobs:
   build:
     # Build machine only; the IPA is identical either way. If jobs sit "Queued" and fail with
     # "not acquired by Runner", that pool is out of capacity: switch between macos-15 (Apple silicon)
-    # and macos-15-intel. 2026-11-10 arm64 was full; 2026-11-11 both pools were full (arm64 again by evening).
+    # and macos-15-intel. In use since 2026-11-11 (arm64 was out of capacity then).
     runs-on: macos-15-intel
     timeout-minutes: 30
     steps:
@@ -34,7 +34,9 @@ jobs:
           swift --version
 
       - name: Unit tests (TrainerKit package)
-        run: swift test --package-path Packages/TrainerKit
+        run: |
+          set -o pipefail
+          swift test --package-path Packages/TrainerKit 2>&1 | tee test.log
 
       - name: Install XcodeGen
         run: brew install xcodegen
@@ -56,7 +58,26 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             CURRENT_PROJECT_VERSION=${{ github.run_number }} \
-            build
+            build 2>&1 | tee build.log
+
+      # Lists compiler warnings on the run's summary page (the full logs are long and load slowly).
+      - name: Warnings summary
+        if: always()
+        run: |
+          : > warnings.txt
+          for f in test.log build.log; do
+            [ -f "$f" ] && grep -E ': warning: ' "$f" | sed -E "s#^$GITHUB_WORKSPACE/##" >> warnings.txt || true
+          done
+          sort -u warnings.txt -o warnings.txt
+          n=$(wc -l < warnings.txt | tr -d ' ')
+          {
+            echo "### Compiler warnings: $n"
+            if [ "$n" -gt 0 ]; then
+              echo '```'
+              head -n 150 warnings.txt
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Package IPA
         run: |

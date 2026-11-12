@@ -50,8 +50,8 @@ Also:
 | 11 | Bulk screenshot import (many Pokémon at once) | Confirmed on build #19 (2026-11-12) |
 | 12 | Evolution requirements in My Collection (items, lures, quests, buddy, time, gender) + how to get each item | Confirmed on build #20 (2026-11-12). See DATA_SOURCES.md "evolution requirements" |
 | 13 | Collection power-ups: one-tap Planner goal + raid rank by level (and evolved) vs your other counters | Confirmed on build #21 (2026-11-12). `Counters/PowerUpValue.swift`, `Features/Collection/PowerUpValueView.swift` |
-| 14 | Raid "trainers needed" estimate (community tier table, unverified) | Built 2026-11-12. **Not tested on the phone** |
-| 15 | Backup and restore (iCloud Drive via Files; automatic daily backups to a chosen folder) | Built 2026-11-12 (user asked: free sideload expires weekly). **Not tested on the phone**. See "Backup" |
+| 14 | Raid "trainers needed" estimate (community tier table, unverified) | Confirmed on build #23 (2026-11-12) |
+| 15 | Backup and restore (iCloud Drive via Files; automatic daily backups to a chosen folder) | Confirmed on build #23 (2026-11-12; user asked for it because free sideloads expire weekly). See "Backup" |
 
 ## Current state (update this section as work continues)
 
