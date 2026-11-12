@@ -15,6 +15,8 @@ struct ScreenshotImportView: View {
     @State private var speciesId: String?
     @State private var solutionId: String?
     @State private var showAllSolutions = false
+    /// The game's shiny mark can't be read reliably from a screenshot, so the user sets it here.
+    @State private var isShiny = false
 
     private let maxScreenshots = 4
 
@@ -93,10 +95,17 @@ struct ScreenshotImportView: View {
                 }
                 let moves = p.moves(for: option.pokemon, lookup: lookup)
                 LabeledContent("Moves", value: movesText(moves, lookup: lookup))
+                Toggle(isOn: $isShiny) {
+                    Label("Shiny", systemImage: "sparkles")
+                }
             } header: {
                 Text("Pokémon")
             } footer: {
-                if p.options.count > 1 { Text("More than one Pokémon fits (a nickname, or regional forms). Pick the right one.") }
+                if p.options.count > 1 {
+                    Text("More than one Pokémon fits (a nickname, or regional forms). Pick the right one. Shiny can't be read from screenshots, so set it here.")
+                } else {
+                    Text("Shiny can't be read from screenshots, so set it here.")
+                }
             }
             solutionsSection(option, barsMissing: p.barIVs.isEmpty)
             Section {
@@ -170,6 +179,7 @@ struct ScreenshotImportView: View {
         d.secondChargedMoveId = moves.charged.count > 1 ? moves.charged[1] : ""
         d.isShadow = p.isShadow
         d.isLucky = p.isLucky && !p.isShadow
+        d.isShiny = isShiny
         return d
     }
 
@@ -181,6 +191,7 @@ struct ScreenshotImportView: View {
         speciesId = nil
         solutionId = nil
         showAllSolutions = false
+        isShiny = false
         defer { scanning = false }
 
         var reading = ScreenReading()

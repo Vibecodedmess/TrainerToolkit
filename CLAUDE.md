@@ -46,7 +46,7 @@ Also:
 | 7 | Team Rocket Counter Sheet | Confirmed on build #16 |
 | 8 | Trade Planner | Confirmed on build #16 |
 | 9 | Home tab + polish, final README | Home confirmed on build #16. User: "a simple, pleasant app" |
-| 10 | Add to Collection from screenshots (like Poke Genie) | Built 2026-11-12. **Not tested on the phone**. See "Screenshot import" |
+| 10 | Add to Collection from screenshots (like Poke Genie) | Build #17 works on the phone, including a lucky Pokémon. Shiny wasn't detected; the user chose a Shiny switch on the import screen (build #18). See "Screenshot import" |
 
 ## Current state (update this section as work continues)
 
@@ -97,6 +97,7 @@ Also:
 - App: `Features/Collection/ScreenshotReader.swift` (Vision `VNRecognizeTextRequest`, `.accurate`, en-US, no language correction; scans rows from the label's bottom to 1.6 label-heights below) and `ScreenshotImportView.swift` (PhotosPicker, up to 4 images, "Read from the screenshots" summary, then the editor via `CollectionEditorView(prefilled:)`).
 - Checked on the user's real screenshots (in `samples/`, gitignored, **never commit them or their values**): the CP/HP/stardust math and the bar measurement give the right level and IVs for both sample Pokémon. Their screenshots also show a third-party IV overlay (a dark "level, IV %, IVs" label at the top right); the app does **not** read it.
 - Not verified until it runs on a phone: what Vision actually returns for these screens (line splitting, the CP font, the "Attack/Defense/HP" label boxes).
+- **Shiny is not detected.** In the user's shiny screenshots the only sparkles belong to their IV tool (its label and side panel) or the Pokémon's animation; the game's own mark wasn't visible. The user chose a **Shiny switch on the import screen** (2026-11-12) over reading the tool's marker. Don't read the third-party overlay.
 
 ## Raids and Rocket (Phases 6–7): how they work
 
