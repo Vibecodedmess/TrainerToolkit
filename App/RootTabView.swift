@@ -25,6 +25,7 @@ struct RootTabView: View {
                 .tabItem { Label("More", systemImage: "ellipsis.circle") }
                 .tag(AppTab.more)
         }
+        .tint(AppTheme.accent)
     }
 }
 

@@ -190,19 +190,20 @@ private struct CollectionRow: View {
     let lookup: GamemasterLookup?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 3) {
+        let types = lookup?.pokemon(id: pokemon.speciesId)?.realTypes ?? []
+        return VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline) {
                 Text(pokemon.displayName)
                     .font(.headline)
                     .lineLimit(1)
                 flagIcons
                 Spacer()
-                if let types = lookup?.pokemon(id: pokemon.speciesId)?.realTypes {
-                    TypeBadges(types: types)
-                }
+                TypeBadges(types: types)
             }
-            Text(statsLine)
-                .font(.subheadline)
+            // CP, level and IVs (Attack/Defense/HP) in one line, with the IV % as a bar underneath.
+            StatsLineText(cp: tables.flatMap { pokemon.cp($0) }, level: pokemon.level, ivs: pokemon.ivs)
+            MeterBar(value: Double(pokemon.ivs.percent) / 100, color: AppTheme.typeColor(types))
+                .padding(.bottom, 1)
             if !movesLine.isEmpty {
                 Text(movesLine)
                     .font(.caption)
@@ -218,14 +219,6 @@ private struct CollectionRow: View {
             }
         }
         .padding(.vertical, 2)
-    }
-
-    private var statsLine: String {
-        var parts: [String] = []
-        if let tables, let cp = pokemon.cp(tables) { parts.append("CP \(cp)") }
-        parts.append("L\(pokemon.level.description)")
-        parts.append("\(pokemon.ivAttack)/\(pokemon.ivDefense)/\(pokemon.ivStamina) (\(pokemon.ivs.percent)%)")
-        return parts.joined(separator: " · ")
     }
 
     private var movesLine: String {

@@ -61,15 +61,16 @@ struct RocketLineupRow: View {
     let lineup: SDRocketLineup
 
     var body: some View {
-        HStack {
+        // Grunts have a type; leaders and the boss get the accent colour.
+        let types = [lineup.type ?? ""].filter { !$0.isEmpty }
+        return HStack(spacing: 10) {
+            TypeStrip(types: types)
             VStack(alignment: .leading, spacing: 3) {
                 Text(lineup.name).font(.headline)
                 Text(summary).font(.caption).foregroundStyle(.secondary).lineLimit(2)
             }
             Spacer()
-            if let type = lineup.type, !type.isEmpty {
-                TypeBadge(type: type)
-            }
+            TypeBadges(types: types)
         }
         .padding(.vertical, 2)
     }

@@ -3,24 +3,39 @@ import SwiftData
 import DataSources
 import GameMath
 
-/// Today at a glance: live events, the next Community Day, top raid bosses, goals and collection.
+/// Today at a glance: shortcut tiles, the next Community Day, live events, top raid bosses and goals.
 struct HomeView: View {
     @Environment(DataCenter.self) private var dataCenter
     @Query(sort: \PowerUpGoal.createdAt, order: .reverse) private var goals: [PowerUpGoal]
     @Query private var collection: [CollectedPokemon]
+    @State private var destination: Destination?
+
+    /// Where a tile leads.
+    enum Destination: Hashable {
+        case collection, planner, rocket, backup
+    }
 
     var body: some View {
         NavigationStack {
             TimelineView(.periodic(from: .now, by: 60)) { context in
                 let events = EventCalendar.resolve(dataCenter.events, now: context.date)
                 List {
-                    liveSection(events)
+                    tilesSection
                     communityDaySection(events, now: context.date)
+                    liveSection(events)
                     raidSection
-                    toolsSection
+                    goalsSection
                 }
             }
             .navigationTitle("Home")
+            .navigationDestination(item: $destination) { destination in
+                switch destination {
+                case .collection: CollectionView()
+                case .planner: PlannerView()
+                case .rocket: RocketView()
+                case .backup: BackupView()
+                }
+            }
             .refreshable { await dataCenter.refreshNow() }
             .safeAreaInset(edge: .top) {
                 if let warning = dataCenter.warning { WarningBanner(text: warning) }
@@ -28,7 +43,75 @@ struct HomeView: View {
         }
     }
 
+    // MARK: - Tiles
+
+    private var tilesSection: some View {
+        Section {
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible())], spacing: 10) {
+                tile(.collection, InfoTile(systemImage: "square.stack.3d.up", color: .blue,
+                                           value: Text("\(collection.count)"), label: "My collection"))
+                tile(.planner, InfoTile(systemImage: "chart.line.uptrend.xyaxis", color: .green,
+                                        value: Text("\(goals.count)"), label: "Power-up goals"))
+                tile(.rocket, InfoTile(systemImage: "flag.2.crossed", color: .red,
+                                       value: Text("\(dataCenter.rocketLineups.count)"), label: "Rocket lineups"))
+                tile(.backup, backupTile)
+            }
+            .listRowInsets(EdgeInsets())
+            .listRowBackground(Color.clear)
+        }
+    }
+
+    private func tile(_ target: Destination, _ content: InfoTile) -> some View {
+        Button {
+            destination = target
+        } label: {
+            content
+        }
+        // Plain style keeps each tile separately tappable inside one list row.
+        .buttonStyle(.plain)
+    }
+
+    /// Last backup as "2 days ago"; orange when there's none from the last 7 days.
+    private var backupTile: InfoTile {
+        if let last = BackupManager.lastBackup {
+            let stale = Date.now.timeIntervalSince(last) > 7 * 24 * 3600
+            return InfoTile(systemImage: "externaldrive.badge.icloud", color: stale ? .orange : .teal,
+                            value: Text(last, format: .relative(presentation: .named)), label: "Last backup",
+                            valueColor: stale ? .orange : .primary)
+        }
+        return InfoTile(systemImage: "externaldrive.badge.icloud", color: .orange, value: Text("Never"),
+                        label: "Last backup", valueColor: .orange)
+    }
+
     // MARK: - Sections
+
+    @ViewBuilder
+    private func communityDaySection(_ events: [ResolvedEvent], now: Date) -> some View {
+        if let cd = EventCalendar.nextCommunityDay(in: events) {
+            Section("Community Day") {
+                NavigationLink {
+                    EventDetailView(event: cd)
+                } label: {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(cd.event.name).font(.subheadline).foregroundStyle(.secondary)
+                        if cd.status == .live {
+                            Label("Live now", systemImage: "dot.radiowaves.left.and.right")
+                                .font(.title3.weight(.semibold))
+                                .foregroundStyle(.green)
+                        } else if let start = cd.start {
+                            Text(countdown(to: start, now: now))
+                                .font(.title2.monospacedDigit().weight(.bold))
+                            Text(start, format: .dateTime.weekday(.wide).day().month().hour().minute())
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+                .listRowBackground(AppTheme.accent.opacity(0.14))
+            }
+        }
+    }
 
     @ViewBuilder
     private func liveSection(_ events: [ResolvedEvent]) -> some View {
@@ -42,12 +125,18 @@ struct HomeView: View {
                     NavigationLink {
                         EventDetailView(event: event)
                     } label: {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(event.event.name).lineLimit(2)
-                            if let end = event.end {
-                                Text("Ends \(end, format: .relative(presentation: .named))")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                        HStack(alignment: .firstTextBaseline, spacing: 10) {
+                            Image(systemName: "circle.fill")
+                                .font(.system(size: 8))
+                                .foregroundStyle(.green)
+                                .accessibilityHidden(true)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(event.event.name).lineLimit(2)
+                                if let end = event.end {
+                                    Text("Ends \(end, format: .relative(presentation: .named))")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                     }
@@ -58,31 +147,6 @@ struct HomeView: View {
             }
         } header: {
             Text("Happening now")
-        }
-    }
-
-    @ViewBuilder
-    private func communityDaySection(_ events: [ResolvedEvent], now: Date) -> some View {
-        if let cd = EventCalendar.nextCommunityDay(in: events) {
-            Section("Community Day") {
-                NavigationLink {
-                    EventDetailView(event: cd)
-                } label: {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(cd.event.name).font(.headline)
-                        if cd.status == .live {
-                            Label("Live now", systemImage: "dot.radiowaves.left.and.right").foregroundStyle(.green)
-                        } else if let start = cd.start {
-                            Text(countdown(to: start, now: now))
-                                .font(.title3.monospacedDigit().weight(.semibold))
-                            Text(start, format: .dateTime.weekday(.wide).day().month().hour().minute())
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .padding(.vertical, 2)
-                }
-            }
         }
     }
 
@@ -106,55 +170,24 @@ struct HomeView: View {
         }
     }
 
-    private var toolsSection: some View {
-        Section("Your plans") {
-            NavigationLink {
-                PlannerView()
-            } label: {
-                LabeledContent {
-                    Text(goals.isEmpty ? "None yet" : "\(goals.count)")
-                } label: {
-                    Label("Power-up goals", systemImage: "chart.line.uptrend.xyaxis")
-                }
-            }
-            ForEach(goals.prefix(3)) { goal in
-                Text("\(goal.speciesName): level \(PokemonLevel(halfSteps: goal.currentLevelHalfSteps).description) → \(PokemonLevel(halfSteps: goal.targetLevelHalfSteps).description)")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
-            NavigationLink {
-                CollectionView()
-            } label: {
-                LabeledContent {
-                    Text("\(collection.count)")
-                } label: {
-                    Label("My collection", systemImage: "square.stack.3d.up")
-                }
-            }
-            NavigationLink {
-                BackupView()
-            } label: {
-                LabeledContent {
-                    backupStatus
-                } label: {
-                    Label("Backup", systemImage: "externaldrive.badge.icloud")
-                }
-            }
-        }
-    }
-
-    /// "2 days ago", in orange when there's no backup from the last 7 days.
     @ViewBuilder
-    private var backupStatus: some View {
-        if let last = BackupManager.lastBackup {
-            Text(last, format: .relative(presentation: .named))
-                .foregroundStyle(Date.now.timeIntervalSince(last) > 7 * 24 * 3600 ? Color.orange : Color.secondary)
-        } else {
-            Text("Never").foregroundStyle(.orange)
+    private var goalsSection: some View {
+        if !goals.isEmpty {
+            Section("Next power-ups") {
+                ForEach(goals.prefix(3)) { goal in
+                    HStack {
+                        Text(goal.speciesName)
+                        Spacer()
+                        Text("L\(PokemonLevel(halfSteps: goal.currentLevelHalfSteps).description) → L\(PokemonLevel(halfSteps: goal.targetLevelHalfSteps).description)")
+                            .font(.subheadline.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
         }
     }
 
-    /// "3 d 04:12" style countdown, minutes resolution (the view refreshes every minute).
+    /// "in 3 d 4 h 12 min" countdown, minutes resolution (the view refreshes every minute).
     private func countdown(to date: Date, now: Date) -> String {
         let minutes = max(0, Int(date.timeIntervalSince(now) / 60))
         let days = minutes / (24 * 60)

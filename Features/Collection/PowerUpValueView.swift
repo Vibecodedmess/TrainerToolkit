@@ -182,8 +182,7 @@ struct PowerUpValueView: View {
                 Text("#\(point.rank) of \(point.ofCount)")
                     .font(.subheadline.monospacedDigit().weight(.semibold))
             }
-            ProgressView(value: min(max(point.relativeToBest, 0), 1))
-                .accessibilityLabel("\(Int((point.relativeToBest * 100).rounded())) percent of your best counter")
+            MeterBar(value: point.relativeToBest, color: AppTheme.typeColor(types))
             HStack {
                 Text(point.relativeToBest, format: .percent.precision(.fractionLength(0)))
                     .font(.caption.monospacedDigit())

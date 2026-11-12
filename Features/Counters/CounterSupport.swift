@@ -156,12 +156,18 @@ struct CounterRow: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
-                ProgressView(value: min(max(score, 0), 1))
-                    .accessibilityHidden(true)
+                MeterBar(value: score, color: attackColor)
             }
         }
         .padding(.vertical, 2)
         .accessibilityElement(children: .combine)
+    }
+
+    /// The bar takes the colour of the attack's type: the charged move's, else the fast move's.
+    private var attackColor: Color {
+        let moveId = moveset.chargedMoveId ?? moveset.fastMoveId
+        guard let type = lookup?.move(moveId)?.type else { return AppTheme.accent }
+        return TypeBadge.color(for: type)
     }
 
     private var movesText: String {

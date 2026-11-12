@@ -64,19 +64,23 @@ struct RaidBossRow: View {
     let boss: SDRaidBoss
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(boss.name).font(.headline)
-                if boss.canBeShiny == true {
-                    Image(systemName: "sparkles").foregroundStyle(.yellow).accessibilityLabel("Can be shiny")
+        let types = (boss.types ?? []).map { $0.name.lowercased() }
+        return HStack(spacing: 10) {
+            TypeStrip(types: types)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .firstTextBaseline) {
+                    Text(boss.name).font(.headline)
+                    if boss.canBeShiny == true {
+                        Image(systemName: "sparkles").foregroundStyle(.yellow).accessibilityLabel("Can be shiny")
+                    }
+                    Spacer()
+                    TypeBadges(types: types)
                 }
-                Spacer()
-                TypeBadges(types: (boss.types ?? []).map(\.name))
-            }
-            if let cp = boss.combatPower?.normal {
-                Text("CP \(cp.min)–\(cp.max)" + (boss.combatPower?.boosted.map { " · weather boosted \($0.min)–\($0.max)" } ?? ""))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if let cp = boss.combatPower?.normal {
+                    Text("CP \(cp.min)–\(cp.max)" + (boss.combatPower?.boosted.map { " · weather boosted \($0.min)–\($0.max)" } ?? ""))
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .padding(.vertical, 2)

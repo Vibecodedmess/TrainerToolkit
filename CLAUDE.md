@@ -52,10 +52,17 @@ Also:
 | 13 | Collection power-ups: one-tap Planner goal + raid rank by level (and evolved) vs your other counters | Confirmed on build #21 (2026-11-12). `Counters/PowerUpValue.swift`, `Features/Collection/PowerUpValueView.swift` |
 | 14 | Raid "trainers needed" estimate (community tier table, unverified) | Confirmed on build #23 (2026-11-12) |
 | 15 | Backup and restore (iCloud Drive via Files; automatic daily backups to a chosen folder) | Confirmed on build #23 (2026-11-12; user asked for it because free sideloads expire weekly). See "Backup" |
+| 16 | Visual polish, "concept A: polished native" (user's pick of 3 concepts) | Built 2026-11-12. **Not tested on the phone**. See "Look and feel" |
 
 ## Current state (update this section as work continues)
 
-- **As of 2026-11-12:** Phases 0–15 are built, and everything is confirmed on the phone except the CSV import, which is untested because the user has no CSV.
+- **As of 2026-11-12:** Phases 0–15 are built, and everything is confirmed on the phone except the CSV import, which is untested because the user has no CSV. Phase 16 (visual polish) is built but not yet tested.
+- **Look and feel (Phase 16, user's choices):**
+  - The user picked "polished native" over a card dashboard and a dark HUD. They explicitly did **not** want separate ATK/DEF/HP stat bars: keep the layout as it is.
+  - **Stats line everywhere:** `CP 2651 · L30 · 13/15/14 · 93%`, IVs as Attack/Defense/HP. Use `PokemonStats.line` / `StatsLineText` in `Shared/Theme.swift`; don't hand-build it.
+  - `Shared/Theme.swift` also has `AppTheme` (accent from `AccentColor.colorset`, type colour of a Pokémon), `MeterBar` (IV % or relative strength, in the type colour), `TypeStrip` (leading colour strip on raid/Rocket rows) and `InfoTile` (Home tiles).
+  - Home: 2×2 tiles (collection, goals, Rocket, backup) using `navigationDestination(item:)`, then a tinted Community Day card, live events, the top raid tier and the next goals.
+  - Counter bars take the colour of the attack's type (charged move, else fast move).
 - **Maintenance (2026-11-12, user's choice):**
   - Snapshots refreshed.
   - PokeMiners pins checked: still the latest commits.

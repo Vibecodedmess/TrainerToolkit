@@ -207,9 +207,13 @@ private struct GroupRow: View {
 
     private var detail: String {
         var parts: [String] = []
-        if let cp = proposal.reading.cp { parts.append("CP \(cp)") }
         if let s = proposal.certainChoice?.solution {
-            parts.append("L\(s.level.description) · \(s.ivs.attack)/\(s.ivs.defense)/\(s.ivs.stamina)")
+            parts.append(PokemonStats.line(cp: proposal.reading.cp, level: s.level, ivs: s.ivs))
+        } else if let cp = proposal.reading.cp {
+            parts.append("CP \(cp)")
+        }
+        if proposal.certainChoice != nil {
+            // Nothing to add: the stats line says it all.
         } else if proposal.options.isEmpty {
             parts.append("nothing fits")
         } else if proposal.options.count > 1 {

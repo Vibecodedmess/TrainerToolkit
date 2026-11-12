@@ -3,7 +3,7 @@
 A personal-use iOS companion app for trainers: search string builder, power-up planner, raid and Rocket counters, event checklists and trade planning.
 It is sideloaded, never published.
 
-**Status:** all planned features are built (Phases 0–15). See "Features" below and `CLAUDE.md` for what has been tested on a phone.
+**Status:** all planned features are built (Phases 0–16). See "Features" below and `CLAUDE.md` for what has been tested on a phone.
 
 ## Features
 
@@ -36,7 +36,7 @@ Counter rankings use the PvE damage formula with the game master's type chart, w
 | `Config/Shared.xcconfig` | Bundle ID, display name, version (the one place to change them) |
 | `App/` | App entry point and tab bar |
 | `Features/*` | One folder per feature screen |
-| `Shared/` | Reusable SwiftUI views |
+| `Shared/` | Reusable SwiftUI views and the app theme (`Theme.swift`: accent, stats line, bars, tiles) |
 | `Persistence/` | On-device storage (SwiftData from Phase 1 on) |
 | `Packages/TrainerKit/` | Pure-Swift modules `GameMath`, `DataSources`, `SearchBuilder`, `CollectionImport`, `Counters`, `ScreenshotImport` and `BackupFormat`, with unit tests |
 | `Packages/TrainerKit/Sources/DataSources/Snapshots/` | Bundled offline copy of every dataset (see `DATA_SOURCES.md`) |
