@@ -131,6 +131,26 @@ struct HomeView: View {
                     Label("My collection", systemImage: "square.stack.3d.up")
                 }
             }
+            NavigationLink {
+                BackupView()
+            } label: {
+                LabeledContent {
+                    backupStatus
+                } label: {
+                    Label("Backup", systemImage: "externaldrive.badge.icloud")
+                }
+            }
+        }
+    }
+
+    /// "2 days ago", in orange when there's no backup from the last 7 days.
+    @ViewBuilder
+    private var backupStatus: some View {
+        if let last = BackupManager.lastBackup {
+            Text(last, format: .relative(presentation: .named))
+                .foregroundStyle(Date.now.timeIntervalSince(last) > 7 * 24 * 3600 ? Color.orange : Color.secondary)
+        } else {
+            Text("Never").foregroundStyle(.orange)
         }
     }
 

@@ -13,6 +13,7 @@ let package = Package(
         .library(name: "CollectionImport", targets: ["CollectionImport"]),
         .library(name: "Counters", targets: ["Counters"]),
         .library(name: "ScreenshotImport", targets: ["ScreenshotImport"]),
+        .library(name: "BackupFormat", targets: ["BackupFormat"]),
     ],
     targets: [
         .target(
@@ -43,5 +44,8 @@ let package = Package(
         // Pokémon screenshots -> species, level, IVs, moves (text from Vision in the app; bars from pixels).
         .target(name: "ScreenshotImport", dependencies: ["DataSources", "GameMath"]),
         .testTarget(name: "ScreenshotImportTests", dependencies: ["ScreenshotImport", "DataSources", "GameMath"]),
+        // Backup file format (plain Codable values; the app maps its SwiftData models to it).
+        .target(name: "BackupFormat"),
+        .testTarget(name: "BackupFormatTests", dependencies: ["BackupFormat"]),
     ]
 )

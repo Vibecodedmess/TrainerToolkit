@@ -3,7 +3,7 @@
 A personal-use iOS companion app for trainers: search string builder, power-up planner, raid and Rocket counters, event checklists and trade planning.
 It is sideloaded, never published.
 
-**Status:** all planned features are built (Phases 0–14). See "Features" below and `CLAUDE.md` for what has been tested on a phone.
+**Status:** all planned features are built (Phases 0–15). See "Features" below and `CLAUDE.md` for what has been tested on a phone.
 
 ## Features
 
@@ -17,6 +17,7 @@ It is sideloaded, never published.
 | More > Collection | Your own Pokémon: manual entry, from screenshots of one or many Pokémon at once (on-device text recognition reads CP, HP, name, power-up cost, moves and the appraisal bars, then works out level and IVs), or CSV import (see [COLLECTION_IMPORT.md](COLLECTION_IMPORT.md)). Each Pokémon shows what it needs to evolve (item, lure, quest, buddy, time) and how to get the item, and how it would rank among your raid counters if powered up (or evolved), with a one-tap Planner goal |
 | More > Rocket | Giovanni, leader and grunt lineups; counters per possible Pokémon and per slot; works offline |
 | More > Trades | Friends, want lists and an estimated stardust cost per trade |
+| More > Backup | Back up everything to iCloud Drive (or anywhere in Files), automatic daily backups to a folder you choose, and restore with undo |
 
 Counter rankings use the PvE damage formula with the game master's type chart, weather and move stats. The opponent's real stats are server-side, so percentages are relative to the best counter (each screen has a "How this is calculated" note).
 
@@ -37,7 +38,7 @@ Counter rankings use the PvE damage formula with the game master's type chart, w
 | `Features/*` | One folder per feature screen |
 | `Shared/` | Reusable SwiftUI views |
 | `Persistence/` | On-device storage (SwiftData from Phase 1 on) |
-| `Packages/TrainerKit/` | Pure-Swift modules `GameMath`, `DataSources`, `SearchBuilder`, `CollectionImport`, `Counters` and `ScreenshotImport`, with unit tests |
+| `Packages/TrainerKit/` | Pure-Swift modules `GameMath`, `DataSources`, `SearchBuilder`, `CollectionImport`, `Counters`, `ScreenshotImport` and `BackupFormat`, with unit tests |
 | `Packages/TrainerKit/Sources/DataSources/Snapshots/` | Bundled offline copy of every dataset (see `DATA_SOURCES.md`) |
 | `scripts/update-snapshots.sh` | Refreshes the bundled snapshots |
 | `Packages/TrainerKit/Sources/SearchBuilder/` | Search string builder and `search-terms.json` (the editable term list) |

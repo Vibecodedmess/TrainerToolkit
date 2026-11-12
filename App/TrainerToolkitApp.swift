@@ -26,6 +26,8 @@ struct TrainerToolkitApp: App {
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .active {
                         Task { await dataCenter.refreshIfStale() }
+                        // Daily automatic backup to the chosen folder (if switched on).
+                        BackupManager.autoBackupIfDue(modelContainer.mainContext)
                     }
                 }
         }

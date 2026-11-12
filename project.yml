@@ -44,6 +44,8 @@ targets:
         product: Counters
       - package: TrainerKit
         product: ScreenshotImport
+      - package: TrainerKit
+        product: BackupFormat
     settings:
       base:
         PRODUCT_NAME: TrainerToolkit

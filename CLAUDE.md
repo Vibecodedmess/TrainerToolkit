@@ -51,11 +51,12 @@ Also:
 | 12 | Evolution requirements in My Collection (items, lures, quests, buddy, time, gender) + how to get each item | Confirmed on build #20 (2026-11-12). See DATA_SOURCES.md "evolution requirements" |
 | 13 | Collection power-ups: one-tap Planner goal + raid rank by level (and evolved) vs your other counters | Confirmed on build #21 (2026-11-12). `Counters/PowerUpValue.swift`, `Features/Collection/PowerUpValueView.swift` |
 | 14 | Raid "trainers needed" estimate (community tier table, unverified) | Built 2026-11-12. **Not tested on the phone** |
+| 15 | Backup and restore (iCloud Drive via Files; automatic daily backups to a chosen folder) | Built 2026-11-12 (user asked: free sideload expires weekly). **Not tested on the phone**. See "Backup" |
 
 ## Current state (update this section as work continues)
 
 - **Latest (2026-11-12):** `87d2d9f`, bulk screenshot import. Build #19 is green and confirmed on the phone. Everything through Phase 11 works.
-- **Ideas the user hasn't picked yet:** PvP league IV ranks for the collection; backup and restore (export/import the collection, goals and trade lists); maintenance (refresh the bundled snapshots, CI Node 20 warnings, docs).
+- **Ideas the user hasn't picked yet:** PvP league IV ranks for the collection; maintenance (refresh the bundled snapshots, CI Node 20 warnings, docs).
 - **Power-up value (Phase 13):** `PowerUpValue.evaluate` ranks the Pokémon at its current level and at 40/45/50 (up to the max upgrade level) against the other collection entries, which stay at their own levels. The boss is chosen from the current raids; there's an optional evolved form (regular moves only, same IVs). Costs come from `PowerUpCalculator` with shadow/purified/lucky. A Pokémon without a saved fast move uses its species' regular moves (the screen says so). Planner hook: `GoalEditorView(prefilled:)` with `GoalDraft(collected:types:target:)`.
 - Earlier: `9988d39`, Phases 6–9 (Raids, Rocket, Trades, Home, README). Build #16 green (`macos-15-intel`).
   - Earlier on 2026-11-11: `a604f13` fixed the move-name lookup ("Seed Bomb" vs "Seed Bomb+"), and `8e90321` fixed the editor's CP box (build #15 green).
@@ -110,6 +111,16 @@ Also:
 - Checked on the user's real screenshots (in `samples/`, gitignored, **never commit them or their values**): the CP/HP/stardust math and the bar measurement give the right level and IVs for both sample Pokémon. Their screenshots also show a third-party IV overlay (a dark "level, IV %, IVs" label at the top right); the app does **not** read it.
 - Not verified until it runs on a phone: what Vision actually returns for these screens (line splitting, the CP font, the "Attack/Defense/HP" label boxes).
 - **Shiny is not detected.** In the user's shiny screenshots the only sparkles belong to their IV tool (its label and side panel) or the Pokémon's animation; the game's own mark wasn't visible. The user chose a **Shiny switch on the import screen** (2026-11-12) over reading the tool's marker. Don't read the third-party overlay.
+
+## Backup (Phase 15): how it works
+
+- **No CloudKit:** free-signed sideloaded apps get no iCloud container entitlement. iCloud Drive is reached through the Files picker instead: `fileExporter`/`fileImporter`, plus a security-scoped **folder bookmark** for automatic backups.
+- **Format:** `Packages/TrainerKit/Sources/BackupFormat/AppBackup.swift`, versioned JSON (`format: "trainer-toolkit-backup"`, `version`, ISO 8601 dates). It holds every SwiftData model and the user-entered settings in `BackupManager.settingsKeys` (base trade costs, refresh interval). A newer version is refused with a clear message.
+- **App side:**
+  - `Persistence/BackupManager.swift` does the snapshot and the restore (delete all, then insert). Before a restore it saves an **undo copy** at `Application Support/Backups/before-last-restore.json`.
+  - Automatic backup runs when the app becomes active, at most every 24 h, with coordinated writes. It keeps the newest 14 `TrainerToolkit-backup-*.json` files and never touches other files.
+  - `Features/Settings/BackupView.swift` (More > Backup), plus a Home row that turns orange after 7 days without a backup.
+- **When adding a new @Model or a user-entered setting,** add it to `AppBackup`, `BackupManager.snapshot` and `BackupManager.restore`. Bump `AppBackup.currentVersion` only when old backups can't be read as they are.
 
 ## Raids and Rocket (Phases 6–7): how they work
 
