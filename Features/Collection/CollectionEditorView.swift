@@ -38,6 +38,17 @@ struct CollectionEditorView: View {
             if let speciesId = draft.speciesId {
                 EvolutionSection(speciesId: speciesId, isPurified: draft.isPurified, lookup: dataCenter.lookup)
             }
+            if let pokemon {
+                Section {
+                    NavigationLink {
+                        PowerUpValueView(pokemon: pokemon)
+                    } label: {
+                        Label("Power-up value and plan", systemImage: "chart.line.uptrend.xyaxis")
+                    }
+                } footer: {
+                    Text("How it ranks among your raid counters at higher levels, or evolved, and a one-tap Planner goal. Uses the saved values.")
+                }
+            }
             flagsSection
             Section("Notes") {
                 TextField("Optional", text: $draft.notes, axis: .vertical)

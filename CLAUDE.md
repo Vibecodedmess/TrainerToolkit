@@ -48,12 +48,14 @@ Also:
 | 9 | Home tab + polish, final README | Home confirmed on build #16. User: "a simple, pleasant app" |
 | 10 | Add to Collection from screenshots (like Poke Genie) | Confirmed on build #18 (2026-11-12), including lucky, and the Shiny switch the user chose (the game's shiny mark isn't readable). See "Screenshot import" |
 | 11 | Bulk screenshot import (many Pokémon at once) | Confirmed on build #19 (2026-11-12) |
-| 12 | Evolution requirements in My Collection (items, lures, quests, buddy, time, gender) + how to get each item | Built 2026-11-12. **Not tested on the phone**. See DATA_SOURCES.md "evolution requirements" |
+| 12 | Evolution requirements in My Collection (items, lures, quests, buddy, time, gender) + how to get each item | Confirmed on build #20 (2026-11-12). See DATA_SOURCES.md "evolution requirements" |
+| 13 | Collection power-ups: one-tap Planner goal + raid rank by level (and evolved) vs your other counters | Built 2026-11-12. **Not tested on the phone**. `Counters/PowerUpValue.swift`, `Features/Collection/PowerUpValueView.swift` |
 
 ## Current state (update this section as work continues)
 
 - **Latest (2026-11-12):** `87d2d9f`, bulk screenshot import. Build #19 is green and confirmed on the phone. Everything through Phase 11 works.
-- **Ideas the user hasn't picked yet:** the raid "trainers needed" estimate (open decision, see "Raids and Rocket"); Collection power-ups (a one-tap Planner goal from a collection entry, and raid gain at a higher level); maintenance (refresh the bundled snapshots, CI Node 20 warnings, docs).
+- **Ideas the user hasn't picked yet:** the raid "trainers needed" estimate (open decision, see "Raids and Rocket"); maintenance (refresh the bundled snapshots, CI Node 20 warnings, docs).
+- **Power-up value (Phase 13):** `PowerUpValue.evaluate` ranks the Pokémon at its current level and at 40/45/50 (up to the max upgrade level) against the other collection entries, which stay at their own levels. The boss is chosen from the current raids; there's an optional evolved form (regular moves only, same IVs). Costs come from `PowerUpCalculator` with shadow/purified/lucky. A Pokémon without a saved fast move uses its species' regular moves (the screen says so). Planner hook: `GoalEditorView(prefilled:)` with `GoalDraft(collected:types:target:)`.
 - Earlier: `9988d39`, Phases 6–9 (Raids, Rocket, Trades, Home, README). Build #16 green (`macos-15-intel`).
   - Earlier on 2026-11-11: `a604f13` fixed the move-name lookup ("Seed Bomb" vs "Seed Bomb+"), and `8e90321` fixed the editor's CP box (build #15 green).
   - Builds #10–#12 were never acquired (no runner capacity); #13 failed on the Seed Bomb test.

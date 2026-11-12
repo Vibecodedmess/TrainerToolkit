@@ -20,6 +20,12 @@ struct GoalEditorView: View {
         _draft = State(initialValue: goal.map { GoalDraft(goal: $0, types: []) } ?? GoalDraft())
     }
 
+    /// A new goal that starts with these values (for example from a Pokémon in My Collection).
+    init(prefilled draft: GoalDraft) {
+        goal = nil
+        _draft = State(initialValue: draft)
+    }
+
     var body: some View {
         if let tables = PlannerMath.tables {
             form(tables)
