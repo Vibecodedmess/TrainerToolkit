@@ -1,24 +1,32 @@
 import SwiftUI
+import SwiftData
 import PhotosUI
 import GameMath
 import DataSources
 import ScreenshotImport
 
-/// Add a Pokémon from screenshots of its screen and appraisal. Everything runs on the phone.
+/// One Pokémon found in a batch of screenshots.
+struct ScreenshotGroup: Identifiable {
+    let id: Int
+    /// 1-based positions of its screenshots in the picked batch.
+    let screenshotNumbers: [Int]
+    /// Nil when nothing usable (no CP) was read.
+    let proposal: ScreenshotImporter.Proposal?
+}
+
+/// Add Pokémon from screenshots: one Pokémon or many at once. Everything runs on the phone.
 struct ScreenshotImportView: View {
     @Environment(DataCenter.self) private var dataCenter
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Query private var existing: [CollectedPokemon]
     @State private var items: [PhotosPickerItem] = []
-    @State private var scanning = false
+    @State private var progress: (done: Int, total: Int)?
     @State private var errorText: String?
-    @State private var proposal: ScreenshotImporter.Proposal?
-    @State private var speciesId: String?
-    @State private var solutionId: String?
-    @State private var showAllSolutions = false
-    /// The game's shiny mark can't be read reliably from a screenshot, so the user sets it here.
-    @State private var isShiny = false
+    @State private var groups: [ScreenshotGroup] = []
+    @State private var savedMessage: String?
 
-    private let maxScreenshots = 4
+    private let maxScreenshots = 40
 
     var body: some View {
         Form {
@@ -27,16 +35,35 @@ struct ScreenshotImportView: View {
                     Label(items.isEmpty ? "Choose screenshots" : "Choose other screenshots", systemImage: "photo.on.rectangle")
                 }
             } footer: {
-                Text("Pick up to \(maxScreenshots) screenshots of one Pokémon: its screen (the top, and scrolled down to the power-up cost and moves) and its appraisal with the three bars. The game must be in English.")
+                Text("Per Pokémon: the top of its screen, scrolled down to the power-up cost and moves, and its appraisal with the three bars. Pick up to \(maxScreenshots) screenshots, one or more Pokémon, keeping each Pokémon's screenshots together. The game must be in English.")
             }
 
-            if scanning {
-                Section { HStack { ProgressView(); Text("Reading screenshots…").foregroundStyle(.secondary) } }
+            if let progress {
+                Section {
+                    HStack {
+                        ProgressView()
+                        Text("Reading screenshot \(min(progress.done + 1, progress.total)) of \(progress.total)…")
+                            .foregroundStyle(.secondary)
+                    }
+                }
             } else if let errorText {
                 Section { Text(errorText).foregroundStyle(.secondary) }
-            } else if let proposal {
-                readSection(proposal)
-                resultSections(proposal)
+            } else if !groups.isEmpty {
+                summarySection
+                Section(groups.count == 1 ? "Found 1 Pokémon" : "Found \(groups.count) Pokémon") {
+                    ForEach(groups) { group in
+                        if let proposal = group.proposal {
+                            NavigationLink {
+                                ScreenshotReviewView(proposal: proposal)
+                            } label: {
+                                GroupRow(group: group, proposal: proposal, isSaved: isInCollection(proposal),
+                                         lookup: dataCenter.lookup)
+                            }
+                        } else {
+                            UnreadGroupRow(group: group)
+                        }
+                    }
+                }
             }
         }
         .navigationTitle("From screenshots")
@@ -51,169 +78,193 @@ struct ScreenshotImportView: View {
         }
     }
 
-    // MARK: - Sections
+    // MARK: - Summary and bulk save
 
-    private func readSection(_ p: ScreenshotImporter.Proposal) -> some View {
-        let r = p.reading
-        return Section {
-            LabeledContent("CP", value: r.cp.map(String.init) ?? "Not found")
-            LabeledContent("HP", value: r.hp.map(String.init) ?? "Not found")
-            LabeledContent("Name", value: r.name ?? "Not found")
-            if let family = r.candyFamily { LabeledContent("Candy", value: family) }
-            if !r.types.isEmpty { LabeledContent("Type") { TypeBadges(types: r.types) } }
-            LabeledContent("Power-up stardust", value: r.powerUpStardust.map { $0.formatted() } ?? "Not found")
-            LabeledContent("Appraisal IVs", value: barText(p.barIVs))
-            if p.isShadow { Label("Shadow (PURIFY button found)", systemImage: "flame.fill") }
-            if p.isLucky { Label("Lucky", systemImage: "star.circle") }
-        } header: {
-            Text("Read from the screenshots")
-        } footer: {
-            if p.ignoredStardust {
-                Text("No level fits the power-up stardust that was read, so it was ignored. Check the level below.")
-            }
+    private var readyToSave: [ScreenshotImporter.Proposal.CertainChoice] {
+        groups.compactMap { group in
+            guard let p = group.proposal, let choice = p.certainChoice, !isInCollection(p) else { return nil }
+            return choice
         }
     }
 
     @ViewBuilder
-    private func resultSections(_ p: ScreenshotImporter.Proposal) -> some View {
-        if p.options.isEmpty {
-            Section {
-                Text(p.reading.cp == nil
-                     ? "The CP couldn't be read. Use a screenshot of the top of the Pokémon's screen."
-                     : "No Pokémon, level and IVs fit what was read. Check that the screenshots show one Pokémon, or add it by hand.")
-                    .foregroundStyle(.secondary)
-            }
-        } else if let lookup = dataCenter.lookup {
-            let option = p.options.first { $0.pokemon.speciesId == speciesId } ?? p.options[0]
-            Section {
-                if p.options.count > 1 {
-                    Picker("Pokémon", selection: Binding(get: { option.pokemon.speciesId }, set: { speciesId = $0; solutionId = nil })) {
-                        ForEach(p.options) { Text($0.pokemon.speciesName).tag($0.pokemon.speciesId) }
-                    }
-                } else {
-                    LabeledContent("Pokémon", value: option.pokemon.speciesName)
-                }
-                let moves = p.moves(for: option.pokemon, lookup: lookup)
-                LabeledContent("Moves", value: movesText(moves, lookup: lookup))
-                Toggle(isOn: $isShiny) {
-                    Label("Shiny", systemImage: "sparkles")
-                }
-            } header: {
-                Text("Pokémon")
-            } footer: {
-                if p.options.count > 1 {
-                    Text("More than one Pokémon fits (a nickname, or regional forms). Pick the right one. Shiny can't be read from screenshots, so set it here.")
-                } else {
-                    Text("Shiny can't be read from screenshots, so set it here.")
-                }
-            }
-            solutionsSection(option, barsMissing: p.barIVs.isEmpty)
-            Section {
-                NavigationLink {
-                    CollectionEditorView(prefilled: draft(p, option, lookup: lookup))
-                } label: {
-                    Label("Review and save", systemImage: "square.and.pencil")
-                }
-            } footer: {
-                Text("Opens the normal editor with these values. Check them, then tap Save.")
-            }
-        }
-    }
-
-    private func solutionsSection(_ option: ScreenshotImporter.SpeciesOption, barsMissing: Bool) -> some View {
-        let all = option.solutions
-        let shown = showAllSolutions ? Array(all.prefix(60)) : Array(all.prefix(6))
-        let selected = all.first { $0.id == solutionId } ?? all[0]
-        return Section {
-            ForEach(shown) { s in
+    private var summarySection: some View {
+        let ready = readyToSave
+        let unsure = groups.filter { g in g.proposal.map { $0.certainChoice == nil && !isInCollection($0) } ?? true }.count
+        Section {
+            if !ready.isEmpty {
                 Button {
-                    solutionId = s.id
+                    saveCertain()
                 } label: {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Level \(s.level.description) · \(s.ivs.attack)/\(s.ivs.defense)/\(s.ivs.stamina) (\(s.ivs.percent)%)")
-                                .foregroundStyle(.primary)
-                            if s.distance == 0 && !barsMissing {
-                                Text("Matches the appraisal bars").font(.caption).foregroundStyle(.secondary)
-                            }
-                        }
-                        Spacer()
-                        if s.id == selected.id { Image(systemName: "checkmark").foregroundStyle(.tint) }
-                    }
+                    Label(ready.count == 1 ? "Save the 1 sure Pokémon" : "Save the \(ready.count) sure Pokémon",
+                          systemImage: "tray.and.arrow.down")
                 }
             }
-            if all.count > shown.count {
-                Button("Show all \(all.count) possibilities") { showAllSolutions = true }
+            if let savedMessage {
+                Label(savedMessage, systemImage: "checkmark.circle").foregroundStyle(.green)
             }
-        } header: {
-            Text(all.count == 1 ? "Level and IVs" : "Level and IVs (\(all.count) fit)")
         } footer: {
-            if all.count > 1 {
-                Text("Several combinations give this CP and HP. An appraisal screenshot narrows it down.")
+            if unsure > 0 {
+                Text("\(unsure) need a choice from you (several levels or IVs fit, or something wasn't read). Tap them to review. Shiny isn't saved by \"Save\": set it in the review if needed.")
+            } else {
+                Text("Shiny can't be read from screenshots. To mark one as shiny, tap it and use the review instead.")
             }
         }
     }
 
-    // MARK: - Helpers
-
-    private func barText(_ hints: IVSolver.Hints) -> String {
-        guard !hints.isEmpty else { return "No appraisal found" }
-        return [hints.attack, hints.defense, hints.stamina].map { $0.map(String.init) ?? "?" }.joined(separator: "/")
+    private func saveCertain() {
+        guard let lookup = dataCenter.lookup else { return }
+        var count = 0
+        for group in groups {
+            guard let p = group.proposal, let choice = p.certainChoice, !isInCollection(p) else { continue }
+            let draft = p.draft(option: choice.option, solution: choice.solution, isShiny: false, lookup: lookup)
+            if let model = draft.apply(to: nil) {
+                modelContext.insert(model)
+                count += 1
+            }
+        }
+        try? modelContext.save()
+        savedMessage = count == 1 ? "Saved 1 Pokémon." : "Saved \(count) Pokémon."
     }
 
-    private func movesText(_ moves: (fast: String?, charged: [String]), lookup: GamemasterLookup) -> String {
-        let names = ([moves.fast].compactMap { $0 } + moves.charged).map { lookup.moveName($0) }
-        return names.isEmpty ? "Not found" : names.joined(separator: ", ")
+    /// True when a collection entry matches one of the proposal's answers (same species, IVs, level, shadow).
+    private func isInCollection(_ p: ScreenshotImporter.Proposal) -> Bool {
+        let keys = Set(existing.map { CollectionImportView.key($0) })
+        return p.options.contains { option in
+            option.solutions.contains { s in
+                keys.contains("\(option.pokemon.speciesId)|\(s.ivs.attack)|\(s.ivs.defense)|\(s.ivs.stamina)|\(s.level.halfSteps)|\(p.isShadow)")
+            }
+        }
     }
 
-    private func draft(_ p: ScreenshotImporter.Proposal, _ option: ScreenshotImporter.SpeciesOption,
-                       lookup: GamemasterLookup) -> CollectionDraft {
-        let solution = option.solutions.first { $0.id == solutionId } ?? option.solutions[0]
-        var d = CollectionDraft()
-        d.select(option.pokemon, lookup: lookup)
-        d.ivs = solution.ivs
-        d.level = solution.level
-        let moves = p.moves(for: option.pokemon, lookup: lookup)
-        d.fastMoveId = moves.fast ?? ""
-        d.chargedMoveId = moves.charged.first ?? ""
-        d.secondChargedMoveId = moves.charged.count > 1 ? moves.charged[1] : ""
-        d.isShadow = p.isShadow
-        d.isLucky = p.isLucky && !p.isShadow
-        d.isShiny = isShiny
-        return d
-    }
+    // MARK: - Reading
 
     private func scan() async {
         guard !items.isEmpty else { return }
-        scanning = true
         errorText = nil
-        proposal = nil
-        speciesId = nil
-        solutionId = nil
-        showAllSolutions = false
-        isShiny = false
-        defer { scanning = false }
+        groups = []
+        savedMessage = nil
+        progress = (0, items.count)
+        defer { progress = nil }
 
-        var reading = ScreenReading()
-        var bars: [AppraisalStat: Double] = [:]
-        for item in items {
-            guard let data = try? await item.loadTransferable(type: Data.self) else { continue }
-            guard let scan = try? await Task.detached(priority: .userInitiated, operation: { try ScreenshotReader.scan(data) }).value else { continue }
-            reading = reading.merged(with: scan.reading)
-            for (stat, value) in scan.barFractions where bars[stat] == nil { bars[stat] = value }
+        var scans: [ScreenshotScan] = []
+        for (index, item) in items.enumerated() {
+            progress = (index, items.count)
+            if let data = try? await item.loadTransferable(type: Data.self),
+               let scan = try? await Task.detached(priority: .userInitiated, operation: { try ScreenshotReader.scan(data) }).value {
+                scans.append(scan)
+            } else {
+                scans.append(ScreenshotScan(reading: ScreenReading(), barFractions: [:]))
+            }
         }
         guard let gm = dataCenter.gamemaster, let lookup = dataCenter.lookup, let tables = PlannerMath.tables else {
             errorText = "Pokémon data is still loading. Try again in a moment."
             return
         }
-        let finalReading = reading, finalBars = bars
-        let result = await Task.detached(priority: .userInitiated) {
-            ScreenshotImporter.propose(finalReading, barFractions: finalBars, gamemaster: gm, lookup: lookup, tables: tables)
+        let finalScans = scans
+        groups = await Task.detached(priority: .userInitiated) { () -> [ScreenshotGroup] in
+            ScreenshotGrouping.group(finalScans.map(\.reading)).enumerated().map { number, indices in
+                var reading = ScreenReading()
+                var bars: [AppraisalStat: Double] = [:]
+                for i in indices {
+                    reading = reading.merged(with: finalScans[i].reading)
+                    for (stat, value) in finalScans[i].barFractions where bars[stat] == nil { bars[stat] = value }
+                }
+                let proposal = ScreenshotImporter.propose(reading, barFractions: bars, gamemaster: gm, lookup: lookup, tables: tables)
+                return ScreenshotGroup(id: number, screenshotNumbers: indices.map { $0 + 1 }, proposal: proposal)
+            }
         }.value
-        if let result {
-            proposal = result
-        } else {
-            errorText = "The CP couldn't be read. Use a screenshot of the top of the Pokémon's screen, in the English game."
+    }
+}
+
+// MARK: - Rows
+
+private struct GroupRow: View {
+    let group: ScreenshotGroup
+    let proposal: ScreenshotImporter.Proposal
+    let isSaved: Bool
+    let lookup: GamemasterLookup?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack {
+                Text(title).font(.headline)
+                if proposal.isLucky { Image(systemName: "star.circle").foregroundStyle(.yellow).accessibilityLabel("Lucky") }
+                if proposal.isShadow { Image(systemName: "flame.fill").foregroundStyle(.purple).accessibilityLabel("Shadow") }
+                Spacer()
+                status
+            }
+            Text(detail).font(.caption).foregroundStyle(.secondary)
         }
+        .padding(.vertical, 2)
+    }
+
+    private var title: String {
+        if let choice = proposal.certainChoice { return choice.option.pokemon.speciesName }
+        if proposal.options.count == 1 { return proposal.options[0].pokemon.speciesName }
+        return proposal.reading.name ?? "Unknown Pokémon"
+    }
+
+    private var detail: String {
+        var parts: [String] = []
+        if let cp = proposal.reading.cp { parts.append("CP \(cp)") }
+        if let s = proposal.certainChoice?.solution {
+            parts.append("L\(s.level.description) · \(s.ivs.attack)/\(s.ivs.defense)/\(s.ivs.stamina)")
+        } else if proposal.options.isEmpty {
+            parts.append("nothing fits")
+        } else if proposal.options.count > 1 {
+            parts.append("\(proposal.options.count) Pokémon fit")
+        } else {
+            parts.append("\(proposal.options[0].solutions.count) level/IV options")
+        }
+        parts.append(group.screenshotNumbers.count == 1 ? "screenshot \(group.screenshotNumbers[0])"
+                     : "screenshots \(group.screenshotNumbers.map(String.init).joined(separator: ", "))")
+        return parts.joined(separator: " · ")
+    }
+
+    @ViewBuilder
+    private var status: some View {
+        if isSaved {
+            Label("Saved", systemImage: "checkmark.circle.fill").labelStyle(.iconOnly).foregroundStyle(.green)
+                .accessibilityLabel("In your collection")
+        } else if proposal.certainChoice != nil {
+            Text("Sure").font(.caption2).foregroundStyle(.secondary)
+        } else {
+            Image(systemName: "questionmark.circle").foregroundStyle(.orange).accessibilityLabel("Needs a choice")
+        }
+    }
+}
+
+private struct UnreadGroupRow: View {
+    let group: ScreenshotGroup
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Label("Couldn't read a CP", systemImage: "exclamationmark.triangle").foregroundStyle(.orange)
+            Text("Screenshot \(group.screenshotNumbers.map(String.init).joined(separator: ", ")). Include the top of the Pokémon's screen.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
+// MARK: - Draft
+
+extension ScreenshotImporter.Proposal {
+    /// The editor's draft for one answer: species, level, IVs, moves read from the screen, flags.
+    func draft(option: ScreenshotImporter.SpeciesOption, solution: IVSolver.Solution, isShiny: Bool,
+               lookup: GamemasterLookup) -> CollectionDraft {
+        var d = CollectionDraft()
+        d.select(option.pokemon, lookup: lookup)
+        d.ivs = solution.ivs
+        d.level = solution.level
+        let read = self.moves(for: option.pokemon, lookup: lookup)
+        d.fastMoveId = read.fast ?? ""
+        d.chargedMoveId = read.charged.first ?? ""
+        d.secondChargedMoveId = read.charged.count > 1 ? read.charged[1] : ""
+        d.isShadow = isShadow
+        d.isLucky = isLucky && !isShadow
+        d.isShiny = isShiny
+        return d
     }
 }

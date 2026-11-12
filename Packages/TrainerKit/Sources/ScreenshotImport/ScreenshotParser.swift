@@ -114,6 +114,11 @@ public enum ScreenshotParser {
                     && isNameLike($0.text)
             }
             r.name = above.max { $0.box.maxY < $1.box.maxY }.map { cleanedName($0.text) }
+        } else {
+            // Scrolled down: the name is still visible at the very top, under the status bar.
+            r.name = lines.filter { $0.box.midY < 0.06 && abs($0.box.midX - 0.5) < 0.15 && isNameLike($0.text) }
+                .min { $0.box.minY < $1.box.minY }
+                .map { cleanedName($0.text) }
         }
 
         for line in lines {

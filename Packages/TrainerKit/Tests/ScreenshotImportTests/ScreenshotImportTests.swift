@@ -96,6 +96,61 @@ final class ScreenshotImportTests: XCTestCase {
         XCTAssertEqual(merged.appraisalLabels.count, 3)
     }
 
+    func testScrolledScreenReadsTheNameAtTheTop() {
+        let r = ScreenshotParser.parse([
+            line("09:09", x: 0.05, y: 0.02, w: 0.15),
+            line("Examplemon", x: 0.38, y: 0.012, w: 0.24, h: 0.03),
+            line("POWER UP", x: 0.1, y: 0.33, w: 0.3, h: 0.03),
+            line("2,500", x: 0.55, y: 0.335, w: 0.12),
+        ])
+        XCTAssertNil(r.cp)
+        XCTAssertEqual(r.name, "Examplemon")
+        XCTAssertEqual(r.powerUpStardust, 2500)
+    }
+
+    // MARK: - Grouping
+
+    private func reading(cp: Int? = nil, hp: Int? = nil, name: String? = nil, family: String? = nil) -> ScreenReading {
+        var r = ScreenReading()
+        r.cp = cp
+        r.hp = hp
+        r.name = name
+        r.candyFamily = family
+        return r
+    }
+
+    func testGroupingSplitsPerPokemon() {
+        let readings = [
+            reading(cp: 900, hp: 80, name: "Alpha"),          // A top
+            reading(name: "Alpha", family: "Alpha"),          // A scrolled
+            reading(cp: 900, hp: 80, name: "Alpha"),          // A appraisal
+            reading(name: "Beta"),                            // B scrolled (before its top)
+            reading(cp: 1500, hp: 120, name: "Beta"),         // B top
+            reading(cp: 1500, hp: 121, name: "Beta"),         // C: same name and CP, other HP
+            reading(),                                        // nothing read: joins C
+        ]
+        XCTAssertEqual(ScreenshotGrouping.group(readings), [[0, 1, 2], [3, 4], [5, 6]])
+        XCTAssertEqual(ScreenshotGrouping.group([]), [])
+    }
+
+    func testCertainChoiceNeedsOneAnswer() throws {
+        let (_, p) = try evolvedSpecies()
+        let level = PokemonLevel(25), ivs = IVs(attack: 6, defense: 11, stamina: 2)
+        let r = try reading(for: p, name: p.speciesName, level: level, ivs: ivs)
+        let bars: [AppraisalStat: Double] = [.attack: 6.0 / 15, .defense: 11.0 / 15, .hp: 2.0 / 15]
+        let withBars = try XCTUnwrap(ScreenshotImporter.propose(r, barFractions: bars, gamemaster: gamemaster, lookup: lookup, tables: levels))
+        if withBars.options.count == 1 {
+            let choice = try XCTUnwrap(withBars.certainChoice)
+            XCTAssertEqual(choice.solution.ivs, ivs)
+            XCTAssertEqual(choice.solution.level, level)
+        }
+        // Without bars: only certain when exactly one combination fits.
+        let noBars = try XCTUnwrap(ScreenshotImporter.propose(r, barFractions: [:], gamemaster: gamemaster, lookup: lookup, tables: levels))
+        if let option = noBars.options.first, noBars.options.count == 1 {
+            XCTAssertEqual(noBars.certainChoice != nil, option.solutions.count == 1)
+        }
+    }
+
     func testIntegersWithSeparators() {
         XCTAssertEqual(ScreenshotParser.integers(in: "5,000 4"), [5000, 4])
         XCTAssertEqual(ScreenshotParser.integers(in: "143,144"), [143144])

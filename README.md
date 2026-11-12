@@ -3,7 +3,7 @@
 A personal-use iOS companion app for trainers: search string builder, power-up planner, raid and Rocket counters, event checklists and trade planning.
 It is sideloaded, never published.
 
-**Status:** all planned features are built (Phases 0–10). See "Features" below and `CLAUDE.md` for what has been tested on a phone.
+**Status:** all planned features are built (Phases 0–11). See "Features" below and `CLAUDE.md` for what has been tested on a phone.
 
 ## Features
 
@@ -14,7 +14,7 @@ It is sideloaded, never published.
 | Raids | Current raid bosses by tier; per boss: weaknesses, resistances and a ranked party of 6 counters, either from every released Pokémon or from My Collection, with weather |
 | Events | Event calendar with local times, checklists and reminders, Community Day details |
 | More > Planner | Candy, XL candy and stardust needed to power a Pokémon up to a target level |
-| More > Collection | Your own Pokémon: manual entry, from screenshots (on-device text recognition reads CP, HP, name, power-up cost, moves and the appraisal bars, then works out level and IVs), or CSV import (see [COLLECTION_IMPORT.md](COLLECTION_IMPORT.md)) |
+| More > Collection | Your own Pokémon: manual entry, from screenshots of one or many Pokémon at once (on-device text recognition reads CP, HP, name, power-up cost, moves and the appraisal bars, then works out level and IVs), or CSV import (see [COLLECTION_IMPORT.md](COLLECTION_IMPORT.md)) |
 | More > Rocket | Giovanni, leader and grunt lineups; counters per possible Pokémon and per slot; works offline |
 | More > Trades | Friends, want lists and an estimated stardust cost per trade |
 
