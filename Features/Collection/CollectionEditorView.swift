@@ -35,6 +35,9 @@ struct CollectionEditorView: View {
             pokemonSection
             statsSection
             movesSection
+            if let speciesId = draft.speciesId {
+                EvolutionSection(speciesId: speciesId, isPurified: draft.isPurified, lookup: dataCenter.lookup)
+            }
             flagsSection
             Section("Notes") {
                 TextField("Optional", text: $draft.notes, axis: .vertical)

@@ -209,6 +209,13 @@ private struct CollectionRow: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
+            let evolutionItems = EvolutionData.itemNames(forSpecies: pokemon.speciesId)
+            if !evolutionItems.isEmpty {
+                Label("Evolves with \(evolutionItems.joined(separator: " or "))", systemImage: "shippingbox")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
         }
         .padding(.vertical, 2)
     }

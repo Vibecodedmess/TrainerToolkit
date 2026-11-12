@@ -1,0 +1,31 @@
+{
+  "source": {
+    "name": "Pokémon GO Wiki (Fandom)",
+    "pages": [
+      "https://pokemongo.fandom.com/wiki/Evolution_Items",
+      "https://pokemongo.fandom.com/wiki/Lure_Modules",
+      "https://pokemongo.fandom.com/wiki/Zygarde_Cube"
+    ],
+    "retrieved": "2026-11-12",
+    "license": "CC BY-SA",
+    "note": "Community information, paraphrased. Not from the game's data and not verified: methods change with events and updates."
+  },
+  "items": {
+    "ITEM_SUN_STONE": "Small chance from spinning PokéStops and Gyms. A 7-day spin streak guarantees one of the Johto evolution items (Sun Stone, King's Rock, Metal Coat, Dragon Scale, Upgrade). Also from research tasks and Gifts.",
+    "ITEM_KINGS_ROCK": "Small chance from spinning PokéStops and Gyms. A 7-day spin streak guarantees one of the Johto evolution items (Sun Stone, King's Rock, Metal Coat, Dragon Scale, Upgrade). Also from research tasks and Gifts.",
+    "ITEM_METAL_COAT": "Small chance from spinning PokéStops and Gyms. A 7-day spin streak guarantees one of the Johto evolution items (Sun Stone, King's Rock, Metal Coat, Dragon Scale, Upgrade). Also from research tasks and Gifts.",
+    "ITEM_DRAGON_SCALE": "Small chance from spinning PokéStops and Gyms. A 7-day spin streak guarantees one of the Johto evolution items (Sun Stone, King's Rock, Metal Coat, Dragon Scale, Upgrade). Also from research tasks and Gifts.",
+    "ITEM_UP_GRADE": "Small chance from spinning PokéStops and Gyms. A 7-day spin streak guarantees one of the Johto evolution items (Sun Stone, King's Rock, Metal Coat, Dragon Scale, Upgrade). Also from research tasks and Gifts.",
+    "ITEM_GEN4_EVOLUTION_STONE": "From Research Breakthrough rewards and from Trainer Battles.",
+    "ITEM_GEN5_EVOLUTION_STONE": "From Research Breakthrough rewards and from defeating Team GO Rocket Leaders.",
+    "ITEM_OTHER_EVOLUTION_STONE_A": "By catching or walking with Gimmighoul, and by spinning Golden PokéStops.",
+    "ITEM_OTHER_EVOLUTION_STONE_MAPLE_A": "Tap apples on the map. They appear more often next to a PokéStop with a Mossy Lure Module.",
+    "ITEM_OTHER_EVOLUTION_STONE_MAPLE_B": "Tap apples on the map. They appear more often next to a PokéStop with a Mossy Lure Module.",
+    "ITEM_OTHER_EVOLUTION_STONE_MAPLE_C": "Tap apples on the map. They appear more often next to a PokéStop with a Mossy Lure Module.",
+    "ITEM_TROY_DISK_GLACIAL": "Sold in the Shop. Also a reward from research tasks and PokéStop Showcases.",
+    "ITEM_TROY_DISK_MAGNETIC": "Sold in the Shop. Also a reward from research tasks and PokéStop Showcases.",
+    "ITEM_TROY_DISK_MOSSY": "Sold in the Shop. Also a reward from research tasks and PokéStop Showcases.",
+    "ITEM_TROY_DISK_RAINY": "Sold in the Shop. Also a reward from research tasks and PokéStop Showcases.",
+    "ITEM_BEANS": "Found on Routes after you get the Zygarde Cube from the Special Research \"From A to Zygarde\", at most 3 per day."
+  }
+}

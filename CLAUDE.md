@@ -48,6 +48,7 @@ Also:
 | 9 | Home tab + polish, final README | Home confirmed on build #16. User: "a simple, pleasant app" |
 | 10 | Add to Collection from screenshots (like Poke Genie) | Confirmed on build #18 (2026-11-12), including lucky, and the Shiny switch the user chose (the game's shiny mark isn't readable). See "Screenshot import" |
 | 11 | Bulk screenshot import (many Pokémon at once) | Confirmed on build #19 (2026-11-12) |
+| 12 | Evolution requirements in My Collection (items, lures, quests, buddy, time, gender) + how to get each item | Built 2026-11-12. **Not tested on the phone**. See DATA_SOURCES.md "evolution requirements" |
 
 ## Current state (update this section as work continues)
 
@@ -88,6 +89,10 @@ Also:
 - **Community Day** exclusive move and evolve deadline are **not in any feed**, so the user types them in. The app shows PvPoke elite moves only as hints.
 - **Collection CSV:** Poke Genie's export needs a subscription, so the user chose the **app's own format** (COLLECTION_IMPORT.md, `CollectionImport/CollectionCSV.swift`). Don't write importers for other apps without a real sample file from the user.
 - **Shadow/purified/lucky cost rounding** is `TODO: verify`: rounded up per power-up, and lucky + purified stack.
+- **Evolution data (2026-11-12):**
+  - Requirements and the official item and quest names come from PokeMiners: the game master, plus the game's English text in `pogo_assets` (pinned `db10df7`, approved by the user). Extracted by `scripts/update-evolution-tables.ps1`.
+  - **How to get an item** is community info from the Pokémon GO Wiki (CC BY-SA), cited and labelled unverified in the app. The user chose this over game text only. It's a hand-written paraphrase in `evolution-items-community.json`, and a test checks it covers exactly the items in the data.
+  - App: `Features/Collection/EvolutionSection.swift`, shown in the collection editor plus an "Evolves with …" line in list rows. Species ids are mapped game master → PvPoke in `EvolutionTables.speciesKey` (`_ALOLA` → `_alolan` and so on). Cosmetic forms are filed under the plain species.
 
 ## Screenshot import (Phase 10): how it works
 

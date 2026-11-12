@@ -131,6 +131,28 @@ The planner's estimate is base cost × (1 − `tradingDiscount`). `TODO: verify`
 - the rounding (the app rounds to the nearest whole stardust)
 - the mapping of the planner's trade kinds to `unlockedTrading` ids, which is read from the id names (`IN_POKEDEX` = registered, `NON_POKEDEX` = not registered)
 
+### PokeMiners game master + game text: evolution requirements (for My Collection)
+
+The user approved the game's own English text as a source on 2026-11-12.
+`scripts/update-evolution-tables.ps1` writes `Packages/TrainerKit/Sources/GameMath/Resources/evolution-tables.json` from:
+- **The game master** (commit `8e227be`, as above):
+  - `pokemonSettings.evolutionBranch`: target, candy cost (and purified cost), item (and how many), Lure Module, buddy distance or must-be-buddy, day/night/dusk/full moon/upside down, gender, no candy cost when traded, and the evolution quest.
+  - Mega (temporary) evolutions are skipped.
+  - A form named `<ID>_NORMAL` is stored as "no form", so the copies under several templates merge.
+  - The `*_EVOLUTION_QUEST` templates give the quest's goal number.
+- **The game's English text**, PokeMiners [pogo_assets](https://github.com/PokeMiners/pogo_assets) `Texts/Latest APK/JSON/i18n_english.json`, pinned to commit `db10df7`:
+  - only `item_*_name` and `item_*_desc` for the evolution items and lures
+  - the quest display text, with `{0}` replaced by the goal number
+
+**Not in either file: how to get an item.** The user chose a cited community source, shown as unverified.
+- It is in `Packages/TrainerKit/Sources/GameMath/Resources/evolution-items-community.json`, written by hand as a short paraphrase.
+- Source: the Pokémon GO Wiki on Fandom, retrieved 2026-11-12, licensed CC BY-SA:
+  - [Evolution Items](https://pokemongo.fandom.com/wiki/Evolution_Items)
+  - [Lure Modules](https://pokemongo.fandom.com/wiki/Lure_Modules)
+  - [Zygarde Cube](https://pokemongo.fandom.com/wiki/Zygarde_Cube)
+- The app shows the source, licence and date, labelled "Not verified". Shop prices are left out.
+- Community guides disagree on some items (for example the Sinnoh Stone), and methods change with events.
+
 ## Open questions (decisions needed before later phases)
 
 1. **Raid boss HP and boss CP multiplier per tier (Phase 6).** These are **not** in the game master; the game's servers hold them. The "how many trainers" estimate needs them, but DPS rankings don't. The options are a cited community table, marked `TODO: verify`, or leaving the trainer estimate out.
