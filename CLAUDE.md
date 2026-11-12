@@ -47,11 +47,13 @@ Also:
 | 8 | Trade Planner | Confirmed on build #16 |
 | 9 | Home tab + polish, final README | Home confirmed on build #16. User: "a simple, pleasant app" |
 | 10 | Add to Collection from screenshots (like Poke Genie) | Confirmed on build #18 (2026-11-12), including lucky, and the Shiny switch the user chose (the game's shiny mark isn't readable). See "Screenshot import" |
-| 11 | Bulk screenshot import (many Pokémon at once) | Built 2026-11-12. **Not tested on the phone** |
+| 11 | Bulk screenshot import (many Pokémon at once) | Confirmed on build #19 (2026-11-12) |
 
 ## Current state (update this section as work continues)
 
-- Last code commit: `9988d39`, Phases 6–9 (Raids, Rocket, Trades, Home, README). **Build #16 is green** (`macos-15-intel`): artifact `TrainerToolkit-ipa-16`, `/actions/runs/43040528767`.
+- **Latest (2026-11-12):** `87d2d9f`, bulk screenshot import. Build #19 is green and confirmed on the phone. Everything through Phase 11 works.
+- **Ideas the user hasn't picked yet:** the raid "trainers needed" estimate (open decision, see "Raids and Rocket"); Collection power-ups (a one-tap Planner goal from a collection entry, and raid gain at a higher level); maintenance (refresh the bundled snapshots, CI Node 20 warnings, docs).
+- Earlier: `9988d39`, Phases 6–9 (Raids, Rocket, Trades, Home, README). Build #16 green (`macos-15-intel`).
   - Earlier on 2026-11-11: `a604f13` fixed the move-name lookup ("Seed Bomb" vs "Seed Bomb+"), and `8e90321` fixed the editor's CP box (build #15 green).
   - Builds #10–#12 were never acquired (no runner capacity); #13 failed on the Seed Bomb test.
 - **Next steps:**
