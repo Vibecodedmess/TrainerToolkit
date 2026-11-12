@@ -168,10 +168,11 @@ The user chose a cited community table on 2026-11-12. It's in `Packages/TrainerK
   - The 3-star Shadow time limit isn't shown separately in the source table.
 - **The estimate** (`Counters/RaidEstimate.swift`) is a best case: boss HP ÷ (the party's average best-moveset DPS × time limit), rounded up. Boss defence uses the tier multiplier with 15 IVs. No fainting, dodging, relobbying, or friendship or Mega bonuses.
 
-## Open questions (decisions needed before later phases)
+## Decided questions
 
-1. **Raid boss HP and boss CP multiplier per tier (Phase 6).** These are **not** in the game master; the game's servers hold them. The "how many trainers" estimate needs them, but DPS rankings don't. The options are a cited community table, marked `TODO: verify`, or leaving the trainer estimate out.
-2. **Trade stardust costs (Phase 8):** answered. The discounts come from the game master; the base costs are typed in by the trainer (see "trade tables" above).
+1. **Raid boss HP and boss CP multiplier per tier:** answered 2026-11-12. The user chose a cited community table, Bulbapedia (see "raid tier numbers" above), marked `TODO: verify`.
+2. **Trade stardust costs:** answered. The discounts come from the game master; the base costs are typed in by the trainer (see "trade tables" above).
+3. **How to get evolution items:** answered 2026-11-12. The user chose a cited community wiki, marked unverified (see "evolution requirements" above).
 
 ## Not used
 

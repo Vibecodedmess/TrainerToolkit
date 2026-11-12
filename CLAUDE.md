@@ -19,10 +19,10 @@ Also:
 
 ## Working agreement
 
-- **Phases:** stop after each phase. Tell the user what changed, how to install, a phone test checklist, and any `TODO: verify` items. Wait for "All passed" before starting the next phase.
+- **Phases:** stop after each phase or feature. Tell the user what changed, how to install, a phone test checklist, and any `TODO: verify` items. Wait for their test result before starting the next one; they pick what comes next.
 - **Git:** commit or push only with the user's OK. The user usually answers "Push and build". Commits end with the `Co-Authored-By` line the session gives.
 - **The user has no Mac.** The only compiler is GitHub Actions on the public repo `Vibecodedmess/TrainerToolkit`, using the workflow `.github/workflows/build.yml`.
-  - It currently runs on `runs-on: macos-15-intel` (switched from `macos-15`, Apple silicon, on 2026-11-11). If a job sits "Queued" for 15 minutes and fails with "not acquired by Runner", that pool is out of capacity, not the code. Switch between `macos-15` and `macos-15-intel`, which needs a commit, so ask the user. The arm64 pool was full on 2026-11-10, the Intel pool on 2026-11-11, and arm64 again later on 2026-11-11 (build #12; GitHub's annotation names "capacity constraints" on macOS arm64).
+  - It runs on `runs-on: macos-15-intel` (since 2026-11-11). If a job sits "Queued" for 15 minutes and fails with "not acquired by Runner", that pool is out of capacity, not the code. Switch between `macos-15` (Apple silicon) and `macos-15-intel`, which needs a commit, so ask the user. Both pools ran out of capacity at times on 2026-11-10 and 2026-11-11.
   - The runner is only the build machine. The IPA for the iPhone is identical either way.
   - The workflow only runs on demand (`workflow_dispatch`) or on `v*` tags. Start it in the **built-in browser pane**: Actions > Build unsigned IPA > Run workflow > Run workflow. There is no `gh` CLI here.
   - **The user signs in to GitHub themselves.** Never type a password. If the Run workflow button is missing, the pane has been signed out: open github.com/login and ask the user to sign in.
@@ -55,30 +55,36 @@ Also:
 
 ## Current state (update this section as work continues)
 
-- **Latest (2026-11-12):** `87d2d9f`, bulk screenshot import. Build #19 is green and confirmed on the phone. Everything through Phase 11 works.
-- **Ideas the user hasn't picked yet:** PvP league IV ranks for the collection; maintenance (refresh the bundled snapshots, CI Node 20 warnings, docs).
-- **Power-up value (Phase 13):** `PowerUpValue.evaluate` ranks the Pokémon at its current level and at 40/45/50 (up to the max upgrade level) against the other collection entries, which stay at their own levels. The boss is chosen from the current raids; there's an optional evolved form (regular moves only, same IVs). Costs come from `PowerUpCalculator` with shadow/purified/lucky. A Pokémon without a saved fast move uses its species' regular moves (the screen says so). Planner hook: `GoalEditorView(prefilled:)` with `GoalDraft(collected:types:target:)`.
-- Earlier: `9988d39`, Phases 6–9 (Raids, Rocket, Trades, Home, README). Build #16 green (`macos-15-intel`).
-  - Earlier on 2026-11-11: `a604f13` fixed the move-name lookup ("Seed Bomb" vs "Seed Bomb+"), and `8e90321` fixed the editor's CP box (build #15 green).
-  - Builds #10–#12 were never acquired (no runner capacity); #13 failed on the Seed Bomb test.
-- **Next steps:**
-  1. The user installs build #16 and goes through the Phase 5 checklist below plus the Phases 6–9 checklist.
-  2. Fix whatever fails. Then ask about the open raid decision (trainer estimate, see "Raids and Rocket").
-- **Trade Planner `TODO: verify`** (tell the user): cost rounding (nearest stardust), the mapping of trade kinds to the game master's `unlockedTrading` ids, the attack bonus shown as a multiplier, and the readable category names. Friendship level names aren't in the data, so levels are shown as "Level N" with points.
-- **Phases 6–9 phone test checklist:**
-  - Home: live events, Community Day countdown, top raid tier rows open the boss screen, goals and collection links.
-  - Raids tab: bosses grouped by tier, boss screen with Weak to / Resists, a party of 6 plus more counters. Changing the weather, level and toggles reranks. "My collection" uses your own Pokémon (they need a fast move). The settings are remembered.
-  - More > Rocket: lineups grouped by role; each slot lists its Pokémon (tap to see the top 3 counters and weaknesses) and shows "Good against all of these". Works in airplane mode.
-  - More > Trades: add a friend, want lists, base trade costs, cost check, Friendship levels screen.
-  - Existing data (collection, goals, event checklists) survives installing over the old build (2 new SwiftData models were added).
-- **Phase 5 phone test checklist** (give it to the user with the IPA):
-  - Collection empty state.
-  - Add a Pokémon manually: species picker, IVs, level or "Find level from CP", move pickers with ★ for elite moves, flags.
-  - "Find level from CP": one matching level is applied as soon as the CP is typed. With several matches, Save stays disabled (orange hint) until one is picked or the box is cleared. Changing the level stepper clears the box. (Build #14 bug: a typed CP was dropped on Save unless "Use level" was tapped.)
-  - The list shows CP, IV % and icons.
-  - Search, the filter/sort menu (remembered), edit, and delete with confirmation.
-  - Data persists after a force-close.
-  - **+ > Import CSV:** share the template, fill one or two rows in a spreadsheet, export CSV, import. The preview shows warnings and duplicates, and bad rows are listed with line numbers.
+- **As of 2026-11-12:** Phases 0–15 are built, and everything is confirmed on the phone except the CSV import, which is untested because the user has no CSV.
+- **Maintenance (2026-11-12, user's choice):**
+  - Snapshots refreshed.
+  - PokeMiners pins checked: still the latest commits.
+  - CI writes a "Compiler warnings" summary on each run page. Build #24 (`3c146c8`) had 0 warnings and was green.
+- **Next idea, not picked yet:** PvP league IV ranks for the collection (Great/Ultra/Master rank, best level under the cap, evolutions). It needs only data the app already has, and PvPoke's `defaultIVs` can serve as a test oracle.
+- **Open `TODO: verify` items** (each one is also marked in code and in DATA_SOURCES.md):
+  - shadow/purified/lucky power-up cost rounding
+  - Trade Planner:
+    - cost rounding
+    - trade kind → `unlockedTrading` mapping
+    - attack bonus shown as a multiplier
+    - readable category names
+    - friendship levels shown as "Level N", since the names aren't in the data
+  - raid tier numbers (Bulbapedia), including the 3-star Shadow time limit
+  - evolution "how to get" texts (Pokémon GO Wiki)
+- **CI tips:**
+  - Build times vary from 4 to 10 minutes.
+  - Read results on the run page, including the warnings summary.
+  - Artifact downloads sometimes land in Downloads as random `*.tmp` files instead of `TrainerToolkit-ipa-N.zip`. Check each candidate is a zip containing `TrainerToolkit.ipa`, then use it and delete the leftovers.
+
+## Collection extras (Phases 12–13): how they work
+
+- **Evolution:** see "Decisions already made" and DATA_SOURCES.md.
+- **Power-up value:**
+  - `PowerUpValue.evaluate` ranks the Pokémon at its current level and at 40/45/50 (up to the max upgrade level). It compares against the other collection entries, which stay at their own levels.
+  - The boss is chosen from the current raids. There's an optional evolved form (regular moves only, same IVs).
+  - Costs come from `PowerUpCalculator`, with shadow/purified/lucky.
+  - A Pokémon without a saved fast move uses its species' regular moves, and the screen says so.
+  - Planner hook: `GoalEditorView(prefilled:)` with `GoalDraft(collected:types:target:)`.
 
 ## Decisions already made
 
@@ -134,16 +140,19 @@ Also:
 
 - `App/`: app entry, tab bar, `DataCenter` (feeds → decoded gamemaster, lookup, events)
 - `Features/<Feature>/`: SwiftUI screens per feature
-- `Persistence/`: SwiftData models (`AppModelContainer.schema` lists them all)
+- `Persistence/`: SwiftData models (`AppModelContainer.schema` lists them all) and `BackupManager`
 - `Packages/TrainerKit/`: pure Swift, tested with `swift test` on CI
   - `DataSources`: feeds, cache, `EventCalendar`, `EventExtras`, `GamemasterLookup`, snapshots
-  - `GameMath`: level/battle tables, CP, costs, `DamageCalculator`
+  - `GameMath`: level/battle/trade/evolution tables, CP, costs, `DamageCalculator`
   - `SearchBuilder`: `search-terms.json` and the query builder
   - `CollectionImport`: `CSVReader` and `CollectionCSV`
-  - `Counters`: raid/Rocket counter rankings (`CounterRanker`)
-  - `ScreenshotImport`: screenshot text parsing, appraisal bars, IV solver
+  - `Counters`: raid/Rocket counter rankings (`CounterRanker`), `PowerUpValue`, `RaidEstimate` + `raid-tiers.json`
+  - `ScreenshotImport`: screenshot text parsing, appraisal bars, IV solver, grouping
+  - `BackupFormat`: the backup file format
 - `scripts/`:
   - `update-snapshots.sh`: bundled feed snapshots
-  - `update-level-tables.ps1`: PokeMiners tables
+  - `update-level-tables.ps1`: PokeMiners level and battle tables
+  - `update-trade-tables.ps1`: friendship/trade tables
+  - `update-evolution-tables.ps1`: evolution requirements and the game's English item/quest text
   - `make-app-icon.ps1`
 - Docs: README.md, INSTALL.md, DATA_SOURCES.md, COLLECTION_IMPORT.md
