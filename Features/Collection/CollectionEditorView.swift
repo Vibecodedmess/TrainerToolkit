@@ -21,6 +21,12 @@ struct CollectionEditorView: View {
         _draft = State(initialValue: pokemon.map { CollectionDraft(pokemon: $0, types: []) } ?? CollectionDraft())
     }
 
+    /// A new entry that starts with these values (for example read from screenshots).
+    init(prefilled draft: CollectionDraft) {
+        pokemon = nil
+        _draft = State(initialValue: draft)
+    }
+
     private var tables: LevelTables? { PlannerMath.tables }
     private var gmPokemon: GMPokemon? { draft.speciesId.flatMap { dataCenter.lookup?.pokemon(id: $0) } }
 

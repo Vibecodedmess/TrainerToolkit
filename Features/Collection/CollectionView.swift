@@ -18,6 +18,7 @@ struct CollectionView: View {
     @State private var search = ""
     @State private var showingAdd = false
     @State private var showingImport = false
+    @State private var showingScreenshots = false
     @AppStorage("collection.sort") private var sortRaw = SortOrder.recent.rawValue
     @AppStorage("collection.onlyShiny") private var onlyShiny = false
     @AppStorage("collection.onlyShadow") private var onlyShadow = false
@@ -38,6 +39,7 @@ struct CollectionView: View {
                 } actions: {
                     Button("Add Pokémon") { showingAdd = true }
                         .buttonStyle(.borderedProminent)
+                    Button("Add from screenshots") { showingScreenshots = true }
                     Button("Import from CSV") { showingImport = true }
                 }
             } else {
@@ -55,6 +57,11 @@ struct CollectionView: View {
                         Label("Add manually", systemImage: "square.and.pencil")
                     }
                     Button {
+                        showingScreenshots = true
+                    } label: {
+                        Label("From screenshots", systemImage: "photo.on.rectangle")
+                    }
+                    Button {
                         showingImport = true
                     } label: {
                         Label("Import CSV", systemImage: "square.and.arrow.down")
@@ -67,6 +74,13 @@ struct CollectionView: View {
         .sheet(isPresented: $showingAdd) {
             NavigationStack {
                 CollectionEditorView(pokemon: nil)
+            }
+            .environment(dataCenter)
+            .modelContext(modelContext)
+        }
+        .sheet(isPresented: $showingScreenshots) {
+            NavigationStack {
+                ScreenshotImportView()
             }
             .environment(dataCenter)
             .modelContext(modelContext)

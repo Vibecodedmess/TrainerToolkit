@@ -12,6 +12,7 @@ let package = Package(
         .library(name: "SearchBuilder", targets: ["SearchBuilder"]),
         .library(name: "CollectionImport", targets: ["CollectionImport"]),
         .library(name: "Counters", targets: ["Counters"]),
+        .library(name: "ScreenshotImport", targets: ["ScreenshotImport"]),
     ],
     targets: [
         .target(
@@ -37,5 +38,8 @@ let package = Package(
         // Raid and Rocket counter rankings (gamemaster species + PvE battle math).
         .target(name: "Counters", dependencies: ["DataSources", "GameMath"]),
         .testTarget(name: "CountersTests", dependencies: ["Counters", "DataSources", "GameMath"]),
+        // Pokémon screenshots -> species, level, IVs, moves (text from Vision in the app; bars from pixels).
+        .target(name: "ScreenshotImport", dependencies: ["DataSources", "GameMath"]),
+        .testTarget(name: "ScreenshotImportTests", dependencies: ["ScreenshotImport", "DataSources", "GameMath"]),
     ]
 )

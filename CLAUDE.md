@@ -41,11 +41,12 @@ Also:
 | 2 | Search String Builder (+ app icon from the user's own image) | Confirmed. All 4 previously unverified terms confirmed in game |
 | 3 | Candy & Stardust Planner (GameMath CP/costs) | Confirmed |
 | 4 | Events, checklist, local reminders | Confirmed |
-| 5 | My Collection: manual entry (5a) + CSV import in the app's **own** format (5b) | Build #14 on the phone; CP-box bug found and fixed (`8e90321`, build #15 green). Rest of the checklist not reported yet |
-| 6 | Raid Counter Picker | Built 2026-11-11 (user said "build as much as possible", no stop between phases). **Not tested on the phone** |
-| 7 | Team Rocket Counter Sheet | Built 2026-11-11. **Not tested on the phone** |
-| 8 | Trade Planner | Built 2026-11-11 by a helper agent. **Not tested on the phone** |
-| 9 | Home tab + polish, final README | Home tab + README built 2026-11-11. **Not tested on the phone** |
+| 5 | My Collection: manual entry (5a) + CSV import in the app's **own** format (5b) | CP-box bug found on build #14 and fixed (`8e90321`). **CSV import untested**: the user has no CSV of their own Pokémon (2026-11-12). Don't make test CSVs; the user declined one |
+| 6 | Raid Counter Picker | Confirmed on build #16 (2026-11-12) |
+| 7 | Team Rocket Counter Sheet | Confirmed on build #16 |
+| 8 | Trade Planner | Confirmed on build #16 |
+| 9 | Home tab + polish, final README | Home confirmed on build #16. User: "a simple, pleasant app" |
+| 10 | Add to Collection from screenshots (like Poke Genie) | Built 2026-11-12. **Not tested on the phone**. See "Screenshot import" |
 
 ## Current state (update this section as work continues)
 
@@ -85,6 +86,18 @@ Also:
 - **Collection CSV:** Poke Genie's export needs a subscription, so the user chose the **app's own format** (COLLECTION_IMPORT.md, `CollectionImport/CollectionCSV.swift`). Don't write importers for other apps without a real sample file from the user.
 - **Shadow/purified/lucky cost rounding** is `TODO: verify`: rounded up per power-up, and lucky + purified stack.
 
+## Screenshot import (Phase 10): how it works
+
+- The user OK'd importing their own screenshots (2026-11-12): it's user-chosen data, like a CSV. No overlay, no screen recording, no automation. The game is in **English**.
+- `Packages/TrainerKit/Sources/ScreenshotImport/`:
+  - `ScreenshotParser`: reads recognised text lines (top-left normalised boxes): CP, "x / y HP", name above the HP line, "<FAMILY> CANDY", type labels, the POWER UP row's stardust and candy, move lines under "GYMS & RAIDS", PURIFY (shadow), LUCKY, and the appraisal labels.
+  - `AppraisalBars`: bar fill from pixel rows. Saturated = filled, light grey = empty, white gaps ≤ 12 px are segment dividers. A bar must start within 2 label-heights of the scan start. IV = fill × 15.
+  - `IVSolver`: every half level × IV combination, matched to CP, HP and the next power-up's stardust (`PowerUpCalculator`), narrowed by the bar IVs (±1).
+  - `ScreenshotImporter`: species from the name (all forms with that base name), else the candy family's evolution line, filtered by type labels. It retries as lucky, then without the stardust.
+- App: `Features/Collection/ScreenshotReader.swift` (Vision `VNRecognizeTextRequest`, `.accurate`, en-US, no language correction; scans rows from the label's bottom to 1.6 label-heights below) and `ScreenshotImportView.swift` (PhotosPicker, up to 4 images, "Read from the screenshots" summary, then the editor via `CollectionEditorView(prefilled:)`).
+- Checked on the user's real screenshots (in `samples/`, gitignored, **never commit them or their values**): the CP/HP/stardust math and the bar measurement give the right level and IVs for both sample Pokémon. Their screenshots also show a third-party IV overlay (a dark "level, IV %, IVs" label at the top right); the app does **not** read it.
+- Not verified until it runs on a phone: what Vision actually returns for these screens (line splitting, the CP font, the "Attack/Defense/HP" label boxes).
+
 ## Raids and Rocket (Phases 6–7): how they work
 
 - `Packages/TrainerKit/Sources/Counters/CounterRanker.swift`: generic candidate pool (released PvPoke species, toggles for shadow, mega, elite/legacy moves), ranking by best-moveset DPS (`DamageCalculator`), `rankAgainstAll` (average relative DPS over several defenders, used per Rocket slot), weaknesses/resistances, and feed-name matching ("Mega Charizard X" → "Charizard (Mega X)", "Primal Kyogre" → "Kyogre (Primal)").
@@ -104,6 +117,7 @@ Also:
   - `SearchBuilder`: `search-terms.json` and the query builder
   - `CollectionImport`: `CSVReader` and `CollectionCSV`
   - `Counters`: raid/Rocket counter rankings (`CounterRanker`)
+  - `ScreenshotImport`: screenshot text parsing, appraisal bars, IV solver
 - `scripts/`:
   - `update-snapshots.sh`: bundled feed snapshots
   - `update-level-tables.ps1`: PokeMiners tables

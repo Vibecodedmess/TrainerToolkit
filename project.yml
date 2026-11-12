@@ -42,6 +42,8 @@ targets:
         product: CollectionImport
       - package: TrainerKit
         product: Counters
+      - package: TrainerKit
+        product: ScreenshotImport
     settings:
       base:
         PRODUCT_NAME: TrainerToolkit

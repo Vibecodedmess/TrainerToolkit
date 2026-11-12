@@ -3,7 +3,7 @@
 A personal-use iOS companion app for trainers: search string builder, power-up planner, raid and Rocket counters, event checklists and trade planning.
 It is sideloaded, never published.
 
-**Status:** all planned features are built (Phases 0–9). See "Features" below and `CLAUDE.md` for what has been tested on a phone.
+**Status:** all planned features are built (Phases 0–10). See "Features" below and `CLAUDE.md` for what has been tested on a phone.
 
 ## Features
 
@@ -14,7 +14,7 @@ It is sideloaded, never published.
 | Raids | Current raid bosses by tier; per boss: weaknesses, resistances and a ranked party of 6 counters, either from every released Pokémon or from My Collection, with weather |
 | Events | Event calendar with local times, checklists and reminders, Community Day details |
 | More > Planner | Candy, XL candy and stardust needed to power a Pokémon up to a target level |
-| More > Collection | Your own Pokémon: manual entry or CSV import (see [COLLECTION_IMPORT.md](COLLECTION_IMPORT.md)) |
+| More > Collection | Your own Pokémon: manual entry, from screenshots (on-device text recognition reads CP, HP, name, power-up cost, moves and the appraisal bars, then works out level and IVs), or CSV import (see [COLLECTION_IMPORT.md](COLLECTION_IMPORT.md)) |
 | More > Rocket | Giovanni, leader and grunt lineups; counters per possible Pokémon and per slot; works offline |
 | More > Trades | Friends, want lists and an estimated stardust cost per trade |
 
@@ -37,7 +37,7 @@ Counter rankings use the PvE damage formula with the game master's type chart, w
 | `Features/*` | One folder per feature screen |
 | `Shared/` | Reusable SwiftUI views |
 | `Persistence/` | On-device storage (SwiftData from Phase 1 on) |
-| `Packages/TrainerKit/` | Pure-Swift modules `GameMath`, `DataSources`, `SearchBuilder`, `CollectionImport` and `Counters`, with unit tests |
+| `Packages/TrainerKit/` | Pure-Swift modules `GameMath`, `DataSources`, `SearchBuilder`, `CollectionImport`, `Counters` and `ScreenshotImport`, with unit tests |
 | `Packages/TrainerKit/Sources/DataSources/Snapshots/` | Bundled offline copy of every dataset (see `DATA_SOURCES.md`) |
 | `scripts/update-snapshots.sh` | Refreshes the bundled snapshots |
 | `Packages/TrainerKit/Sources/SearchBuilder/` | Search string builder and `search-terms.json` (the editable term list) |
@@ -45,6 +45,7 @@ Counter rankings use the PvE damage formula with the game master's type chart, w
 | `scripts/update-level-tables.ps1` | Extracts level/cost tables and battle tables (type chart, weather, PvE moves) from PokeMiners' game master |
 | `Packages/TrainerKit/Sources/CollectionImport/` | CSV reader and the collection import format |
 | `Packages/TrainerKit/Sources/Counters/` | Raid and Rocket counter rankings |
+| `Packages/TrainerKit/Sources/ScreenshotImport/` | Screenshot text parsing, appraisal bar reading and the IV solver |
 | `scripts/update-trade-tables.ps1` | Extracts friendship trade discounts from PokeMiners' game master |
 | `.github/workflows/build.yml` | macOS CI: tests, then an unsigned `.ipa` artifact |
 
