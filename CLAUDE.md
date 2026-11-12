@@ -52,11 +52,11 @@ Also:
 | 13 | Collection power-ups: one-tap Planner goal + raid rank by level (and evolved) vs your other counters | Confirmed on build #21 (2026-11-12). `Counters/PowerUpValue.swift`, `Features/Collection/PowerUpValueView.swift` |
 | 14 | Raid "trainers needed" estimate (community tier table, unverified) | Confirmed on build #23 (2026-11-12) |
 | 15 | Backup and restore (iCloud Drive via Files; automatic daily backups to a chosen folder) | Confirmed on build #23 (2026-11-12; user asked for it because free sideloads expire weekly). See "Backup" |
-| 16 | Visual polish, "concept A: polished native" (user's pick of 3 concepts) | Built 2026-11-12. **Not tested on the phone**. See "Look and feel" |
+| 16 | Visual polish, "concept A: polished native" (user's pick of 3 concepts) | Confirmed on build #25 (2026-11-12; user: "this looks very nice"). See "Look and feel" |
 
 ## Current state (update this section as work continues)
 
-- **As of 2026-11-12:** Phases 0–15 are built, and everything is confirmed on the phone except the CSV import, which is untested because the user has no CSV. Phase 16 (visual polish) is built but not yet tested.
+- **As of 2026-11-12:** Phases 0–15 are built, and everything is confirmed on the phone except the CSV import, which is untested because the user has no CSV. Phase 16 (visual polish) is confirmed too.
 - **Look and feel (Phase 16, user's choices):**
   - The user picked "polished native" over a card dashboard and a dark HUD. They explicitly did **not** want separate ATK/DEF/HP stat bars: keep the layout as it is.
   - **Stats line everywhere:** `CP 2651 · L30 · 13/15/14 · 93%`, IVs as Attack/Defense/HP. Use `PokemonStats.line` / `StatsLineText` in `Shared/Theme.swift`; don't hand-build it.
@@ -67,7 +67,7 @@ Also:
   - Snapshots refreshed.
   - PokeMiners pins checked: still the latest commits.
   - CI writes a "Compiler warnings" summary on each run page. Build #24 (`3c146c8`) had 0 warnings and was green.
-- **Next idea, not picked yet:** PvP league IV ranks for the collection (Great/Ultra/Master rank, best level under the cap, evolutions). It needs only data the app already has, and PvPoke's `defaultIVs` can serve as a test oracle.
+- **No open feature ideas.** The user is **not interested in PvP** (declined PvP league IV ranks on 2026-11-12): do not suggest PvP features again. Wait for the user to name what they want next.
 - **Open `TODO: verify` items** (each one is also marked in code and in DATA_SOURCES.md):
   - shadow/purified/lucky power-up cost rounding
   - Trade Planner:
