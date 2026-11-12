@@ -35,12 +35,6 @@ public struct EvolutionTables: Decodable, Sendable {
         /// The evolved Pokémon in PvPoke's id style ("scizor", "sandslash_alolan").
         public var targetKey: String { EvolutionTables.speciesKey(pokemonId: evolution, form: evolutionForm) }
 
-        /// Anything beyond candy: an item, a lure, a quest, buddy, time, gender or trade rule.
-        public var needsMoreThanCandy: Bool {
-            item != nil || lure != nil || quest != nil || kmBuddyDistance != nil || mustBeBuddy || onlyDaytime
-                || onlyNighttime || onlyDusk || onlyFullMoon || onlyUpsideDown || gender != nil
-        }
-
         /// Everything except the source form, for merging cosmetic forms that evolve the same way.
         fileprivate var signature: [String] {
             [evolution, evolutionForm ?? "", "\(candyCost ?? -1)", "\(candyCostPurified ?? -1)", item ?? "", "\(itemCost ?? -1)",

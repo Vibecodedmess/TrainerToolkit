@@ -37,7 +37,7 @@ struct CollectionDraft: Equatable {
         speciesId = pokemon.speciesId
         speciesName = pokemon.speciesName
         types = pokemon.realTypes
-        base = BaseStats(attack: pokemon.baseStats.atk, defense: pokemon.baseStats.def, stamina: pokemon.baseStats.hp)
+        base = pokemon.stats
         if pokemon.tags.contains("shadow") { isShadow = true; isPurified = false; isLucky = false }
         if let lookup {
             let options = lookup.moveOptions(for: pokemon)
@@ -109,4 +109,13 @@ extension CollectedPokemon {
     var displayName: String { nickname.isEmpty ? speciesName : "\(nickname) (\(speciesName))" }
 
     var chargedMoveIds: [String] { [chargedMoveId, secondChargedMoveId].filter { !$0.isEmpty } }
+
+    /// Same species, IVs, level and shadow status = treated as the same Pokémon (import duplicate checks).
+    static func makeDuplicateKey(speciesId: String, ivs: IVs, level: PokemonLevel, isShadow: Bool) -> String {
+        "\(speciesId)|\(ivs.attack)|\(ivs.defense)|\(ivs.stamina)|\(level.halfSteps)|\(isShadow)"
+    }
+
+    var duplicateKey: String {
+        CollectedPokemon.makeDuplicateKey(speciesId: speciesId, ivs: ivs, level: level, isShadow: isShadow)
+    }
 }

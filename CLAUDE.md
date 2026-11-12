@@ -63,6 +63,8 @@ Also:
   - `Shared/Theme.swift` also has `AppTheme` (accent from `AccentColor.colorset`, type colour of a Pokémon), `MeterBar` (IV % or relative strength, in the type colour), `TypeStrip` (leading colour strip on raid/Rocket rows) and `InfoTile` (Home tiles).
   - Home: 2×2 tiles (collection, goals, Rocket, backup) using `navigationDestination(item:)`, then a tinted Community Day card, live events, the top raid tier and the next goals.
   - Counter bars take the colour of the attack's type (charged move, else fast move).
+  - **Shared helpers, use them instead of repeating code:** `FlagIcons` (shiny/shadow/purified/lucky/mine icons), `CollectedPokemon.duplicateKey` and `makeDuplicateKey` (import duplicate checks), and `GMPokemon.stats` (PvPoke base stats as GameMath `BaseStats`; defined once in the app and once in the Counters package).
+- **Code cleanup (2026-11-12, user asked):** removed unused code (`PlaceholderView` and three unused members), merged the duplicated icon, duplicate-key and base-stats code into the helpers above, and fixed stale wording in README, INSTALL.md and comments. No behaviour change intended, except that the lucky icon is now the same star everywhere.
 - **Maintenance (2026-11-12, user's choice):**
   - Snapshots refreshed.
   - PokeMiners pins checked: still the latest commits.

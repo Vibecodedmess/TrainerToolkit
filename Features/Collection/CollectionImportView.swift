@@ -197,13 +197,10 @@ struct CollectionImportView: View {
 
     // MARK: - Helpers
 
-    /// Same species, IVs, level and shadow status = treated as the same Pokémon.
-    static func key(_ p: CollectedPokemon) -> String {
-        "\(p.speciesId)|\(p.ivAttack)|\(p.ivDefense)|\(p.ivStamina)|\(p.levelHalfSteps)|\(p.isShadow)"
-    }
+    static func key(_ p: CollectedPokemon) -> String { p.duplicateKey }
 
     static func key(_ c: CollectionCSV.Candidate) -> String {
-        "\(c.speciesId)|\(c.ivs.attack)|\(c.ivs.defense)|\(c.ivs.stamina)|\(c.level.halfSteps)|\(c.isShadow)"
+        CollectedPokemon.makeDuplicateKey(speciesId: c.speciesId, ivs: c.ivs, level: c.level, isShadow: c.isShadow)
     }
 
     static func writeTemplate() -> URL? {
@@ -226,8 +223,8 @@ private struct CandidateRow: View {
             HStack {
                 Text(candidate.nickname.isEmpty ? candidate.speciesName : "\(candidate.nickname) (\(candidate.speciesName))")
                     .font(.subheadline.weight(.semibold))
-                if candidate.isShadow { Image(systemName: "flame.fill").foregroundStyle(.purple).accessibilityLabel("Shadow") }
-                if candidate.isShiny { Image(systemName: "sparkles").foregroundStyle(.yellow).accessibilityLabel("Shiny") }
+                FlagIcons(isShiny: candidate.isShiny, isShadow: candidate.isShadow, isPurified: candidate.isPurified,
+                          isLucky: candidate.isLucky)
                 Spacer()
                 if isDuplicate {
                     Text("Already added")

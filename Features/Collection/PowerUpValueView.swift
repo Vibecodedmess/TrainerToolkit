@@ -36,8 +36,6 @@ struct PowerUpValueView: View {
     @State private var computing = false
     @State private var usedSpeciesMoves = false
 
-    private var tables: LevelTables? { PlannerMath.tables }
-
     /// Raid bosses that could be matched to the Pokémon data.
     private var bosses: [(boss: SDRaidBoss, pokemon: GMPokemon)] {
         guard let lookup = dataCenter.lookup else { return [] }
@@ -209,7 +207,7 @@ struct PowerUpValueView: View {
     private func cp(at level: PokemonLevel, tables: LevelTables) -> Int? {
         let base: BaseStats
         if !form.isEmpty, let target = dataCenter.lookup?.pokemon(id: form) {
-            base = BaseStats(attack: target.baseStats.atk, defense: target.baseStats.def, stamina: target.baseStats.hp)
+            base = target.stats
         } else {
             base = pokemon.baseStats
         }

@@ -115,3 +115,32 @@ struct InfoTile: View {
         .accessibilityElement(children: .combine)
     }
 }
+
+/// Shiny, shadow, purified, lucky and "from my collection" markers: the same icons everywhere.
+/// Put it inside an HStack; it adds only the icons that apply.
+struct FlagIcons: View {
+    var isShiny = false
+    var isShadow = false
+    var isPurified = false
+    var isLucky = false
+    var isMine = false
+
+    var body: some View {
+        if isShiny {
+            Image(systemName: "sparkles").foregroundStyle(.yellow).accessibilityLabel("Shiny")
+        }
+        if isShadow {
+            Image(systemName: "flame.fill").foregroundStyle(.purple).accessibilityLabel("Shadow")
+        }
+        if isPurified {
+            Image(systemName: "sun.max.fill").foregroundStyle(.cyan).accessibilityLabel("Purified")
+        }
+        if isLucky {
+            Image(systemName: "star.fill").foregroundStyle(.orange).accessibilityLabel("Lucky")
+        }
+        if isMine {
+            Image(systemName: "person.crop.circle.badge.checkmark").foregroundStyle(.tint)
+                .accessibilityLabel("From my collection")
+        }
+    }
+}

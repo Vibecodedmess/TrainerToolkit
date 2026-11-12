@@ -24,7 +24,7 @@ Counter rankings use the PvE damage formula with the game master's type chart, w
 ## Ground rules
 
 - No game account access, no unofficial game APIs, no automation. Data comes only from public community feeds or from what you enter.
-- No invented game data. Every value comes from a cited source (see `DATA_SOURCES.md`, added in Phase 1). Anything unsure is marked `TODO: verify`.
+- No invented game data. Every value comes from a cited source (see `DATA_SOURCES.md`). Anything unsure is marked `TODO: verify`.
 - No official artwork. Text, type color badges and SF Symbols only.
 - No backend, no accounts, no analytics. All data stays on the device.
 
@@ -37,7 +37,7 @@ Counter rankings use the PvE damage formula with the game master's type chart, w
 | `App/` | App entry point and tab bar |
 | `Features/*` | One folder per feature screen |
 | `Shared/` | Reusable SwiftUI views and the app theme (`Theme.swift`: accent, stats line, bars, tiles) |
-| `Persistence/` | On-device storage (SwiftData from Phase 1 on) |
+| `Persistence/` | On-device storage (SwiftData models) and the backup manager |
 | `Packages/TrainerKit/` | Pure-Swift modules `GameMath`, `DataSources`, `SearchBuilder`, `CollectionImport`, `Counters`, `ScreenshotImport` and `BackupFormat`, with unit tests |
 | `Packages/TrainerKit/Sources/DataSources/Snapshots/` | Bundled offline copy of every dataset (see `DATA_SOURCES.md`) |
 | `scripts/update-snapshots.sh` | Refreshes the bundled snapshots |

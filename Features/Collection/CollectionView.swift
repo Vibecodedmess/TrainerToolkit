@@ -196,7 +196,8 @@ private struct CollectionRow: View {
                 Text(pokemon.displayName)
                     .font(.headline)
                     .lineLimit(1)
-                flagIcons
+                FlagIcons(isShiny: pokemon.isShiny, isShadow: pokemon.isShadow, isPurified: pokemon.isPurified,
+                          isLucky: pokemon.isLucky)
                 Spacer()
                 TypeBadges(types: types)
             }
@@ -225,22 +226,6 @@ private struct CollectionRow: View {
         let fast = pokemon.fastMoveId.isEmpty ? nil : lookup?.moveName(pokemon.fastMoveId) ?? pokemon.fastMoveId
         let charged = pokemon.chargedMoveIds.map { lookup?.moveName($0) ?? $0 }
         return ([fast].compactMap { $0 } + charged).joined(separator: " · ")
-    }
-
-    @ViewBuilder
-    private var flagIcons: some View {
-        if pokemon.isShiny {
-            Image(systemName: "sparkles").foregroundStyle(.yellow).accessibilityLabel("Shiny")
-        }
-        if pokemon.isShadow {
-            Image(systemName: "flame.fill").foregroundStyle(.purple).accessibilityLabel("Shadow")
-        }
-        if pokemon.isPurified {
-            Image(systemName: "sun.max.fill").foregroundStyle(.cyan).accessibilityLabel("Purified")
-        }
-        if pokemon.isLucky {
-            Image(systemName: "star.fill").foregroundStyle(.orange).accessibilityLabel("Lucky")
-        }
     }
 }
 

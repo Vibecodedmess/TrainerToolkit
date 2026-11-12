@@ -65,7 +65,7 @@ struct GoalDraft: Equatable {
         speciesId = pokemon.speciesId
         speciesName = pokemon.speciesName
         types = pokemon.realTypes
-        base = BaseStats(attack: pokemon.baseStats.atk, defense: pokemon.baseStats.def, stamina: pokemon.baseStats.hp)
+        base = pokemon.stats
         // PvPoke lists shadow forms separately; picking one switches the shadow option on.
         if pokemon.tags.contains("shadow") { isShadow = true; isPurified = false; isLucky = false }
     }
@@ -133,5 +133,13 @@ extension Gamemaster {
 
     func types(forSpecies id: String) -> [String] {
         pokemon.first { $0.speciesId == id }?.realTypes ?? []
+    }
+}
+
+extension GMPokemon {
+    /// PvPoke's base stats as GameMath's `BaseStats`. Qualified, because inside this extension the bare
+    /// name means PvPoke's own nested `GMPokemon.BaseStats`.
+    var stats: GameMath.BaseStats {
+        GameMath.BaseStats(attack: baseStats.atk, defense: baseStats.def, stamina: baseStats.hp)
     }
 }

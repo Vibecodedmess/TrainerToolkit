@@ -56,7 +56,7 @@ public enum CounterRanker {
     public static let standInDefenderIVs = IVs(attack: 15, defense: 15, stamina: 15)
 
     public static func defender(_ pokemon: GMPokemon, isShadow: Bool = false) -> Combatant {
-        Combatant(base: BaseStats(attack: pokemon.baseStats.atk, defense: pokemon.baseStats.def, stamina: pokemon.baseStats.hp),
+        Combatant(base: pokemon.stats,
                   ivs: standInDefenderIVs, level: standInDefenderLevel, types: pokemon.realTypes,
                   isShadow: isShadow || isShadowEntry(pokemon))
     }
@@ -142,7 +142,7 @@ public enum CounterRanker {
             let fast = unique(p.fastMoves + (options.includeSpecialMoves ? p.eliteMoves + p.legacyMoves : [])).filter(allowed)
             let charged = unique(p.chargedMoves + (options.includeSpecialMoves ? p.eliteMoves + p.legacyMoves : [])).filter(allowed)
             guard !fast.isEmpty else { continue }
-            let base = BaseStats(attack: p.baseStats.atk, defense: p.baseStats.def, stamina: p.baseStats.hp)
+            let base = p.stats
             result.append(CounterCandidate(
                 id: "generic:\(p.speciesId)", speciesId: p.speciesId, name: p.speciesName,
                 combatant: Combatant(base: base, ivs: options.ivs, level: options.level, types: p.realTypes, isShadow: shadow),
@@ -199,5 +199,13 @@ public enum CounterRanker {
     private static func unique(_ ids: [String]) -> [String] {
         var seen: Set<String> = []
         return ids.filter { seen.insert($0).inserted }
+    }
+}
+
+extension GMPokemon {
+    /// PvPoke's base stats as GameMath's `BaseStats`. Qualified, because inside this extension the bare
+    /// name means PvPoke's own nested `GMPokemon.BaseStats`.
+    var stats: GameMath.BaseStats {
+        GameMath.BaseStats(attack: baseStats.atk, defense: baseStats.def, stamina: baseStats.hp)
     }
 }

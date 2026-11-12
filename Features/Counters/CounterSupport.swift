@@ -33,7 +33,7 @@ enum CounterPool: String, CaseIterable, Identifiable {
 }
 
 /// Counter settings shared by the Raid and Rocket screens. Remembered between launches.
-struct CounterSettingsKeys {
+enum CounterSettingsKeys {
     static let pool = "counters.pool"
     static let level = "counters.level"
     static let shadow = "counters.includeShadow"
@@ -140,13 +140,7 @@ struct CounterRow: View {
             VStack(alignment: .leading, spacing: 3) {
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
                     Text(name).font(.headline).lineLimit(1)
-                    if candidate.combatant.isShadow {
-                        Image(systemName: "flame.fill").foregroundStyle(.purple).accessibilityLabel("Shadow")
-                    }
-                    if candidate.isMine {
-                        Image(systemName: "person.crop.circle.badge.checkmark").foregroundStyle(.tint)
-                            .accessibilityLabel("From my collection")
-                    }
+                    FlagIcons(isShadow: candidate.combatant.isShadow, isMine: candidate.isMine)
                     Spacer()
                     Text(score, format: .percent.precision(.fractionLength(0)))
                         .font(.subheadline.monospacedDigit())

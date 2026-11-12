@@ -62,7 +62,7 @@ public enum PowerUpValue {
         let fast = target.fastMoves.filter { !special.contains($0) }
         let charged = target.chargedMoves.filter { !special.contains($0) }
         guard !fast.isEmpty else { return nil }
-        let base = BaseStats(attack: target.baseStats.atk, defense: target.baseStats.def, stamina: target.baseStats.hp)
+        let base = target.stats
         let combatant = Combatant(base: base, ivs: subject.combatant.ivs, level: subject.combatant.level,
                                   types: target.realTypes, isShadow: subject.combatant.isShadow)
         return CounterCandidate(id: subject.id + "->" + target.speciesId, speciesId: target.speciesId, name: target.speciesName,

@@ -53,6 +53,16 @@ After re-signing and reinstalling over the existing app:
 
 > Status: **verified on device (2026-11-10).** Build #2 was signed with the same Apple ID and installed over build #1, and *First launch* stayed the same.
 
+### Back up, in case the app does get deleted
+
+Go to More > **Backup** in the app:
+
+- **Back up now…** saves one backup file where you choose in Files, for example iCloud Drive.
+- **Choose a folder…** turns on automatic backups: a dated backup at most once a day, the newest 14 kept.
+- **Restore from a backup file…** brings everything back after a fresh install. It shows what's in the backup first.
+
+A backup holds your collection, Planner goals, event plans and checklists, saved searches, trade friends and base trade costs.
+
 ## Changing the bundle ID
 
 The bundle ID is set in one place: `Config/Shared.xcconfig` (`APP_BUNDLE_ID`).

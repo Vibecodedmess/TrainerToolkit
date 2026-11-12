@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 /// The on-device SwiftData store for everything the user creates.
-/// Add new @Model types to `schema` as later phases introduce them.
+/// Add every new @Model type to `schema`, and to the backup (see `BackupManager`).
 enum AppModelContainer {
     static let schema = Schema([SavedSearchPreset.self, PowerUpGoal.self, EventPlan.self, ChecklistItem.self,
                                 CollectedPokemon.self, TradeFriend.self, TradeWant.self])

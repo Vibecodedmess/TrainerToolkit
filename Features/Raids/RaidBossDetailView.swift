@@ -124,7 +124,7 @@ struct RaidBossDetailView: View {
                 } else if let gmBoss, let battle = BattleData.battle, let levels = PlannerMath.tables,
                           let result = RaidEstimate.estimate(
                             party: results.prefix(partySize).map(\.candidate),
-                            bossBase: BaseStats(attack: gmBoss.baseStats.atk, defense: gmBoss.baseStats.def, stamina: gmBoss.baseStats.hp),
+                            bossBase: gmBoss.stats,
                             bossTypes: bossTypes, tier: tier, weather: weather.isEmpty ? nil : weather,
                             levels: levels, battle: battle) {
                     LabeledContent {

@@ -2,7 +2,7 @@ import Foundation
 
 /// Small on-device record used to check that app data survives re-signing.
 /// UserDefaults lives in the app's data container, the same place the SwiftData
-/// store will live, so if these values survive a reinstall, so will your data.
+/// store lives, so if these values survive a reinstall, so does your data.
 enum InstallInfo {
     private static let firstLaunchKey = "install.firstLaunch"
     private static let launchCountKey = "install.launchCount"

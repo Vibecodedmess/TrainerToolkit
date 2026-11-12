@@ -134,8 +134,6 @@ public struct GamemasterLookup: Sendable {
 
     // MARK: - Name matching
 
-    static let regionalPrefixes = ["Alolan", "Galarian", "Hisuian", "Paldean"]
-
     /// Normalised lookup keys: "Meowth (Galarian)" and "Galarian Meowth" both give "galarian meowth".
     static func keys(for name: String) -> [String] {
         var keys = [normalize(name)]

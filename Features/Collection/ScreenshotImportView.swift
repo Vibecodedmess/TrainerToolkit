@@ -129,10 +129,11 @@ struct ScreenshotImportView: View {
 
     /// True when a collection entry matches one of the proposal's answers (same species, IVs, level, shadow).
     private func isInCollection(_ p: ScreenshotImporter.Proposal) -> Bool {
-        let keys = Set(existing.map { CollectionImportView.key($0) })
+        let keys = Set(existing.map(\.duplicateKey))
         return p.options.contains { option in
             option.solutions.contains { s in
-                keys.contains("\(option.pokemon.speciesId)|\(s.ivs.attack)|\(s.ivs.defense)|\(s.ivs.stamina)|\(s.level.halfSteps)|\(p.isShadow)")
+                keys.contains(CollectedPokemon.makeDuplicateKey(speciesId: option.pokemon.speciesId, ivs: s.ivs,
+                                                                level: s.level, isShadow: p.isShadow))
             }
         }
     }
@@ -189,8 +190,7 @@ private struct GroupRow: View {
         VStack(alignment: .leading, spacing: 3) {
             HStack {
                 Text(title).font(.headline)
-                if proposal.isLucky { Image(systemName: "star.circle").foregroundStyle(.yellow).accessibilityLabel("Lucky") }
-                if proposal.isShadow { Image(systemName: "flame.fill").foregroundStyle(.purple).accessibilityLabel("Shadow") }
+                FlagIcons(isShadow: proposal.isShadow, isLucky: proposal.isLucky)
                 Spacer()
                 status
             }
@@ -208,18 +208,17 @@ private struct GroupRow: View {
     private var detail: String {
         var parts: [String] = []
         if let s = proposal.certainChoice?.solution {
+            // Sure: the stats line says it all.
             parts.append(PokemonStats.line(cp: proposal.reading.cp, level: s.level, ivs: s.ivs))
-        } else if let cp = proposal.reading.cp {
-            parts.append("CP \(cp)")
-        }
-        if proposal.certainChoice != nil {
-            // Nothing to add: the stats line says it all.
-        } else if proposal.options.isEmpty {
-            parts.append("nothing fits")
-        } else if proposal.options.count > 1 {
-            parts.append("\(proposal.options.count) Pokémon fit")
         } else {
-            parts.append("\(proposal.options[0].solutions.count) level/IV options")
+            if let cp = proposal.reading.cp { parts.append("CP \(cp)") }
+            if proposal.options.isEmpty {
+                parts.append("nothing fits")
+            } else if proposal.options.count > 1 {
+                parts.append("\(proposal.options.count) Pokémon fit")
+            } else {
+                parts.append("\(proposal.options[0].solutions.count) level/IV options")
+            }
         }
         parts.append(group.screenshotNumbers.count == 1 ? "screenshot \(group.screenshotNumbers[0])"
                      : "screenshots \(group.screenshotNumbers.map(String.init).joined(separator: ", "))")

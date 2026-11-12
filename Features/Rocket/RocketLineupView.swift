@@ -139,8 +139,7 @@ struct RocketLineupView: View {
                         HStack {
                             Text("\(i + 1).").monospacedDigit().foregroundStyle(.secondary)
                             Text(s.candidate.name)
-                            if s.candidate.combatant.isShadow { Image(systemName: "flame.fill").foregroundStyle(.purple) }
-                            if s.candidate.isMine { Image(systemName: "person.crop.circle.badge.checkmark").foregroundStyle(.tint) }
+                            FlagIcons(isShadow: s.candidate.combatant.isShadow, isMine: s.candidate.isMine)
                             Spacer()
                             Text(s.score, format: .percent.precision(.fractionLength(0))).monospacedDigit().foregroundStyle(.secondary)
                         }
