@@ -68,6 +68,21 @@ struct RocketLineupView: View {
     var body: some View {
         Form {
             Section {
+                let lines = RocketData.lines(for: lineup)
+                if lines.isEmpty {
+                    Text("The game's text has no line of its own for this one.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                } else {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(lines.count == 1 ? "Says" : "Says one of these (no type hint)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        ForEach(lines, id: \.self) { line in
+                            Text("“\(line)”").italic()
+                        }
+                    }
+                }
                 if let title = lineup.title, !title.isEmpty { LabeledContent("Role", value: title) }
                 if let type = lineup.type, !type.isEmpty { LabeledContent("Type") { TypeBadge(type: type) } }
                 Text("Counters assume the opponent's Pokémon are shadow Pokémon. In-battle shields and charged-move timing are not modelled.")

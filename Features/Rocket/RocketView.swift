@@ -1,9 +1,27 @@
 import SwiftUI
 import DataSources
+import Counters
+
+/// What Rocket members say before a battle (the game's own text). A grunt's line gives away its type.
+enum RocketData {
+    static let quotes: RocketQuotes? = try? RocketQuotes.bundled()
+
+    static func lines(for lineup: SDRocketLineup) -> [String] {
+        quotes?.lines(name: lineup.name, type: lineup.type, title: lineup.title) ?? []
+    }
+
+    /// Everything a search can match: the lines, name, title, type and the Pokémon it may use.
+    static func searchText(for lineup: SDRocketLineup) -> String {
+        let pokemon = [lineup.firstPokemon, lineup.secondPokemon, lineup.thirdPokemon]
+            .flatMap { $0 ?? [] }.map(\.name)
+        return (lines(for: lineup) + [lineup.name, lineup.title ?? "", lineup.type ?? ""] + pokemon).joined(separator: " ")
+    }
+}
 
 /// Team GO Rocket lineups (ScrapedDuck / LeekDuck feed). Works offline from the saved copy.
 struct RocketView: View {
     @Environment(DataCenter.self) private var dataCenter
+    @State private var query = ""
 
     var body: some View {
         Group {
@@ -15,12 +33,20 @@ struct RocketView: View {
             }
         }
         .navigationTitle("Rocket")
+        .searchable(text: $query, prompt: "What they said, a name or a Pokémon")
         .refreshable { await dataCenter.refreshNow() }
     }
 
+    private var filtered: [SDRocketLineup] {
+        let q = query.trimmingCharacters(in: .whitespaces)
+        guard !q.isEmpty else { return dataCenter.rocketLineups }
+        return dataCenter.rocketLineups.filter { RocketQuotes.matches(q, in: RocketData.searchText(for: $0)) }
+    }
+
     private var list: some View {
-        List {
-            ForEach(Self.groups(dataCenter.rocketLineups), id: \.title) { group in
+        let shown = filtered
+        return List {
+            ForEach(Self.groups(shown), id: \.title) { group in
                 Section(group.title) {
                     ForEach(Array(group.lineups.enumerated()), id: \.offset) { _, lineup in
                         NavigationLink {
@@ -32,10 +58,16 @@ struct RocketView: View {
                 }
             }
             Section {
-                Text("Lineups from ScrapedDuck (data from LeekDuck.com). Saved on the device, so this works offline.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Lineups from ScrapedDuck (data from LeekDuck.com). Saved on the device, so this works offline.")
+                    Text("What they say is the game's own text (PokeMiners). Type a few words of a grunt's line in the search to find its type.")
+                }
+                .font(.footnote)
+                .foregroundStyle(.secondary)
             }
+        }
+        .overlay {
+            if shown.isEmpty { ContentUnavailableView.search(text: query) }
         }
     }
 
@@ -67,12 +99,25 @@ struct RocketLineupRow: View {
             TypeStrip(types: types)
             VStack(alignment: .leading, spacing: 3) {
                 Text(lineup.name).font(.headline)
+                if let said = saidText {
+                    Text(said).font(.subheadline).italic().lineLimit(2)
+                }
                 Text(summary).font(.caption).foregroundStyle(.secondary).lineLimit(2)
             }
             Spacer()
             TypeBadges(types: types)
         }
         .padding(.vertical, 2)
+    }
+
+    /// The line it says, in quotes; for grunts without a type, a note that it's one of the generic lines.
+    private var saidText: String? {
+        let lines = RocketData.lines(for: lineup)
+        switch lines.count {
+        case 0: return nil
+        case 1: return "“\(lines[0])”"
+        default: return "Says one of \(lines.count) general lines (no type hint)"
+        }
     }
 
     private var summary: String {

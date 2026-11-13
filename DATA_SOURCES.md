@@ -153,6 +153,15 @@ The user approved the game's own English text as a source on 2026-11-12.
 - The app shows the source, licence and date, labelled "Not verified". Shop prices are left out.
 - Community guides disagree on some items (for example the Sinnoh Stone), and methods change with events.
 
+### Game text: what Rocket members say (for Rocket)
+
+`scripts/update-rocket-quotes.ps1` writes `Packages/TrainerKit/Sources/Counters/Resources/rocket-quotes.json`. The source is the game's English text from PokeMiners `pogo_assets`, the same file and pinned commit (`db10df7`) as the evolution item names.
+- **Typed grunts:** `combat_grunt_quote_<type>__male_speaker` / `__female_speaker`, one line per grunt type. Male and female are identical in the pinned file. `metal` and `steel` share a line; the Rocket feed uses `steel`.
+- **Grunts without a type:** `combat_grunt_quote#1…#3`, three general lines. They give no type hint.
+- **Leaders:** `combat_<giovanni|cliff|arlo|sierra>_quote`.
+- **Decoy Grunt:** the text has no line of its own, so the app says so.
+- Each lineup is matched by its feed `type` (typed grunts), its name (leaders) or "Grunt" in its name or title (general lines).
+
 ### Bulbapedia: raid tier numbers (for the trainers-needed estimate)
 
 The user chose a cited community table on 2026-11-12. It's in `Packages/TrainerKit/Sources/Counters/Resources/raid-tiers.json`, all `TODO: verify`.

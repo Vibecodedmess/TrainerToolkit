@@ -11,11 +11,11 @@ It is sideloaded, never published.
 | --- | --- |
 | Home | Live events, a countdown to the next Community Day, the top raid tier, your power-up goals and collection size |
 | Search | Builds in-game search strings from filters, with saved presets |
-| Raids | Current raid bosses by tier; per boss: weaknesses, resistances, a ranked party of 6 counters and a rough "trainers needed" estimate, either from every released Pokémon or from My Collection, with weather |
+| More > Raids (and a Home tile) | Current raid bosses by tier; per boss: weaknesses, resistances, a ranked party of 6 counters and a rough "trainers needed" estimate, either from every released Pokémon or from My Collection, with weather |
 | Events | Event calendar with local times, checklists and reminders, Community Day details |
 | More > Planner | Candy, XL candy and stardust needed to power a Pokémon up to a target level |
 | More > Collection | Your own Pokémon: manual entry, from screenshots of one or many Pokémon at once (on-device text recognition reads CP, HP, name, power-up cost, moves and the appraisal bars, then works out level and IVs), or CSV import (see [COLLECTION_IMPORT.md](COLLECTION_IMPORT.md)). Each Pokémon shows what it needs to evolve (item, lure, quest, buddy, time) and how to get the item, and how it would rank among your raid counters if powered up (or evolved), with a one-tap Planner goal |
-| More > Rocket | Giovanni, leader and grunt lineups; counters per possible Pokémon and per slot; works offline |
+| Rocket | Giovanni, leader and grunt lineups with what each one says (a grunt's line gives away its type), searchable by those words, names or Pokémon; counters per possible Pokémon and per slot; works offline |
 | More > Trades | Friends, want lists and an estimated stardust cost per trade |
 | More > Backup | Back up everything to iCloud Drive (or anywhere in Files), automatic daily backups to a folder you choose, and restore with undo |
 
@@ -49,6 +49,7 @@ Counter rankings use the PvE damage formula with the game master's type chart, w
 | `Packages/TrainerKit/Sources/ScreenshotImport/` | Screenshot text parsing, appraisal bar reading and the IV solver |
 | `scripts/update-trade-tables.ps1` | Extracts friendship trade discounts from PokeMiners' game master |
 | `scripts/update-evolution-tables.ps1` | Extracts evolution requirements (items, lures, quests) and the game's English item/quest names |
+| `scripts/update-rocket-quotes.ps1` | Extracts what Rocket members say before a battle (the game's English text) |
 | `.github/workflows/build.yml` | macOS CI: tests, then an unsigned `.ipa` artifact |
 
 ## Building

@@ -53,15 +53,18 @@ Also:
 | 14 | Raid "trainers needed" estimate (community tier table, unverified) | Confirmed on build #23 (2026-11-12) |
 | 15 | Backup and restore (iCloud Drive via Files; automatic daily backups to a chosen folder) | Confirmed on build #23 (2026-11-12; user asked for it because free sideloads expire weekly). See "Backup" |
 | 16 | Visual polish, "concept A: polished native" (user's pick of 3 concepts) | Confirmed on build #25 (2026-11-12; user: "this looks very nice"). See "Look and feel" |
+| 17 | Rocket lines (what each member says) shown and searchable; Rocket replaces Raids in the tab bar, Raids moves to More | Built 2026-11-13. **Not tested on the phone** |
 
 ## Current state (update this section as work continues)
 
-- **As of 2026-11-12:** Phases 0–15 are built, and everything is confirmed on the phone except the CSV import, which is untested because the user has no CSV. Phase 16 (visual polish) is confirmed too.
+- **As of 2026-11-13:** Phases 0–16 are confirmed on the phone, except the CSV import (untested, the user has no CSV). Phase 17 is built.
+- **Tabs (user's choice, 2026-11-13):** Home, Search, **Rocket**, Events, More. Raids lives under More > Raids, and Home's tile shows the raid boss count instead of the Rocket count. `RaidsView` has no `NavigationStack` of its own (it's pushed); the Rocket tab wraps `RocketView` in one.
+- **Rocket lines:** `Counters/RocketQuotes.swift` + `rocket-quotes.json` (the game's own text, see DATA_SOURCES.md). The list shows each lineup's line, the search (`RocketQuotes.matches`, punctuation- and accent-insensitive) covers lines, names, types and Pokémon, and the lineup screen shows the line at the top.
 - **Look and feel (Phase 16, user's choices):**
   - The user picked "polished native" over a card dashboard and a dark HUD. They explicitly did **not** want separate ATK/DEF/HP stat bars: keep the layout as it is.
-  - **Stats line everywhere:** `CP 2651 · L30 · 13/15/14 · 93%`, IVs as Attack/Defense/HP. Use `PokemonStats.line` / `StatsLineText` in `Shared/Theme.swift`; don't hand-build it.
+  - **Stats line everywhere:** `CP 1234 · L25 · 10/12/14 · 80%` (made-up example), IVs as Attack/Defense/HP. Use `PokemonStats.line` / `StatsLineText` in `Shared/Theme.swift`; don't hand-build it.
   - `Shared/Theme.swift` also has `AppTheme` (accent from `AccentColor.colorset`, type colour of a Pokémon), `MeterBar` (IV % or relative strength, in the type colour), `TypeStrip` (leading colour strip on raid/Rocket rows) and `InfoTile` (Home tiles).
-  - Home: 2×2 tiles (collection, goals, Rocket, backup) using `navigationDestination(item:)`, then a tinted Community Day card, live events, the top raid tier and the next goals.
+  - Home: 2×2 tiles (collection, goals, raid bosses (was Rocket until 2026-11-13), backup) using `navigationDestination(item:)`, then a tinted Community Day card, live events, the top raid tier and the next goals.
   - Counter bars take the colour of the attack's type (charged move, else fast move).
   - **Shared helpers, use them instead of repeating code:** `FlagIcons` (shiny/shadow/purified/lucky/mine icons), `CollectedPokemon.duplicateKey` and `makeDuplicateKey` (import duplicate checks), and `GMPokemon.stats` (PvPoke base stats as GameMath `BaseStats`; defined once in the app and once in the Counters package).
 - **Code cleanup (2026-11-12, user asked):** removed unused code (`PlaceholderView` and three unused members), merged the duplicated icon, duplicate-key and base-stats code into the helpers above, and fixed stale wording in README, INSTALL.md and comments. No behaviour change intended, except that the lucky icon is now the same star everywhere.
@@ -163,5 +166,6 @@ Also:
   - `update-level-tables.ps1`: PokeMiners level and battle tables
   - `update-trade-tables.ps1`: friendship/trade tables
   - `update-evolution-tables.ps1`: evolution requirements and the game's English item/quest text
+  - `update-rocket-quotes.ps1`: what Rocket members say (game text)
   - `make-app-icon.ps1`
 - Docs: README.md, INSTALL.md, DATA_SOURCES.md, COLLECTION_IMPORT.md

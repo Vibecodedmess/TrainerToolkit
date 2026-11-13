@@ -1,0 +1,45 @@
+{
+  "source": {
+    "name": "PokeMiners pogo_assets, Texts/Latest APK/JSON/i18n_english.json",
+    "url": "https://github.com/PokeMiners/pogo_assets",
+    "commit": "db10df75d6f6f92018d9786af0aecc238fecc4ef",
+    "extracted": "2026-11-13",
+    "templates": [
+      "combat_grunt_quote_<type>",
+      "combat_grunt_quote#<n>",
+      "combat_<leader>_quote"
+    ]
+  },
+  "typed": {
+    "bug": "Go, my super bug Pokémon!",
+    "dark": "Wherever there is light, there is also shadow.",
+    "dragon": "ROAR! ...How’d that sound?",
+    "electric": "Get ready to be shocked!",
+    "fairy": "Check out my cute Pokémon!",
+    "fighting": "This buff physique isn’t just for show!",
+    "fire": "Do you know how hot Pokémon fire breath can get?",
+    "flying": "Battle against my Flying-type Pokémon!",
+    "ghost": "Ke...ke...ke...ke...ke...ke!",
+    "grass": "Don’t tangle with us!",
+    "ground": "You’ll be defeated into the ground!",
+    "ice": "You’re gonna be frozen in your tracks.",
+    "metal": "You’re no match for my iron will!",
+    "normal": "Normal does not mean weak.",
+    "poison": "Coiled and ready to strike!",
+    "psychic": "Are you scared of psychics that use unseen power?",
+    "rock": "Let’s rock and roll!",
+    "steel": "You’re no match for my iron will!",
+    "water": "These waters are treacherous!"
+  },
+  "generic": [
+    "Winning is for winners.",
+    "Don’t bother—I’ve already won.",
+    "Get ready to be defeated!"
+  ],
+  "leaders": {
+    "giovanni": "I’ll remind you and your Pokémon of your place.",
+    "cliff": "Too bad you’ll be losing this battle!",
+    "arlo": "Arrogance leads to failure.",
+    "sierra": "Fancy a battle?"
+  }
+}

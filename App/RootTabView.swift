@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum AppTab: Hashable {
-    case home, search, raids, events, more
+    case home, search, rocket, events, more
 }
 
 struct RootTabView: View {
@@ -15,9 +15,10 @@ struct RootTabView: View {
             SearchView()
                 .tabItem { Label("Search", systemImage: "magnifyingglass") }
                 .tag(AppTab.search)
-            RaidsView()
-                .tabItem { Label("Raids", systemImage: "shield.lefthalf.filled") }
-                .tag(AppTab.raids)
+            // Rocket is a tab (the user's choice, 2026-11-13); Raids is under More.
+            NavigationStack { RocketView() }
+                .tabItem { Label("Rocket", systemImage: "flag.2.crossed") }
+                .tag(AppTab.rocket)
             EventsView()
                 .tabItem { Label("Events", systemImage: "calendar") }
                 .tag(AppTab.events)

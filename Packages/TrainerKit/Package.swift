@@ -39,7 +39,7 @@ let package = Package(
         .testTarget(name: "CollectionImportTests", dependencies: ["CollectionImport", "DataSources", "GameMath"]),
         // Raid and Rocket counter rankings (gamemaster species + PvE battle math).
         .target(name: "Counters", dependencies: ["DataSources", "GameMath"],
-                resources: [.copy("Resources/raid-tiers.json")]),
+                resources: [.copy("Resources/raid-tiers.json"), .copy("Resources/rocket-quotes.json")]),
         .testTarget(name: "CountersTests", dependencies: ["Counters", "DataSources", "GameMath"]),
         // Pokémon screenshots -> species, level, IVs, moves (text from Vision in the app; bars from pixels).
         .target(name: "ScreenshotImport", dependencies: ["DataSources", "GameMath"]),

@@ -12,7 +12,7 @@ enum AppTheme {
     }
 }
 
-/// CP, level and IVs in one line: "CP 2651 · L30 · 13/15/14 · 93%" (Attack/Defense/HP).
+/// CP, level and IVs in one line: "CP 1234 · L25 · 10/12/14 · 80%" (Attack/Defense/HP).
 enum PokemonStats {
     static func line(cp: Int?, level: PokemonLevel, ivs: IVs) -> String {
         var parts: [String] = []

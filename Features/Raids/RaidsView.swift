@@ -5,21 +5,20 @@ import DataSources
 struct RaidsView: View {
     @Environment(DataCenter.self) private var dataCenter
 
+    // Opened from More and from Home (it is no longer a tab), so it uses the caller's navigation stack.
     var body: some View {
-        NavigationStack {
-            Group {
-                if dataCenter.raids.isEmpty {
-                    ContentUnavailableView("No raid bosses loaded", systemImage: "shield.lefthalf.filled",
-                                           description: Text("Pull down to refresh, or check More > Data sources."))
-                } else {
-                    list
-                }
+        Group {
+            if dataCenter.raids.isEmpty {
+                ContentUnavailableView("No raid bosses loaded", systemImage: "shield.lefthalf.filled",
+                                       description: Text("Pull down to refresh, or check More > Data sources."))
+            } else {
+                list
             }
-            .navigationTitle("Raids")
-            .refreshable { await dataCenter.refreshNow() }
-            .safeAreaInset(edge: .top) {
-                if let warning = dataCenter.warning { WarningBanner(text: warning) }
-            }
+        }
+        .navigationTitle("Raids")
+        .refreshable { await dataCenter.refreshNow() }
+        .safeAreaInset(edge: .top) {
+            if let warning = dataCenter.warning { WarningBanner(text: warning) }
         }
     }
 
@@ -88,6 +87,6 @@ struct RaidBossRow: View {
 }
 
 #Preview {
-    RaidsView()
+    NavigationStack { RaidsView() }
         .environment(DataCenter())
 }

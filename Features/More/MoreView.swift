@@ -11,8 +11,8 @@ struct MoreView: View {
                     NavigationLink { CollectionView() } label: {
                         Label("Collection", systemImage: "square.stack.3d.up")
                     }
-                    NavigationLink { RocketView() } label: {
-                        Label("Rocket", systemImage: "flag.2.crossed")
+                    NavigationLink { RaidsView() } label: {
+                        Label("Raids", systemImage: "shield.lefthalf.filled")
                     }
                     NavigationLink { TradesView() } label: {
                         Label("Trades", systemImage: "arrow.left.arrow.right")

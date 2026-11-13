@@ -67,7 +67,7 @@ struct PowerUpValueView: View {
                 levelsSection
             } else {
                 Section {
-                    Text("No current raid bosses to compare against. Pull down on the Raids tab to refresh.")
+                    Text("No current raid bosses to compare against. Pull down on More > Raids to refresh.")
                         .foregroundStyle(.secondary)
                 }
             }
@@ -76,7 +76,7 @@ struct PowerUpValueView: View {
                     Text("""
                     Each row is this Pokémon at that level (same IVs), with its best moveset against the chosen \
                     raid boss, compared with the other Pokémon in My Collection at their current levels. \
-                    The rank and % use the same damage model as the Raids tab: the boss is modelled at a \
+                    The rank and % use the same damage model as the raid screens: the boss is modelled at a \
                     stand-in level, so % is relative to your best counter, not exact DPS. \
                     Evolved forms use the evolution's regular moves (evolving gives random moves). \
                     Costs are from the current level and include shadow, purified and lucky pricing.

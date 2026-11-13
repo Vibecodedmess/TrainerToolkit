@@ -12,7 +12,7 @@ struct HomeView: View {
 
     /// Where a tile leads.
     enum Destination: Hashable {
-        case collection, planner, rocket, backup
+        case collection, planner, raids, backup
     }
 
     var body: some View {
@@ -32,7 +32,7 @@ struct HomeView: View {
                 switch destination {
                 case .collection: CollectionView()
                 case .planner: PlannerView()
-                case .rocket: RocketView()
+                case .raids: RaidsView()
                 case .backup: BackupView()
                 }
             }
@@ -52,8 +52,9 @@ struct HomeView: View {
                                            value: Text("\(collection.count)"), label: "My collection"))
                 tile(.planner, InfoTile(systemImage: "chart.line.uptrend.xyaxis", color: .green,
                                         value: Text("\(goals.count)"), label: "Power-up goals"))
-                tile(.rocket, InfoTile(systemImage: "flag.2.crossed", color: .red,
-                                       value: Text("\(dataCenter.rocketLineups.count)"), label: "Rocket lineups"))
+                // Raids moved off the tab bar (Rocket took its place), so Home keeps a shortcut to it.
+                tile(.raids, InfoTile(systemImage: "shield.lefthalf.filled", color: .red,
+                                      value: Text("\(dataCenter.raids.count)"), label: "Raid bosses"))
                 tile(.backup, backupTile)
             }
             .listRowInsets(EdgeInsets())
@@ -165,7 +166,7 @@ struct HomeView: View {
             } header: {
                 Text(top)
             } footer: {
-                Text("All tiers are in the Raids tab.")
+                Text("All tiers: tap the Raid bosses tile above, or More > Raids.")
             }
         }
     }
