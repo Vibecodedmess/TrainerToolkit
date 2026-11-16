@@ -53,7 +53,8 @@ Also:
 | 14 | Raid "trainers needed" estimate (community tier table, unverified) | Confirmed on build #23 (2026-11-12) |
 | 15 | Backup and restore (iCloud Drive via Files; automatic daily backups to a chosen folder) | Confirmed on build #23 (2026-11-12; user asked for it because free sideloads expire weekly). See "Backup" |
 | 16 | Visual polish, "concept A: polished native" (user's pick of 3 concepts) | Confirmed on build #25 (2026-11-12; user: "this looks very nice"). See "Look and feel" |
-| 17 | Rocket lines (what each member says) shown and searchable; Rocket replaces Raids in the tab bar, Raids moves to More | Built 2026-11-13. **Not tested on the phone** |
+| 17 | Rocket lines (what each member says) shown and searchable; Rocket replaces Raids in the tab bar, Raids moves to More | Confirmed on build #27 (2026-11-16) |
+| 18 | Screenshot import: at least 2 screenshots per Pokémon (misreads merged, majority vote); new app icon | Built 2026-11-16. **Not tested on the phone**. The user will send more example screenshots |
 
 ## Current state (update this section as work continues)
 
@@ -126,6 +127,11 @@ Also:
   - `ScreenshotImporter`: species from the name (all forms with that base name), else the candy family's evolution line, filtered by type labels. It retries as lucky, then without the stardust.
 - App: `Features/Collection/ScreenshotReader.swift` (Vision `VNRecognizeTextRequest`, `.accurate`, en-US, no language correction; scans rows from the label's bottom to 1.6 label-heights below), `ScreenshotImportView.swift` (PhotosPicker, up to 40 images, one row per Pokémon found, "Save the N sure Pokémon"; a row shows a green check once a matching entry is in the collection) and `ScreenshotReviewView.swift` (what was read, species/level/IV choice, Shiny switch, then the editor via `CollectionEditorView(prefilled:)`).
 - **Bulk import (2026-11-12, user's choice of next step):** `ScreenshotGrouping` splits a batch per Pokémon. Screenshots stay in picked order, and a new group starts when CP, max HP, name or candy family differs. Scrolled screenshots are matched by the name at the top. `Proposal.certainChoice` means one species and one level/IV option, or all 3 bars read and exactly one option matching them; only those are saved in bulk (shiny off, moves as read).
+- **At least 2 screenshots per Pokémon (2026-11-16, the user's way of working):** `ScreenshotGrouping.minimumPerPokemon = 2`.
+  - A group of one is treated as a misread. It joins the neighbouring group it disagrees with least, the one before it on a tie (`mergeSmallGroups`).
+  - `ScreenshotGrouping.combine` decides CP, HP, name and candy by majority over the group's screenshots.
+  - Bulk "Save the sure ones" skips groups with fewer than 2 screenshots. Their row says "Add its appraisal".
+  - The user said they'll send more example screenshots: check them against this logic when they arrive.
 - Checked on the user's real screenshots (in `samples/`, gitignored, **never commit them or their values**): the CP/HP/stardust math and the bar measurement give the right level and IVs for both sample Pokémon. Their screenshots also show a third-party IV overlay (a dark "level, IV %, IVs" label at the top right); the app does **not** read it.
 - Not verified until it runs on a phone: what Vision actually returns for these screens (line splitting, the CP font, the "Attack/Defense/HP" label boxes).
 - **Shiny is not detected.** In the user's shiny screenshots the only sparkles belong to their IV tool (its label and side panel) or the Pokémon's animation; the game's own mark wasn't visible. The user chose a **Shiny switch on the import screen** (2026-11-12) over reading the tool's marker. Don't read the third-party overlay.

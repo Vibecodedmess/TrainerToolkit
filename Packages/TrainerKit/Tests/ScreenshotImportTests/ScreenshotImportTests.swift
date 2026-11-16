@@ -133,6 +133,36 @@ final class ScreenshotImportTests: XCTestCase {
         XCTAssertEqual(ScreenshotGrouping.group([]), [])
     }
 
+    func testAMisreadScreenshotIsNotItsOwnPokemon() {
+        let a = reading(cp: 900, hp: 80, name: "Alpha")
+        let misread = reading(cp: 990, hp: 80, name: "Alpha")   // one digit read wrong
+        let b = reading(cp: 1500, hp: 120, name: "Beta")
+        // Misread first: it joins the screenshot after it (there's none before).
+        XCTAssertEqual(ScreenshotGrouping.group([misread, a, b, b]), [[0, 1], [2, 3]])
+        // Misread last: it joins the group before it.
+        XCTAssertEqual(ScreenshotGrouping.group([a, a, b, b, reading(cp: 1500, hp: 999, name: "Beta")]), [[0, 1], [2, 3, 4]])
+        // In the middle: it joins the neighbour it disagrees with least (same name, so Alpha).
+        XCTAssertEqual(ScreenshotGrouping.group([a, a, reading(cp: 777, name: "Alpha"), b, b]), [[0, 1, 2], [3, 4]])
+        // One screenshot on its own stays one group; with a minimum of 1 nothing is merged.
+        XCTAssertEqual(ScreenshotGrouping.group([a]), [[0]])
+        XCTAssertEqual(ScreenshotGrouping.group([misread, a, b, b], minimumPerPokemon: 1), [[0], [1], [2, 3]])
+    }
+
+    func testCombineTakesTheMajority() {
+        let combined = ScreenshotGrouping.combine([
+            reading(cp: 900, hp: 80, name: "Alpha", family: "Alpha"),
+            reading(cp: 990, name: "alpha"),
+            reading(cp: 900, hp: 80, name: "Beta"),
+        ])
+        XCTAssertEqual(combined.cp, 900)
+        XCTAssertEqual(combined.hp, 80)
+        XCTAssertEqual(combined.name, "Alpha")
+        XCTAssertEqual(combined.candyFamily, "Alpha")
+        // A tie goes to the first screenshot.
+        XCTAssertEqual(ScreenshotGrouping.combine([reading(cp: 990), reading(cp: 900)]).cp, 990)
+        XCTAssertNil(ScreenshotGrouping.combine([reading()]).cp)
+    }
+
     func testCertainChoiceNeedsOneAnswer() throws {
         let (_, p) = try evolvedSpecies()
         let level = PokemonLevel(25), ivs = IVs(attack: 6, defense: 11, stamina: 2)

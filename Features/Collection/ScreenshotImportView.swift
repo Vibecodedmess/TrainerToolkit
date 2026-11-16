@@ -35,7 +35,7 @@ struct ScreenshotImportView: View {
                     Label(items.isEmpty ? "Choose screenshots" : "Choose other screenshots", systemImage: "photo.on.rectangle")
                 }
             } footer: {
-                Text("Per Pokémon: the top of its screen, scrolled down to the power-up cost and moves, and its appraisal with the three bars. Pick up to \(maxScreenshots) screenshots, one or more Pokémon, keeping each Pokémon's screenshots together. The game must be in English.")
+                Text("At least \(ScreenshotGrouping.minimumPerPokemon) screenshots per Pokémon: the top of its screen and its appraisal with the three bars (scrolled down to the power-up cost and moves helps too). Pick up to \(maxScreenshots) screenshots, one or more Pokémon, keeping each Pokémon's screenshots together. The game must be in English.")
             }
 
             if let progress {
@@ -80,9 +80,16 @@ struct ScreenshotImportView: View {
 
     // MARK: - Summary and bulk save
 
+    /// Saved in bulk only with an answer and at least `ScreenshotGrouping.minimumPerPokemon` screenshots
+    /// (the trainer always uses its screen plus its appraisal; one screenshot alone gets a review).
+    private func isSure(_ group: ScreenshotGroup) -> Bool {
+        guard let p = group.proposal, p.certainChoice != nil else { return false }
+        return group.screenshotNumbers.count >= ScreenshotGrouping.minimumPerPokemon
+    }
+
     private var readyToSave: [ScreenshotImporter.Proposal.CertainChoice] {
         groups.compactMap { group in
-            guard let p = group.proposal, let choice = p.certainChoice, !isInCollection(p) else { return nil }
+            guard isSure(group), let p = group.proposal, let choice = p.certainChoice, !isInCollection(p) else { return nil }
             return choice
         }
     }
@@ -90,7 +97,7 @@ struct ScreenshotImportView: View {
     @ViewBuilder
     private var summarySection: some View {
         let ready = readyToSave
-        let unsure = groups.filter { g in g.proposal.map { $0.certainChoice == nil && !isInCollection($0) } ?? true }.count
+        let unsure = groups.filter { g in !isSure(g) && !(g.proposal.map(isInCollection) ?? false) }.count
         Section {
             if !ready.isEmpty {
                 Button {
@@ -105,7 +112,7 @@ struct ScreenshotImportView: View {
             }
         } footer: {
             if unsure > 0 {
-                Text("\(unsure) need a choice from you (several levels or IVs fit, or something wasn't read). Tap them to review. Shiny isn't saved by \"Save\": set it in the review if needed.")
+                Text("\(unsure) need a choice from you (several levels or IVs fit, something wasn't read, or only one screenshot). Tap them to review. Shiny isn't saved by \"Save\": set it in the review if needed.")
             } else {
                 Text("Shiny can't be read from screenshots. To mark one as shiny, tap it and use the review instead.")
             }
@@ -116,7 +123,7 @@ struct ScreenshotImportView: View {
         guard let lookup = dataCenter.lookup else { return }
         var count = 0
         for group in groups {
-            guard let p = group.proposal, let choice = p.certainChoice, !isInCollection(p) else { continue }
+            guard isSure(group), let p = group.proposal, let choice = p.certainChoice, !isInCollection(p) else { continue }
             let draft = p.draft(option: choice.option, solution: choice.solution, isShiny: false, lookup: lookup)
             if let model = draft.apply(to: nil) {
                 modelContext.insert(model)
@@ -165,10 +172,10 @@ struct ScreenshotImportView: View {
         let finalScans = scans
         groups = await Task.detached(priority: .userInitiated) { () -> [ScreenshotGroup] in
             ScreenshotGrouping.group(finalScans.map(\.reading)).enumerated().map { number, indices in
-                var reading = ScreenReading()
+                // Majority vote on CP/HP/name/candy, so one misread screenshot doesn't win.
+                let reading = ScreenshotGrouping.combine(indices.map { finalScans[$0].reading })
                 var bars: [AppraisalStat: Double] = [:]
                 for i in indices {
-                    reading = reading.merged(with: finalScans[i].reading)
                     for (stat, value) in finalScans[i].barFractions where bars[stat] == nil { bars[stat] = value }
                 }
                 let proposal = ScreenshotImporter.propose(reading, barFractions: bars, gamemaster: gm, lookup: lookup, tables: tables)
@@ -230,6 +237,11 @@ private struct GroupRow: View {
         if isSaved {
             Label("Saved", systemImage: "checkmark.circle.fill").labelStyle(.iconOnly).foregroundStyle(.green)
                 .accessibilityLabel("In your collection")
+        } else if group.screenshotNumbers.count < ScreenshotGrouping.minimumPerPokemon {
+            // The trainer always uses 2+ screenshots, so one alone needs its appraisal (or a review).
+            Label("Add its appraisal", systemImage: "photo.badge.plus")
+                .font(.caption2)
+                .foregroundStyle(.orange)
         } else if proposal.certainChoice != nil {
             Text("Sure").font(.caption2).foregroundStyle(.secondary)
         } else {
