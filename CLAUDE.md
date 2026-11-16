@@ -54,7 +54,7 @@ Also:
 | 15 | Backup and restore (iCloud Drive via Files; automatic daily backups to a chosen folder) | Confirmed on build #23 (2026-11-12; user asked for it because free sideloads expire weekly). See "Backup" |
 | 16 | Visual polish, "concept A: polished native" (user's pick of 3 concepts) | Confirmed on build #25 (2026-11-12; user: "this looks very nice"). See "Look and feel" |
 | 17 | Rocket lines (what each member says) shown and searchable; Rocket replaces Raids in the tab bar, Raids moves to More | Confirmed on build #27 (2026-11-16) |
-| 18 | Screenshot import: at least 2 screenshots per Pokémon (misreads merged, majority vote); level/IVs from "L43 98% 15/15/14" nicknames; new app icon | Built 2026-11-16 (build #28 green without nicknames; #29 with). **Not tested on the phone** |
+| 18 | Screenshot import: at least 2 screenshots per Pokémon (misreads merged, majority vote); level/IVs from "L30 80% 12/12/12" nicknames; new app icon | Built 2026-11-16 (build #28 green without nicknames; #29 with). **Not tested on the phone** |
 
 ## Current state (update this section as work continues)
 
@@ -133,7 +133,7 @@ Also:
   - Bulk "Save the sure ones" skips groups with fewer than 2 screenshots. Their row says "Add its appraisal".
 - **How the user adds Pokémon (examples in `samples/`, 2026-11-16):**
   - Two screenshots per Pokémon: the top of its screen, then scrolled down to the moves. **No appraisal.**
-  - Their Pokémon are **nicknamed like "L43 98% 15/15/14"** (the IV tool's format). The species therefore comes from the candy name plus the type labels.
+  - Their Pokémon are **nicknamed like "L30 80% 12/12/12"** (the IV tool's format). The species therefore comes from the candy name plus the type labels.
   - Without the nickname, 2–4 level/IV combinations fit each example, and a CP partly hidden behind the Pokémon may not be readable.
 - **Nickname reading (user's choice, 2026-11-16):**
   - `NicknameStats.parse` reads the nickname, only in the name position: the nearest line above the HP line, or a centred line near the top on scrolled screenshots. Never the IV tool's label at the top right.

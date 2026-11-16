@@ -4,7 +4,7 @@ import GameMath
 
 /// Turns readings of one Pokémon's screenshots into a proposal: species, level/IV options, moves, flags.
 public enum ScreenshotImporter {
-    /// How a "L43 98% 15/15/14" nickname was used for a species.
+    /// How a "L30 80% 12/12/12" nickname was used for a species.
     public enum NicknameUse: Hashable, Sendable {
         /// No such nickname was read.
         case none
@@ -52,7 +52,7 @@ public enum ScreenshotImporter {
 
     public static func propose(_ reading: ScreenReading, barFractions: [AppraisalStat: Double],
                                gamemaster: Gamemaster, lookup: GamemasterLookup, tables: LevelTables) -> Proposal? {
-        // Without a CP, a "L43 98% 15/15/14" nickname (checked against HP and stardust) can still decide.
+        // Without a CP, a "L30 80% 12/12/12" nickname (checked against HP and stardust) can still decide.
         guard reading.cp != nil || reading.nickname != nil else { return nil }
         let hints = IVSolver.Hints(attack: barFractions[.attack].map(AppraisalBars.iv(fromFraction:)),
                                    defense: barFractions[.defense].map(AppraisalBars.iv(fromFraction:)),
@@ -82,7 +82,7 @@ public enum ScreenshotImporter {
         return Proposal(reading: reading, barIVs: hints, options: [], isShadow: shadow, isLucky: reading.isLucky, ignoredStardust: false)
     }
 
-    /// Level/IV solutions for one species, using a "L43 98% 15/15/14" nickname when it fits.
+    /// Level/IV solutions for one species, using a "L30 80% 12/12/12" nickname when it fits.
     ///
     /// The nickname is checked first. Its level and IVs must give the HP read and the next power-up's
     /// stardust (each when read):

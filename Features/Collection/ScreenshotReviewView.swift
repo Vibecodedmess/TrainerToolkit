@@ -136,7 +136,7 @@ struct ScreenshotReviewView: View {
                 Text("The nickname's level and IVs don't fit what was read, so it was ignored." + (all.count > 1 ? " Pick the right combination." : ""))
             case .none:
                 if all.count > 1 {
-                    Text("Several combinations give this CP and HP. An appraisal screenshot, or a nickname like \"L43 98% 15/15/14\", narrows it down.")
+                    Text("Several combinations give this CP and HP. An appraisal screenshot, or a nickname like \"L30 80% 12/12/12\", narrows it down.")
                 }
             }
         }
