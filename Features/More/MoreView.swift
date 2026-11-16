@@ -19,6 +19,9 @@ struct MoreView: View {
                     }
                 }
                 Section("App") {
+                    NavigationLink { LooksView() } label: {
+                        Label("Looks", systemImage: "paintpalette")
+                    }
                     NavigationLink { BackupView() } label: {
                         Label("Backup", systemImage: "externaldrive.badge.icloud")
                     }

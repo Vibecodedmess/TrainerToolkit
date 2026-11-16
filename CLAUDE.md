@@ -56,10 +56,11 @@ Also:
 | 17 | Rocket lines (what each member says) shown and searchable; Rocket replaces Raids in the tab bar, Raids moves to More | Confirmed on build #27 (2026-11-16) |
 | 18 | Screenshot import: at least 2 screenshots per Pokémon (misreads merged, majority vote); level/IVs from "L30 80% 12/12/12" nicknames; new app icon | Confirmed on build #29 (2026-11-16; user: "works pretty good") |
 | 19 | Screenshot thumbnails on unsure Pokémon (and in the review, tap to enlarge); ★ on each species' best raid/gym moves | Confirmed on build #30 (2026-11-16). Elite moves now show "(Elite)" in the editor instead of ★ |
+| 20 | More > Looks: pick Standard, Floating dock, Widget board or Timeline (concepts 6, 7, 8 of 10 the user was shown) | Built 2026-11-16, not yet on the phone. See "Looks" |
 
 ## Current state (update this section as work continues)
 
-- **As of 2026-11-16:** Phases 0–19 are confirmed on the phone (latest: build #30), except the CSV import (untested, the user has no CSV).
+- **As of 2026-11-16:** Phases 0–19 are confirmed on the phone (latest: build #30), except the CSV import (untested, the user has no CSV). Phase 20 (Looks) is built.
 - **Tabs (user's choice, 2026-11-13):** Home, Search, **Rocket**, Events, More. Raids lives under More > Raids, and Home's tile shows the raid boss count instead of the Rocket count. `RaidsView` has no `NavigationStack` of its own (it's pushed); the Rocket tab wraps `RocketView` in one.
 - **Rocket lines:** `Counters/RocketQuotes.swift` + `rocket-quotes.json` (the game's own text, see DATA_SOURCES.md). The list shows each lineup's line, the search (`RocketQuotes.matches`, punctuation- and accent-insensitive) covers lines, names, types and Pokémon, and the lineup screen shows the line at the top.
 - **Look and feel (Phase 16, user's choices):**
@@ -89,6 +90,18 @@ Also:
   - Build times vary from 4 to 10 minutes.
   - Read results on the run page, including the warnings summary.
   - Artifact downloads sometimes land in Downloads as random `*.tmp` files instead of `TrainerToolkit-ipa-N.zip`. Check each candidate is a zip containing `TrainerToolkit.ipa`, then use it and delete the leftovers.
+
+## Looks (Phase 20): how they work
+
+- **How it came about (2026-11-16):** the user asked for bigger design changes. They were shown 5 cosmetic options (1–5), asked for bolder ones, were shown 6–10, and chose to have 6, 7 and 8 selectable under More > Looks. Not chosen: 1–5, 9 (field notebook), 10 (retro handheld).
+- `Shared/AppLook.swift`: `AppLook` (`standard`, `dock`, `widgets`, `timeline`), stored in `@AppStorage("app.look")`. It's a display preference, so it's **not** in `BackupManager.settingsKeys`.
+- Every look shows the same data: `HomeSnapshot` in `Features/Home/HomeShared.swift`, built once a minute in `HomeView`. `HomeView` owns the navigation (`Destination`), pull to refresh, the warning banner and the screenshot-import sheet, then switches on the look:
+  - `StandardHome` (in `HomeView.swift`): the Phase 16 list, unchanged.
+  - `DockHome.swift` (look 6): greeting, accent countdown card, round quick buttons (Collection, Goals, Raids, Scan), live events side by side, top raid tier, goals. Hides its own navigation bar.
+  - `WidgetBoardHome.swift` (look 7): mixed-size widgets; titled "Today".
+  - `TimelineHome.swift` (look 8): Today / This week switch (`home.timeline.week`), dots on a line, round scan button.
+- **Floating dock tab bar:** `App/DockTabView.swift`. All five tab screens stay alive in a `ZStack` (only the selected one is visible), with `FloatingDock` in a bottom safe-area inset. It hides while the keyboard is up. Chosen over hiding the system tab bar, which comes back on pushed screens. `AppTab` (in `RootTabView.swift`) holds each tab's title, icon and screen for both containers.
+- Switching to or from Floating dock swaps the tab container, so the More tab goes back to its first screen.
 
 ## Collection extras (Phases 12–13): how they work
 
@@ -166,7 +179,7 @@ Also:
 
 ## Where things are
 
-- `App/`: app entry, tab bar, `DataCenter` (feeds → decoded gamemaster, lookup, events)
+- `App/`: app entry, tab bar (`RootTabView`, `DockTabView`), `DataCenter` (feeds → decoded gamemaster, lookup, events)
 - `Features/<Feature>/`: SwiftUI screens per feature
 - `Persistence/`: SwiftData models (`AppModelContainer.schema` lists them all) and `BackupManager`
 - `Packages/TrainerKit/`: pure Swift, tested with `swift test` on CI

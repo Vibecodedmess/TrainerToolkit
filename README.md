@@ -18,6 +18,7 @@ It is sideloaded, never published.
 | Rocket | Giovanni, leader and grunt lineups with what each one says (a grunt's line gives away its type), searchable by those words, names or Pokémon; counters per possible Pokémon and per slot; works offline |
 | More > Trades | Friends, want lists and an estimated stardust cost per trade |
 | More > Backup | Back up everything to iCloud Drive (or anywhere in Files), automatic daily backups to a folder you choose, and restore with undo |
+| More > Looks | Pick how the app looks: Standard, Floating dock (greeting, big countdown, round quick buttons, floating tab bar), Widget board (Home as mixed-size widgets) or Timeline (Home as one "what's next" line with a scan button) |
 
 Counter rankings use the PvE damage formula with the game master's type chart, weather and move stats. The opponent's real stats are server-side, so percentages are relative to the best counter (each screen has a "How this is calculated" note).
 

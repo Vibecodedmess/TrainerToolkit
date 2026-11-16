@@ -1,30 +1,59 @@
 import SwiftUI
 
-enum AppTab: Hashable {
+enum AppTab: Hashable, CaseIterable {
     case home, search, rocket, events, more
+
+    var title: String {
+        switch self {
+        case .home: "Home"
+        case .search: "Search"
+        case .rocket: "Rocket"
+        case .events: "Events"
+        case .more: "More"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .home: "house"
+        case .search: "magnifyingglass"
+        case .rocket: "flag.2.crossed"
+        case .events: "calendar"
+        case .more: "ellipsis.circle"
+        }
+    }
+
+    /// The tab's screen.
+    @MainActor @ViewBuilder
+    var root: some View {
+        switch self {
+        case .home: HomeView()
+        case .search: SearchView()
+        // Rocket is a tab (the user's choice, 2026-11-13); Raids is under More.
+        case .rocket: NavigationStack { RocketView() }
+        case .events: EventsView()
+        case .more: MoreView()
+        }
+    }
 }
 
 struct RootTabView: View {
     @State private var selection: AppTab = .home
+    @AppStorage(AppLook.storageKey) private var look: AppLook = .standard
 
     var body: some View {
-        TabView(selection: $selection) {
-            HomeView()
-                .tabItem { Label("Home", systemImage: "house") }
-                .tag(AppTab.home)
-            SearchView()
-                .tabItem { Label("Search", systemImage: "magnifyingglass") }
-                .tag(AppTab.search)
-            // Rocket is a tab (the user's choice, 2026-11-13); Raids is under More.
-            NavigationStack { RocketView() }
-                .tabItem { Label("Rocket", systemImage: "flag.2.crossed") }
-                .tag(AppTab.rocket)
-            EventsView()
-                .tabItem { Label("Events", systemImage: "calendar") }
-                .tag(AppTab.events)
-            MoreView()
-                .tabItem { Label("More", systemImage: "ellipsis.circle") }
-                .tag(AppTab.more)
+        Group {
+            if look == .dock {
+                DockTabView(selection: $selection)
+            } else {
+                TabView(selection: $selection) {
+                    ForEach(AppTab.allCases, id: \.self) { tab in
+                        tab.root
+                            .tabItem { Label(tab.title, systemImage: tab.systemImage) }
+                            .tag(tab)
+                    }
+                }
+            }
         }
         .tint(AppTheme.accent)
     }

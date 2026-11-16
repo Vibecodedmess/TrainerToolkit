@@ -3,14 +3,18 @@ import SwiftData
 import DataSources
 import GameMath
 
-/// Today at a glance: shortcut tiles, the next Community Day, live events, top raid bosses and goals.
+/// Today at a glance, in the look picked in More > Looks. Every look shows the same data
+/// (`HomeSnapshot`) and uses the same navigation.
 struct HomeView: View {
     @Environment(DataCenter.self) private var dataCenter
+    @Environment(\.modelContext) private var modelContext
     @Query(sort: \PowerUpGoal.createdAt, order: .reverse) private var goals: [PowerUpGoal]
     @Query private var collection: [CollectedPokemon]
+    @AppStorage(AppLook.storageKey) private var look: AppLook = .standard
     @State private var destination: Destination?
+    @State private var showingScan = false
 
-    /// Where a tile leads.
+    /// Where a tile or quick button leads.
     enum Destination: Hashable {
         case collection, planner, raids, backup
     }
@@ -18,16 +22,22 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             TimelineView(.periodic(from: .now, by: 60)) { context in
-                let events = EventCalendar.resolve(dataCenter.events, now: context.date)
-                List {
-                    tilesSection
-                    communityDaySection(events, now: context.date)
-                    liveSection(events)
-                    raidSection
-                    goalsSection
+                let home = HomeSnapshot(now: context.date, feed: dataCenter.events, raids: dataCenter.raids,
+                                        goals: goals, collectionCount: collection.count,
+                                        lastBackup: BackupManager.lastBackup)
+                let open: (Destination) -> Void = { destination = $0 }
+                switch look {
+                case .standard:
+                    StandardHome(home: home, open: open)
+                case .dock:
+                    DockHome(home: home, open: open, scan: { showingScan = true })
+                case .widgets:
+                    WidgetBoardHome(home: home, open: open)
+                case .timeline:
+                    TimelineHome(home: home, open: open, scan: { showingScan = true })
                 }
             }
-            .navigationTitle("Home")
+            .navigationTitle(look == .widgets ? "Today" : "Home")
             .navigationDestination(item: $destination) { destination in
                 switch destination {
                 case .collection: CollectionView()
@@ -41,20 +51,43 @@ struct HomeView: View {
                 if let warning = dataCenter.warning { WarningBanner(text: warning) }
             }
         }
+        .sheet(isPresented: $showingScan) {
+            NavigationStack {
+                ScreenshotImportView()
+            }
+            .environment(dataCenter)
+            .modelContext(modelContext)
+        }
     }
+}
 
-    // MARK: - Tiles
+// MARK: - Standard look (Phase 16)
+
+/// Shortcut tiles, the next Community Day, live events, top raid bosses and goals, as a list.
+private struct StandardHome: View {
+    let home: HomeSnapshot
+    let open: (HomeView.Destination) -> Void
+
+    var body: some View {
+        List {
+            tilesSection
+            communityDaySection
+            liveSection
+            raidSection
+            goalsSection
+        }
+    }
 
     private var tilesSection: some View {
         Section {
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible())], spacing: 10) {
                 tile(.collection, InfoTile(systemImage: "square.stack.3d.up", color: .blue,
-                                           value: Text("\(collection.count)"), label: "My collection"))
+                                           value: Text("\(home.collectionCount)"), label: "My collection"))
                 tile(.planner, InfoTile(systemImage: "chart.line.uptrend.xyaxis", color: .green,
-                                        value: Text("\(goals.count)"), label: "Power-up goals"))
+                                        value: Text("\(home.goals.count)"), label: "Power-up goals"))
                 // Raids moved off the tab bar (Rocket took its place), so Home keeps a shortcut to it.
                 tile(.raids, InfoTile(systemImage: "shield.lefthalf.filled", color: .red,
-                                      value: Text("\(dataCenter.raids.count)"), label: "Raid bosses"))
+                                      value: Text("\(home.raidCount)"), label: "Raid bosses"))
                 tile(.backup, backupTile)
             }
             .listRowInsets(EdgeInsets())
@@ -62,9 +95,9 @@ struct HomeView: View {
         }
     }
 
-    private func tile(_ target: Destination, _ content: InfoTile) -> some View {
+    private func tile(_ target: HomeView.Destination, _ content: InfoTile) -> some View {
         Button {
-            destination = target
+            open(target)
         } label: {
             content
         }
@@ -74,8 +107,8 @@ struct HomeView: View {
 
     /// Last backup as "2 days ago"; orange when there's none from the last 7 days.
     private var backupTile: InfoTile {
-        if let last = BackupManager.lastBackup {
-            let stale = Date.now.timeIntervalSince(last) > 7 * 24 * 3600
+        if let last = home.lastBackup {
+            let stale = home.backupIsStale
             return InfoTile(systemImage: "externaldrive.badge.icloud", color: stale ? .orange : .teal,
                             value: Text(last, format: .relative(presentation: .named)), label: "Last backup",
                             valueColor: stale ? .orange : .primary)
@@ -84,11 +117,9 @@ struct HomeView: View {
                         label: "Last backup", valueColor: .orange)
     }
 
-    // MARK: - Sections
-
     @ViewBuilder
-    private func communityDaySection(_ events: [ResolvedEvent], now: Date) -> some View {
-        if let cd = EventCalendar.nextCommunityDay(in: events) {
+    private var communityDaySection: some View {
+        if let cd = home.communityDay {
             Section("Community Day") {
                 NavigationLink {
                     EventDetailView(event: cd)
@@ -100,7 +131,7 @@ struct HomeView: View {
                                 .font(.title3.weight(.semibold))
                                 .foregroundStyle(.green)
                         } else if let start = cd.start {
-                            Text(countdown(to: start, now: now))
+                            Text(HomeSnapshot.countdown(to: start, now: home.now))
                                 .font(.title2.monospacedDigit().weight(.bold))
                             Text(start, format: .dateTime.weekday(.wide).day().month().hour().minute())
                                 .font(.caption)
@@ -114,15 +145,13 @@ struct HomeView: View {
         }
     }
 
-    @ViewBuilder
-    private func liveSection(_ events: [ResolvedEvent]) -> some View {
-        let live = EventCalendar.sortedForDisplay(events.filter { $0.status == .live })
+    private var liveSection: some View {
         Section {
-            if live.isEmpty {
-                Text(dataCenter.events.isEmpty ? "Events haven't loaded yet." : "No events running right now.")
+            if home.live.isEmpty {
+                Text(home.eventsLoaded ? "No events running right now." : "Events haven't loaded yet.")
                     .foregroundStyle(.secondary)
             } else {
-                ForEach(live.prefix(5)) { event in
+                ForEach(home.live.prefix(5)) { event in
                     NavigationLink {
                         EventDetailView(event: event)
                     } label: {
@@ -142,8 +171,8 @@ struct HomeView: View {
                         }
                     }
                 }
-                if live.count > 5 {
-                    Text("+ \(live.count - 5) more in the Events tab").font(.footnote).foregroundStyle(.secondary)
+                if home.live.count > 5 {
+                    Text("+ \(home.live.count - 5) more in the Events tab").font(.footnote).foregroundStyle(.secondary)
                 }
             }
         } header: {
@@ -153,10 +182,9 @@ struct HomeView: View {
 
     @ViewBuilder
     private var raidSection: some View {
-        let tiers = RaidsView.tiers(dataCenter.raids)
-        if let top = tiers.first {
+        if let top = home.topTier {
             Section {
-                ForEach(Array(dataCenter.raids.filter { $0.tier == top }.enumerated()), id: \.offset) { _, boss in
+                ForEach(Array(home.topBosses.enumerated()), id: \.offset) { _, boss in
                     NavigationLink {
                         RaidBossDetailView(boss: boss)
                     } label: {
@@ -173,28 +201,19 @@ struct HomeView: View {
 
     @ViewBuilder
     private var goalsSection: some View {
-        if !goals.isEmpty {
+        if !home.goals.isEmpty {
             Section("Next power-ups") {
-                ForEach(goals.prefix(3)) { goal in
+                ForEach(home.goals.prefix(3)) { goal in
                     HStack {
                         Text(goal.speciesName)
                         Spacer()
-                        Text("L\(PokemonLevel(halfSteps: goal.currentLevelHalfSteps).description) → L\(PokemonLevel(halfSteps: goal.targetLevelHalfSteps).description)")
+                        Text(HomeSnapshot.levelRange(goal))
                             .font(.subheadline.monospacedDigit())
                             .foregroundStyle(.secondary)
                     }
                 }
             }
         }
-    }
-
-    /// "in 3 d 4 h 12 min" countdown, minutes resolution (the view refreshes every minute).
-    private func countdown(to date: Date, now: Date) -> String {
-        let minutes = max(0, Int(date.timeIntervalSince(now) / 60))
-        let days = minutes / (24 * 60)
-        let hours = (minutes / 60) % 24
-        let mins = minutes % 60
-        return days > 0 ? "in \(days) d \(hours) h \(mins) min" : "in \(hours) h \(mins) min"
     }
 }
 
