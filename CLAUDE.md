@@ -59,7 +59,7 @@ Also:
 
 ## Current state (update this section as work continues)
 
-- **As of 2026-11-13:** Phases 0–16 are confirmed on the phone, except the CSV import (untested, the user has no CSV). Phase 17 is built.
+- **As of 2026-11-16:** Phases 0–19 are confirmed on the phone (latest: build #30), except the CSV import (untested, the user has no CSV).
 - **Tabs (user's choice, 2026-11-13):** Home, Search, **Rocket**, Events, More. Raids lives under More > Raids, and Home's tile shows the raid boss count instead of the Rocket count. `RaidsView` has no `NavigationStack` of its own (it's pushed); the Rocket tab wraps `RocketView` in one.
 - **Rocket lines:** `Counters/RocketQuotes.swift` + `rocket-quotes.json` (the game's own text, see DATA_SOURCES.md). The list shows each lineup's line, the search (`RocketQuotes.matches`, punctuation- and accent-insensitive) covers lines, names, types and Pokémon, and the lineup screen shows the line at the top.
 - **Look and feel (Phase 16, user's choices):**
