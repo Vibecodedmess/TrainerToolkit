@@ -33,6 +33,9 @@ struct ScreenshotReviewView: View {
             if let family = r.candyFamily { LabeledContent("Candy", value: family) }
             if !r.types.isEmpty { LabeledContent("Type") { TypeBadges(types: r.types) } }
             LabeledContent("Power-up stardust", value: r.powerUpStardust.map { $0.formatted() } ?? "Not found")
+            if let nick = r.nickname {
+                LabeledContent("Nickname", value: "L\(nick.level.description) · \(nick.ivs.attack)/\(nick.ivs.defense)/\(nick.ivs.stamina)")
+            }
             LabeledContent("Appraisal IVs", value: barText(proposal.barIVs))
             if proposal.isShadow { Label("Shadow (PURIFY button found)", systemImage: "flame.fill") }
             if proposal.isLucky { Label("Lucky", systemImage: "star.circle") }
@@ -124,8 +127,17 @@ struct ScreenshotReviewView: View {
         } header: {
             Text(all.count == 1 ? "Level and IVs" : "Level and IVs (\(all.count) fit)")
         } footer: {
-            if all.count > 1 {
-                Text("Several combinations give this CP and HP. An appraisal screenshot narrows it down.")
+            switch option.nicknameUse {
+            case .matched:
+                Text("From the nickname: its level and IVs give the CP, HP and power-up stardust on the screen.")
+            case .usedWithoutCP:
+                Text("From the nickname: the CP couldn't be read reliably, but the nickname's level and IVs give the HP and power-up stardust on the screen.")
+            case .ignored:
+                Text("The nickname's level and IVs don't fit what was read, so it was ignored." + (all.count > 1 ? " Pick the right combination." : ""))
+            case .none:
+                if all.count > 1 {
+                    Text("Several combinations give this CP and HP. An appraisal screenshot, or a nickname like \"L43 98% 15/15/14\", narrows it down.")
+                }
             }
         }
     }

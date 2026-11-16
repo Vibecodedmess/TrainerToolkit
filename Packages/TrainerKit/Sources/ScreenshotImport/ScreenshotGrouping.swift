@@ -58,6 +58,7 @@ public enum ScreenshotGrouping {
         combined.hp = majority(readings.map(\.hp))
         combined.name = majority(readings.map { $0.name }, key: { $0.lowercased() })
         combined.candyFamily = majority(readings.map { $0.candyFamily }, key: { $0.lowercased() })
+        combined.nickname = majority(readings.map(\.nickname))
         return combined
     }
 
@@ -83,7 +84,7 @@ public enum ScreenshotGrouping {
         conflictCount(a, b) > 0
     }
 
-    /// How many of CP, max HP, name and candy family both readings have, with different values.
+    /// How many of CP, max HP, name, "L.. ..%" nickname and candy family both readings have, with different values.
     static func conflictCount(_ a: ScreenReading, _ b: ScreenReading) -> Int {
         func differ<T: Equatable>(_ x: T?, _ y: T?) -> Int {
             guard let x, let y else { return 0 }
@@ -91,6 +92,7 @@ public enum ScreenshotGrouping {
         }
         return differ(a.cp, b.cp) + differ(a.hp, b.hp)
             + differ(a.name?.lowercased(), b.name?.lowercased())
+            + differ(a.nickname, b.nickname)
             + differ(a.candyFamily?.lowercased(), b.candyFamily?.lowercased())
     }
 }

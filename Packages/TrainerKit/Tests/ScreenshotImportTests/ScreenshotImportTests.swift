@@ -181,6 +181,85 @@ final class ScreenshotImportTests: XCTestCase {
         }
     }
 
+    // MARK: - Nickname "L.. ..% a/d/s"
+
+    func testNicknameParsing() {
+        XCTAssertEqual(NicknameStats.parse("L21 47% 7/3/11"), NicknameStats(level: PokemonLevel(21), ivs: IVs(attack: 7, defense: 3, stamina: 11)))
+        XCTAssertEqual(NicknameStats.parse("L 23,5 60 % 9 / 4 / 14")?.level, PokemonLevel(23.5))
+        XCTAssertEqual(NicknameStats.parse("♀L33.5 80% 12/12/12")?.level, PokemonLevel(33.5))
+        XCTAssertNil(NicknameStats.parse("Examplemon"))
+        XCTAssertNil(NicknameStats.parse("L21 47% 16/3/11"))   // IV out of range
+        XCTAssertNil(NicknameStats.parse("L99 47% 7/3/11"))    // level out of range
+    }
+
+    func testNicknameIsReadFromTheNamePositionOnly() {
+        // Top of the screen: nickname just above the HP line; the IV tool's label at the top right is ignored.
+        let top = ScreenshotParser.parse([
+            line("CP1234", x: 0.35, y: 0.06, w: 0.3, h: 0.03),
+            line("♂L30 80% 1/2/3", x: 0.56, y: 0.10, w: 0.38),
+            line("L21 47% 7/3/11", x: 0.22, y: 0.41, w: 0.56, h: 0.03),
+            line("87 / 100 HP", x: 0.4, y: 0.46),
+        ])
+        XCTAssertEqual(top.nickname?.ivs, IVs(attack: 7, defense: 3, stamina: 11))
+        XCTAssertNil(top.name)   // a nickname with digits is not a species name
+        // Scrolled: a centred nickname near the top counts; only the tool's label does not.
+        let scrolled = ScreenshotParser.parse([
+            line("♂L30 80% 1/2/3", x: 0.56, y: 0.10, w: 0.38),
+            line("L21 47% 7/3/11", x: 0.22, y: 0.13, w: 0.56, h: 0.03),
+        ])
+        XCTAssertEqual(scrolled.nickname?.level, PokemonLevel(21))
+        let toolLabelOnly = ScreenshotParser.parse([line("♂L30 80% 1/2/3", x: 0.56, y: 0.10, w: 0.38)])
+        XCTAssertNil(toolLabelOnly.nickname)
+    }
+
+    private func nicknamed(_ p: GMPokemon, level: PokemonLevel, ivs: IVs, cp: Int?, nickname: NicknameStats) throws -> ScreenReading {
+        var r = try reading(for: p, name: nil, level: level, ivs: ivs)
+        r.cp = cp
+        r.candyFamily = p.speciesName
+        r.nickname = nickname
+        return r
+    }
+
+    func testNicknameDecidesWithoutAppraisal() throws {
+        let (_, p) = try evolvedSpecies()
+        let level = PokemonLevel(29.5), ivs = IVs(attack: 5, defense: 9, stamina: 13)
+        let truthCP = try XCTUnwrap(CPCalculator.cp(base: base(p), ivs: ivs, level: level, tables: levels))
+        let nick = NicknameStats(level: level, ivs: ivs)
+        func option(_ r: ScreenReading) throws -> ScreenshotImporter.SpeciesOption {
+            let proposal = try XCTUnwrap(ScreenshotImporter.propose(r, barFractions: [:], gamemaster: gamemaster, lookup: lookup, tables: levels))
+            return try XCTUnwrap(proposal.options.first { $0.pokemon.speciesId == p.speciesId })
+        }
+        // CP read correctly: exactly the nickname's answer.
+        let matched = try option(nicknamed(p, level: level, ivs: ivs, cp: truthCP, nickname: nick))
+        XCTAssertEqual(matched.nicknameUse, .matched)
+        XCTAssertEqual(matched.solutions.map(\.ivs), [ivs])
+        XCTAssertEqual(matched.solutions.map(\.level), [level])
+        // CP hidden or misread: HP and stardust confirm the nickname.
+        for cp in [nil, truthCP + 7] {
+            let fallback = try option(nicknamed(p, level: level, ivs: ivs, cp: cp, nickname: nick))
+            XCTAssertEqual(fallback.nicknameUse, .usedWithoutCP)
+            XCTAssertEqual(fallback.solutions.map(\.ivs), [ivs])
+        }
+    }
+
+    func testANicknameThatDoesNotFitIsIgnored() throws {
+        let (_, p) = try evolvedSpecies()
+        let level = PokemonLevel(29.5), ivs = IVs(attack: 5, defense: 9, stamina: 13)
+        let truthCP = try XCTUnwrap(CPCalculator.cp(base: base(p), ivs: ivs, level: level, tables: levels))
+        // A nickname with another HP IV: it can't give the HP on screen.
+        let wrong = NicknameStats(level: level, ivs: IVs(attack: 5, defense: 9, stamina: 0))
+        let r = try nicknamed(p, level: level, ivs: ivs, cp: truthCP, nickname: wrong)
+        let proposal = try XCTUnwrap(ScreenshotImporter.propose(r, barFractions: [:], gamemaster: gamemaster, lookup: lookup, tables: levels))
+        let option = try XCTUnwrap(proposal.options.first { $0.pokemon.speciesId == p.speciesId })
+        XCTAssertEqual(option.nicknameUse, .ignored)
+        XCTAssertTrue(option.solutions.contains { $0.ivs == ivs && $0.level == level })
+        // Without a CP and with a nickname that doesn't fit, nothing is invented.
+        var noCP = r
+        noCP.cp = nil
+        let none = try XCTUnwrap(ScreenshotImporter.propose(noCP, barFractions: [:], gamemaster: gamemaster, lookup: lookup, tables: levels))
+        XCTAssertFalse(none.options.contains { $0.pokemon.speciesId == p.speciesId })
+    }
+
     func testIntegersWithSeparators() {
         XCTAssertEqual(ScreenshotParser.integers(in: "5,000 4"), [5000, 4])
         XCTAssertEqual(ScreenshotParser.integers(in: "143,144"), [143144])

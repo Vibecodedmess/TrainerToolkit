@@ -35,7 +35,7 @@ struct ScreenshotImportView: View {
                     Label(items.isEmpty ? "Choose screenshots" : "Choose other screenshots", systemImage: "photo.on.rectangle")
                 }
             } footer: {
-                Text("At least \(ScreenshotGrouping.minimumPerPokemon) screenshots per Pokémon: the top of its screen and its appraisal with the three bars (scrolled down to the power-up cost and moves helps too). Pick up to \(maxScreenshots) screenshots, one or more Pokémon, keeping each Pokémon's screenshots together. The game must be in English.")
+                Text("At least \(ScreenshotGrouping.minimumPerPokemon) screenshots per Pokémon: the top of its screen, and scrolled down to the power-up cost and moves. For exact IVs add its appraisal (three bars), or give it a nickname like \"L43 98% 15/15/14\". Pick up to \(maxScreenshots) screenshots, one or more Pokémon, keeping each Pokémon's screenshots together. The game must be in English.")
             }
 
             if let progress {

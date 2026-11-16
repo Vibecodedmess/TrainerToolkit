@@ -54,7 +54,7 @@ Also:
 | 15 | Backup and restore (iCloud Drive via Files; automatic daily backups to a chosen folder) | Confirmed on build #23 (2026-11-12; user asked for it because free sideloads expire weekly). See "Backup" |
 | 16 | Visual polish, "concept A: polished native" (user's pick of 3 concepts) | Confirmed on build #25 (2026-11-12; user: "this looks very nice"). See "Look and feel" |
 | 17 | Rocket lines (what each member says) shown and searchable; Rocket replaces Raids in the tab bar, Raids moves to More | Confirmed on build #27 (2026-11-16) |
-| 18 | Screenshot import: at least 2 screenshots per Pokémon (misreads merged, majority vote); new app icon | Built 2026-11-16. **Not tested on the phone**. The user will send more example screenshots |
+| 18 | Screenshot import: at least 2 screenshots per Pokémon (misreads merged, majority vote); level/IVs from "L43 98% 15/15/14" nicknames; new app icon | Built 2026-11-16 (build #28 green without nicknames; #29 with). **Not tested on the phone** |
 
 ## Current state (update this section as work continues)
 
@@ -131,7 +131,16 @@ Also:
   - A group of one is treated as a misread. It joins the neighbouring group it disagrees with least, the one before it on a tie (`mergeSmallGroups`).
   - `ScreenshotGrouping.combine` decides CP, HP, name and candy by majority over the group's screenshots.
   - Bulk "Save the sure ones" skips groups with fewer than 2 screenshots. Their row says "Add its appraisal".
-  - The user said they'll send more example screenshots: check them against this logic when they arrive.
+- **How the user adds Pokémon (examples in `samples/`, 2026-11-16):**
+  - Two screenshots per Pokémon: the top of its screen, then scrolled down to the moves. **No appraisal.**
+  - Their Pokémon are **nicknamed like "L43 98% 15/15/14"** (the IV tool's format). The species therefore comes from the candy name plus the type labels.
+  - Without the nickname, 2–4 level/IV combinations fit each example, and a CP partly hidden behind the Pokémon may not be readable.
+- **Nickname reading (user's choice, 2026-11-16):**
+  - `NicknameStats.parse` reads the nickname, only in the name position: the nearest line above the HP line, or a centred line near the top on scrolled screenshots. Never the IV tool's label at the top right.
+  - `ScreenshotImporter.solve` checks it first: its level and IVs must give the HP and the power-up stardust (each when read).
+  - If the CP fits too, it's `.matched`. If the CP is missing or differs and the HP was read, it's `.usedWithoutCP` (a likely misread). Otherwise it's `.ignored`, and the usual solving runs.
+  - Grouping compares nicknames and votes on them like CP and HP.
+  - On the samples, the CP/HP/stardust math agrees with each nickname.
 - Checked on the user's real screenshots (in `samples/`, gitignored, **never commit them or their values**): the CP/HP/stardust math and the bar measurement give the right level and IVs for both sample Pokémon. Their screenshots also show a third-party IV overlay (a dark "level, IV %, IVs" label at the top right); the app does **not** read it.
 - Not verified until it runs on a phone: what Vision actually returns for these screens (line splitting, the CP font, the "Attack/Defense/HP" label boxes).
 - **Shiny is not detected.** In the user's shiny screenshots the only sparkles belong to their IV tool (its label and side panel) or the Pokémon's animation; the game's own mark wasn't visible. The user chose a **Shiny switch on the import screen** (2026-11-12) over reading the tool's marker. Don't read the third-party overlay.

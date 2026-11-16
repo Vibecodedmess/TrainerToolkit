@@ -1,4 +1,5 @@
 import Foundation
+import GameMath
 
 /// A rectangle in normalised image coordinates: origin top-left, 0…1 on both axes.
 public struct TextBox: Hashable, Sendable {
@@ -40,6 +41,30 @@ public enum AppraisalStat: String, CaseIterable, Hashable, Sendable {
     case hp = "HP"
 }
 
+/// Level and IVs from a nickname such as "L43 98% 15/15/14" (the trainer names their Pokémon this
+/// way; reading it was their choice, 2026-11-16). Only the nickname in the name position is read,
+/// never the IV tool's own label elsewhere on the screen.
+public struct NicknameStats: Hashable, Sendable {
+    public let level: PokemonLevel
+    public let ivs: IVs
+
+    public init(level: PokemonLevel, ivs: IVs) {
+        self.level = level
+        self.ivs = ivs
+    }
+
+    /// Parses "L43 98% 15/15/14" (also "L27.5 …", "L27,5 …", spaces around "/" and "%"). Nil when the
+    /// text doesn't have that shape or a value is out of range.
+    public static func parse(_ text: String) -> NicknameStats? {
+        let pattern = #"L\s*(\d{1,2}(?:[.,]5)?)\s+\d{1,3}\s*%\s*(\d{1,2})\s*/\s*(\d{1,2})\s*/\s*(\d{1,2})"#
+        guard let m = ScreenshotParser.firstMatch(pattern, in: text), m.count == 5,
+              let level = Double(m[1].replacingOccurrences(of: ",", with: ".")),
+              let a = Int(m[2]), let d = Int(m[3]), let s = Int(m[4]),
+              (1...55).contains(level), [a, d, s].allSatisfy({ IVs.range.contains($0) }) else { return nil }
+        return NicknameStats(level: PokemonLevel(level), ivs: IVs(attack: a, defense: d, stamina: s))
+    }
+}
+
 /// What could be read from one screenshot of a Pokémon's screen (any value may be missing).
 public struct ScreenReading: Hashable, Sendable {
     public var cp: Int?
@@ -47,6 +72,8 @@ public struct ScreenReading: Hashable, Sendable {
     public var hp: Int?
     /// The big name under the Pokémon: the species, or a nickname.
     public var name: String?
+    /// Level and IVs when the nickname is written like "L43 98% 15/15/14".
+    public var nickname: NicknameStats?
     /// "EEVEE CANDY" gives "Eevee": the evolution family.
     public var candyFamily: String?
     /// Type names shown under the name, lowercased ("ice", or "dragon" and "flying").
@@ -71,6 +98,7 @@ public struct ScreenReading: Hashable, Sendable {
         r.cp = cp ?? other.cp
         r.hp = hp ?? other.hp
         r.name = name ?? other.name
+        r.nickname = nickname ?? other.nickname
         r.candyFamily = candyFamily ?? other.candyFamily
         if r.types.isEmpty { r.types = other.types }
         r.powerUpStardust = powerUpStardust ?? other.powerUpStardust
@@ -120,6 +148,7 @@ public enum ScreenshotParser {
                 .min { $0.box.minY < $1.box.minY }
                 .map { cleanedName($0.text) }
         }
+        r.nickname = nickname(in: lines, hpLine: hpLine)
 
         for line in lines {
             let upper = line.text.uppercased()
@@ -147,6 +176,22 @@ public enum ScreenshotParser {
     }
 
     // MARK: - Pieces
+
+    /// A "L43 98% 15/15/14" nickname in the name position: the nearest line above the HP line, or,
+    /// on a scrolled screenshot without an HP line, a centred line near the top. Lines off to the
+    /// side (the IV tool's own label sits at the top right) are never used.
+    static func nickname(in lines: [RecognizedLine], hpLine: RecognizedLine?) -> NicknameStats? {
+        let candidates: [RecognizedLine]
+        if let hp = hpLine {
+            candidates = lines.filter {
+                $0.box.maxY <= hp.box.minY + 0.005 && hp.box.minY - $0.box.maxY < 0.08 && abs($0.box.midX - 0.5) < 0.2
+            }.sorted { $0.box.maxY > $1.box.maxY }
+        } else {
+            candidates = lines.filter { $0.box.midY < 0.25 && abs($0.box.midX - 0.5) < 0.15 }
+                .sorted { $0.box.minY < $1.box.minY }
+        }
+        return candidates.lazy.compactMap { NicknameStats.parse($0.text) }.first
+    }
 
     /// The CP: a line near the top centre that is "CP" (or a misread of it) followed by 2-5 digits.
     static func cp(in lines: [RecognizedLine]) -> Int? {
