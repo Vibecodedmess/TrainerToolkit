@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import GameMath
 import DataSources
 import ScreenshotImport
@@ -7,6 +8,8 @@ import ScreenshotImport
 /// shiny, then the normal editor to save it.
 struct ScreenshotReviewView: View {
     let proposal: ScreenshotImporter.Proposal
+    /// This Pokémon's screenshots (smaller copies), so you can see which one it is.
+    var screenshots: [UIImage] = []
 
     @Environment(DataCenter.self) private var dataCenter
     @State private var speciesId: String?
@@ -14,14 +17,64 @@ struct ScreenshotReviewView: View {
     @State private var showAllSolutions = false
     /// The game's shiny mark can't be read reliably from a screenshot, so the user sets it here.
     @State private var isShiny = false
+    /// Index of the screenshot shown full size.
+    @State private var enlarged: Int?
 
     var body: some View {
         Form {
+            if !screenshots.isEmpty { screenshotsSection }
             readSection
             resultSections
         }
         .navigationTitle(proposal.certainChoice?.option.pokemon.speciesName ?? proposal.reading.name ?? "Review")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: Binding(get: { enlarged != nil }, set: { if !$0 { enlarged = nil } })) {
+            if let index = enlarged, screenshots.indices.contains(index) {
+                NavigationStack {
+                    ScrollView {
+                        Image(uiImage: screenshots[index])
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: .infinity)
+                    }
+                    .navigationTitle("Screenshot \(index + 1) of \(screenshots.count)")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Done") { enlarged = nil }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var screenshotsSection: some View {
+        Section {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(Array(screenshots.enumerated()), id: \.offset) { index, image in
+                        Button {
+                            enlarged = index
+                        } label: {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(height: 260)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(.quaternary))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Screenshot \(index + 1), tap to enlarge")
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        } header: {
+            Text("Screenshots")
+        } footer: {
+            Text("Tap one to see it full size.")
+        }
     }
 
     private var readSection: some View {
@@ -65,7 +118,8 @@ struct ScreenshotReviewView: View {
                 } else {
                     LabeledContent("Pokémon", value: option.pokemon.speciesName)
                 }
-                LabeledContent("Moves", value: movesText(proposal.moves(for: option.pokemon, lookup: lookup), lookup: lookup))
+                LabeledContent("Moves", value: movesText(proposal.moves(for: option.pokemon, lookup: lookup),
+                                                         speciesId: option.pokemon.speciesId, lookup: lookup))
                 Toggle(isOn: $isShiny) {
                     Label("Shiny", systemImage: "sparkles")
                 }
@@ -147,8 +201,11 @@ struct ScreenshotReviewView: View {
         return [hints.attack, hints.defense, hints.stamina].map { $0.map(String.init) ?? "?" }.joined(separator: "/")
     }
 
-    private func movesText(_ moves: (fast: String?, charged: [String]), lookup: GamemasterLookup) -> String {
-        let names = ([moves.fast].compactMap { $0 } + moves.charged).map { lookup.moveName($0) }
+    /// Read moves, with ★ on its species' best for raids and gyms.
+    private func movesText(_ moves: (fast: String?, charged: [String]), speciesId: String, lookup: GamemasterLookup) -> String {
+        let names = ([moves.fast].compactMap { $0 } + moves.charged).map {
+            BestMoveCache.label($0, speciesId: speciesId, lookup: lookup)
+        }
         return names.isEmpty ? "Not found" : names.joined(separator: ", ")
     }
 }

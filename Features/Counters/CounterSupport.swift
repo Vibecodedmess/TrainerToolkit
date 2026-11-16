@@ -20,6 +20,29 @@ enum BattleData {
     }
 }
 
+/// Each species' best raid/gym fast and charged move (`BestMoves`), computed once per species.
+@MainActor
+enum BestMoveCache {
+    private static var cache: [String: Set<String>] = [:]
+
+    /// The best fast and charged move ids of a species (empty when unknown).
+    static func bestMoveIds(forSpecies speciesId: String, lookup: GamemasterLookup?) -> Set<String> {
+        if let hit = cache[speciesId] { return hit }
+        guard let lookup, let p = lookup.pokemon(id: speciesId), let battle = BattleData.battle,
+              let levels = PlannerMath.tables else { return [] }
+        let best = BestMoves.forSpecies(p, levels: levels, battle: battle)
+        let ids = Set([best?.fastMoveId, best?.chargedMoveId].compactMap { $0 })
+        cache[speciesId] = ids
+        return ids
+    }
+
+    /// "Counter ★" when the move is its species' best for raids and gyms.
+    static func label(_ moveId: String, speciesId: String, lookup: GamemasterLookup?) -> String {
+        let name = lookup?.moveName(moveId) ?? moveId
+        return bestMoveIds(forSpecies: speciesId, lookup: lookup).contains(moveId) ? name + " ★" : name
+    }
+}
+
 /// Raid tier numbers (community table, unverified) for the trainers-needed estimate.
 enum RaidData {
     static let table: RaidEstimate.Table? = try? RaidEstimate.Table.bundled()

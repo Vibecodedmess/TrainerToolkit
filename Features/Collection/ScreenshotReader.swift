@@ -26,6 +26,15 @@ enum ScreenshotReader {
         return ScreenshotScan(reading: reading, barFractions: bars)
     }
 
+    /// A smaller copy of a screenshot to show while reviewing (keeps memory low with many screenshots).
+    /// Blocking; call it off the main thread.
+    static func thumbnail(_ data: Data, maxHeight: CGFloat = 900) -> UIImage? {
+        guard let image = UIImage(data: data), image.size.height > 0 else { return nil }
+        let scale = min(1, maxHeight / image.size.height)
+        let size = CGSize(width: (image.size.width * scale).rounded(), height: (image.size.height * scale).rounded())
+        return image.preparingThumbnail(of: size) ?? image
+    }
+
     static func recognizeText(_ image: CGImage) throws -> [RecognizedLine] {
         let request = VNRecognizeTextRequest()
         request.recognitionLevel = .accurate

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import SwiftData
 import PhotosUI
 import GameMath
@@ -25,6 +26,8 @@ struct ScreenshotImportView: View {
     @State private var errorText: String?
     @State private var groups: [ScreenshotGroup] = []
     @State private var savedMessage: String?
+    /// Smaller copies of the picked screenshots, by 1-based number, to show which is which.
+    @State private var thumbnails: [Int: UIImage] = [:]
 
     private let maxScreenshots = 40
 
@@ -54,9 +57,11 @@ struct ScreenshotImportView: View {
                     ForEach(groups) { group in
                         if let proposal = group.proposal {
                             NavigationLink {
-                                ScreenshotReviewView(proposal: proposal)
+                                ScreenshotReviewView(proposal: proposal, screenshots: images(group))
                             } label: {
                                 GroupRow(group: group, proposal: proposal, isSaved: isInCollection(proposal),
+                                         // Thumbnails only where there's a choice to make, to tell them apart.
+                                         thumbnails: isSure(group) || isInCollection(proposal) ? [] : images(group),
                                          lookup: dataCenter.lookup)
                             }
                         } else {
@@ -79,6 +84,10 @@ struct ScreenshotImportView: View {
     }
 
     // MARK: - Summary and bulk save
+
+    private func images(_ group: ScreenshotGroup) -> [UIImage] {
+        group.screenshotNumbers.compactMap { thumbnails[$0] }
+    }
 
     /// Saved in bulk only with an answer and at least `ScreenshotGrouping.minimumPerPokemon` screenshots
     /// (the trainer always uses its screen plus its appraisal; one screenshot alone gets a review).
@@ -152,6 +161,7 @@ struct ScreenshotImportView: View {
         errorText = nil
         groups = []
         savedMessage = nil
+        thumbnails = [:]
         progress = (0, items.count)
         defer { progress = nil }
 
@@ -161,6 +171,7 @@ struct ScreenshotImportView: View {
             if let data = try? await item.loadTransferable(type: Data.self),
                let scan = try? await Task.detached(priority: .userInitiated, operation: { try ScreenshotReader.scan(data) }).value {
                 scans.append(scan)
+                thumbnails[index + 1] = await Task.detached(priority: .userInitiated) { ScreenshotReader.thumbnail(data) }.value
             } else {
                 scans.append(ScreenshotScan(reading: ScreenReading(), barFractions: [:]))
             }
@@ -191,6 +202,8 @@ private struct GroupRow: View {
     let group: ScreenshotGroup
     let proposal: ScreenshotImporter.Proposal
     let isSaved: Bool
+    /// Shown for Pokémon that still need a choice, so you can tell which is which.
+    let thumbnails: [UIImage]
     let lookup: GamemasterLookup?
 
     var body: some View {
@@ -202,6 +215,20 @@ private struct GroupRow: View {
                 status
             }
             Text(detail).font(.caption).foregroundStyle(.secondary)
+            if !thumbnails.isEmpty {
+                HStack(spacing: 6) {
+                    ForEach(Array(thumbnails.enumerated()), id: \.offset) { _, image in
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 96)
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                            .overlay(RoundedRectangle(cornerRadius: 6).strokeBorder(.quaternary))
+                    }
+                }
+                .padding(.top, 4)
+                .accessibilityLabel("\(thumbnails.count) screenshots")
+            }
         }
         .padding(.vertical, 2)
     }

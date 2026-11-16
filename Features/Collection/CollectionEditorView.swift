@@ -211,9 +211,11 @@ struct CollectionEditorView: View {
         Section {
             if let gm = gmPokemon, let lookup = dataCenter.lookup {
                 let options = lookup.moveOptions(for: gm)
-                movePicker("Fast move", selection: $draft.fastMoveId, options: options.fast, lookup: lookup, allowNone: false)
-                movePicker("Charged move", selection: $draft.chargedMoveId, options: options.charged, lookup: lookup, allowNone: false)
-                movePicker("Second charged move", selection: $draft.secondChargedMoveId, options: options.charged, lookup: lookup, allowNone: true)
+                let best = BestMoveCache.bestMoveIds(forSpecies: gm.speciesId, lookup: lookup)
+                movePicker("Fast move", selection: $draft.fastMoveId, options: options.fast, best: best, lookup: lookup, allowNone: false)
+                movePicker("Charged move", selection: $draft.chargedMoveId, options: options.charged, best: best, lookup: lookup, allowNone: false)
+                movePicker("Second charged move", selection: $draft.secondChargedMoveId, options: options.charged, best: best,
+                           lookup: lookup, allowNone: true)
             } else {
                 Text(draft.speciesId == nil ? "Choose a Pokémon to see its moves." : "Move data is still loading.")
                     .foregroundStyle(.secondary)
@@ -221,16 +223,16 @@ struct CollectionEditorView: View {
         } header: {
             Text("Moves")
         } footer: {
-            Text("Moves per PvPoke. ★ = Elite TM or legacy move.")
+            Text("Moves per PvPoke. ★ = best fast and charged move for raids and gyms (most damage per second, neutral target). (Elite) = Elite TM or legacy move.")
         }
     }
 
     private func movePicker(_ title: String, selection: Binding<String>, options: [GamemasterLookup.MoveOption],
-                            lookup: GamemasterLookup, allowNone: Bool) -> some View {
+                            best: Set<String>, lookup: GamemasterLookup, allowNone: Bool) -> some View {
         Picker(title, selection: selection) {
             Text(allowNone ? "None" : "Not set").tag("")
             ForEach(options) { option in
-                Text(option.isSpecial ? "\(option.name) ★" : option.name).tag(option.id)
+                Text(option.name + (option.isSpecial ? " (Elite)" : "") + (best.contains(option.id) ? " ★" : "")).tag(option.id)
             }
             // Keep a saved move selectable even if the data no longer lists it.
             if !selection.wrappedValue.isEmpty && !options.contains(where: { $0.id == selection.wrappedValue }) {

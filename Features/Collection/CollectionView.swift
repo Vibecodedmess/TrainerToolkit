@@ -222,10 +222,10 @@ private struct CollectionRow: View {
         .padding(.vertical, 2)
     }
 
+    /// Its moves, with ★ on the ones that are its species' best for raids and gyms.
     private var movesLine: String {
-        let fast = pokemon.fastMoveId.isEmpty ? nil : lookup?.moveName(pokemon.fastMoveId) ?? pokemon.fastMoveId
-        let charged = pokemon.chargedMoveIds.map { lookup?.moveName($0) ?? $0 }
-        return ([fast].compactMap { $0 } + charged).joined(separator: " · ")
+        let ids = ([pokemon.fastMoveId] + pokemon.chargedMoveIds).filter { !$0.isEmpty }
+        return ids.map { BestMoveCache.label($0, speciesId: pokemon.speciesId, lookup: lookup) }.joined(separator: " · ")
     }
 }
 
