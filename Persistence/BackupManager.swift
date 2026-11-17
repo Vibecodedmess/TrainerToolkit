@@ -257,7 +257,8 @@ enum BackupManager {
     /// Called when the app becomes active: backs up when automatic backups are on and the last
     /// one is more than a day old. Errors are remembered for the Backup screen, never shown as alerts.
     static func autoBackupIfDue(_ context: ModelContext) {
-        guard autoEnabled, hasFolder else { return }
+        // Never back up a temporary empty store: it would push the real backups out of the folder.
+        guard autoEnabled, hasFolder, !AppModelContainer.shared.usingFallback else { return }
         if let last = UserDefaults.standard.object(forKey: lastAutoKey) as? Date, Date.now.timeIntervalSince(last) < autoInterval {
             return
         }

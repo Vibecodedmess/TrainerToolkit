@@ -87,17 +87,18 @@ public enum DamageCalculator {
         public let dps: Double
     }
 
-    /// DPS of one attacker with one moveset against a defender. Nil if a move has no PvE data.
+    /// DPS of one attacker with one moveset against a defender. Nil if a move has no PvE data
+    /// or is the wrong kind (a charged move as the fast move, or the other way round).
     public static func evaluate(attacker: Combatant, fastMoveId: String, chargedMoveId: String?,
                                 defender: Combatant, weather: String?,
                                 levels: LevelTables, battle: BattleTables) -> MovesetResult? {
-        guard let fast = battle.move(fastMoveId),
+        guard let fast = battle.move(fastMoveId), fast.fast,
               let fastDamage = damage(move: fast, attacker: attacker, defender: defender,
                                       weather: weather, levels: levels, battle: battle) else { return nil }
         var charged: BattleTables.PvEMove?
         var chargedDamage = 0
         if let id = chargedMoveId {
-            guard let move = battle.move(id),
+            guard let move = battle.move(id), !move.fast,
                   let d = damage(move: move, attacker: attacker, defender: defender,
                                  weather: weather, levels: levels, battle: battle) else { return nil }
             charged = move

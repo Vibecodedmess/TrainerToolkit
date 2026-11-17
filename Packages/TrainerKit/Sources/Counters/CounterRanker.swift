@@ -137,10 +137,12 @@ public enum CounterRanker {
             if shadow && !options.includeShadow { continue }
             if mega && !options.includeMega { continue }
             seen.insert(p.speciesId)
+            // PvPoke already lists elite and legacy moves in fastMoves/chargedMoves; eliteMoves and
+            // legacyMoves only mark which ones are special (and mix both kinds).
             let special = Set(p.eliteMoves + p.legacyMoves)
             let allowed: (String) -> Bool = { options.includeSpecialMoves || !special.contains($0) }
-            let fast = unique(p.fastMoves + (options.includeSpecialMoves ? p.eliteMoves + p.legacyMoves : [])).filter(allowed)
-            let charged = unique(p.chargedMoves + (options.includeSpecialMoves ? p.eliteMoves + p.legacyMoves : [])).filter(allowed)
+            let fast = p.fastMoves.filter(allowed)
+            let charged = p.chargedMoves.filter(allowed)
             guard !fast.isEmpty else { continue }
             let base = p.stats
             result.append(CounterCandidate(
@@ -194,11 +196,6 @@ public enum CounterRanker {
 
     public static func isMegaEntry(_ p: GMPokemon) -> Bool {
         p.tags.contains("mega") || p.speciesId.contains("_mega") || p.speciesId.contains("_primal")
-    }
-
-    private static func unique(_ ids: [String]) -> [String] {
-        var seen: Set<String> = []
-        return ids.filter { seen.insert($0).inserted }
     }
 }
 

@@ -62,10 +62,11 @@ Also:
 | 23 | Home Screen widget: Community Day countdown and top raid bosses (small, medium, Lock Screen), fetching the feeds itself | Confirmed on build #35 (2026-11-17; user: "Widget works!"). See "Widget" |
 | 24 | Widget styles (Standard, Alien signal, Terminal) picked in the widget's own settings; the alien scene moves a step every minute | Confirmed on build #36 (2026-11-17; user: "almost perfect"). See "Widget" |
 | 25 | Widget style "Terminal, alien edition" (the user's favourite look): terminal on a see-through panel over the dimmed moving scene | Build #37 showed no movement in the alien styles; fixed (scene moved into the content layer, bigger poses, live ticking countdown and signal sweep) and confirmed on build #38 (2026-11-17; user: "works!"). See "Widget" |
+| 26 | Review fixes (user asked for a whole-app review, 2026-11-17): (1) generic counters tried elite/legacy *charged* moves as fast moves (PvPoke's `eliteMoves`/`legacyMoves` mix both kinds and are already in `fastMoves`/`chargedMoves`), which inflated e.g. Mewtwo; `DamageCalculator.evaluate` now rejects the wrong kind of move. (2) If the store falls back to in-memory, automatic backups are skipped and Home shows `AppModelContainer.fallbackWarning`. (3) Reminders are re-synced after each foreground refresh too | Built 2026-11-17, not yet on the phone |
 
 ## Current state (update this section as work continues)
 
-- **As of 2026-11-17:** Phases 0–25 are confirmed on the phone (latest: build #38), except the CSV import (untested, the user has no CSV). The user's favourite look is Terminal, alien edition.
+- **As of 2026-11-17:** Phases 0–25 are confirmed on the phone (latest: build #38), except the CSV import (untested, the user has no CSV). Phase 26 (review fixes) is built. The user's favourite look is Terminal, alien edition.
 - **Tabs (user's choice, 2026-11-13):** Home, Search, **Rocket**, Events, More. Raids lives under More > Raids, and Home's tile shows the raid boss count instead of the Rocket count. `RaidsView` has no `NavigationStack` of its own (it's pushed); the Rocket tab wraps `RocketView` in one.
 - **Rocket lines:** `Counters/RocketQuotes.swift` + `rocket-quotes.json` (the game's own text, see DATA_SOURCES.md). The list shows each lineup's line, the search (`RocketQuotes.matches`, punctuation- and accent-insensitive) covers lines, names, types and Pokémon, and the lineup screen shows the line at the top.
 - **Look and feel (Phase 16, user's choices):**

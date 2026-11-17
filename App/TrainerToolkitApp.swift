@@ -10,7 +10,7 @@ struct TrainerToolkitApp: App {
 
     init() {
         InstallInfo.recordLaunch()
-        modelContainer = AppModelContainer.make().container
+        modelContainer = AppModelContainer.shared.container
     }
 
     var body: some Scene {
@@ -25,7 +25,12 @@ struct TrainerToolkitApp: App {
                 }
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .active {
-                        Task { await dataCenter.refreshIfStale() }
+                        Task {
+                            await dataCenter.refreshIfStale()
+                            // New event data may have moved event times.
+                            await ReminderScheduler.sync(context: modelContainer.mainContext,
+                                                         events: EventCalendar.resolve(dataCenter.events))
+                        }
                         // Daily automatic backup to the chosen folder (if switched on).
                         BackupManager.autoBackupIfDue(modelContainer.mainContext)
                     }

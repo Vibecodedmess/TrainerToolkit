@@ -60,6 +60,17 @@ final class CounterRankerTests: XCTestCase {
         }
     }
 
+    func testCountersUseFastMovesAsFastAndChargedAsCharged() throws {
+        let defender = CounterRanker.defender(try anyRegular())
+        let pool = CounterRanker.genericCandidates(gamemaster, options: .init(includeSpecialMoves: true))
+        let ranked = CounterRanker.rank(pool, against: defender, weather: nil, levels: levels, battle: battle)
+        XCTAssertFalse(ranked.isEmpty)
+        for r in ranked {
+            XCTAssertEqual(battle.move(r.moveset.fastMoveId)?.fast, true, r.candidate.name)
+            if let charged = r.moveset.chargedMoveId { XCTAssertEqual(battle.move(charged)?.fast, false, r.candidate.name) }
+        }
+    }
+
     func testRankingIsSortedAndMatchesTheDamageCalculator() throws {
         let boss = try anyRegular()
         let defender = CounterRanker.defender(boss)

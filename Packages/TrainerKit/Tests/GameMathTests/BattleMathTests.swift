@@ -132,5 +132,10 @@ final class DamageCalculatorTests: XCTestCase {
         XCTAssertGreaterThan(best.dps, 0)
         XCTAssertNil(DamageCalculator.evaluate(attacker: attacker, fastMoveId: "NOT_A_MOVE", chargedMoveId: nil,
                                                defender: defender, weather: nil, levels: levels, battle: battle))
+        // Wrong kind of move in either slot.
+        XCTAssertNil(DamageCalculator.evaluate(attacker: attacker, fastMoveId: "SLUDGE_BOMB", chargedMoveId: nil,
+                                               defender: defender, weather: nil, levels: levels, battle: battle))
+        XCTAssertNil(DamageCalculator.evaluate(attacker: attacker, fastMoveId: "VINE_WHIP", chargedMoveId: "VINE_WHIP",
+                                               defender: defender, weather: nil, levels: levels, battle: battle))
     }
 }
