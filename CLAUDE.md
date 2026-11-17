@@ -56,12 +56,12 @@ Also:
 | 17 | Rocket lines (what each member says) shown and searchable; Rocket replaces Raids in the tab bar, Raids moves to More | Confirmed on build #27 (2026-11-16) |
 | 18 | Screenshot import: at least 2 screenshots per Pokémon (misreads merged, majority vote); level/IVs from "L30 80% 12/12/12" nicknames; new app icon | Confirmed on build #29 (2026-11-16; user: "works pretty good") |
 | 19 | Screenshot thumbnails on unsure Pokémon (and in the review, tap to enlarge); ★ on each species' best raid/gym moves | Confirmed on build #30 (2026-11-16). Elite moves now show "(Elite)" in the editor instead of ★ |
-| 20 | More > Looks: pick Standard, Floating dock, Widget board or Timeline (concepts 6, 7, 8) | Built as build #31 (2026-11-16); the user hasn't reported a phone test yet. See "Looks" |
-| 21 | Three more looks: Terminal (17), Alien signal (21), Terminal, alien edition (22), with an original moving alien background | On build #32 the user found the custom tab bars covered the bottom of lists, and that looks only changed Home. Fixed 2026-11-17 (bar below the screens; looks app-wide), not yet on the phone. See "Looks" |
+| 20 | More > Looks: pick Standard, Floating dock, Widget board or Timeline (concepts 6, 7, 8) | Confirmed on build #33 (2026-11-17). See "Looks" |
+| 21 | Three more looks: Terminal (17), Alien signal (21), Terminal, alien edition (22), with an original moving alien background | Build #32 had the custom tab bars covering list bottoms and looks only on Home; fixed (bar below the screens, looks app-wide) and confirmed on build #33 (2026-11-17; user: "looks great!"). See "Looks" |
 
 ## Current state (update this section as work continues)
 
-- **As of 2026-11-16:** Phases 0–19 are confirmed on the phone (latest: build #30), except the CSV import (untested, the user has no CSV). Phase 20 (Looks) is build #31, not yet reported on. Phase 21 (three more looks) is built.
+- **As of 2026-11-17:** Phases 0–21 are confirmed on the phone (latest: build #33), except the CSV import (untested, the user has no CSV).
 - **Tabs (user's choice, 2026-11-13):** Home, Search, **Rocket**, Events, More. Raids lives under More > Raids, and Home's tile shows the raid boss count instead of the Rocket count. `RaidsView` has no `NavigationStack` of its own (it's pushed); the Rocket tab wraps `RocketView` in one.
 - **Rocket lines:** `Counters/RocketQuotes.swift` + `rocket-quotes.json` (the game's own text, see DATA_SOURCES.md). The list shows each lineup's line, the search (`RocketQuotes.matches`, punctuation- and accent-insensitive) covers lines, names, types and Pokémon, and the lineup screen shows the line at the top.
 - **Look and feel (Phase 16, user's choices):**
