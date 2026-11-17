@@ -55,7 +55,7 @@ struct HomeView: View {
             }
             .refreshable { await dataCenter.refreshNow() }
             .safeAreaInset(edge: .top) {
-                if let warning = AppModelContainer.fallbackWarning ?? dataCenter.warning { WarningBanner(text: warning) }
+                if let warning = AppModelContainer.fallbackWarning ?? InstallInfo.expiryWarning() ?? dataCenter.warning { WarningBanner(text: warning) }
             }
         }
         .sheet(isPresented: $showingScan) {

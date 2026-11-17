@@ -34,6 +34,7 @@ The IPA is **unsigned**. Sideloadly signs it with your Apple ID in the next step
 
 - Apps signed with a **free Apple ID expire after 7 days**. When that happens the app stops opening but **stays installed with its data**.
 - **Don't delete the expired app.** Re-sign the same IPA (or a newer one) in Sideloadly and install it over the top.
+- The app warns you: **More > Settings** shows "Signed until", Home shows a banner 2 days before, and (if notifications are on) a reminder arrives the day before.
 - Free Apple IDs also have limits: about 3 sideloaded apps installed at once, and a weekly cap on new App IDs.
 
 ### Will my data survive a re-sign?

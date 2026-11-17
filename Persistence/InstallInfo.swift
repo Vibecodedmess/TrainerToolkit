@@ -22,6 +22,31 @@ enum InstallInfo {
         UserDefaults.standard.integer(forKey: launchCountKey)
     }
 
+    /// When this install stops opening: the `ExpirationDate` of the provisioning profile Sideloadly
+    /// signs the app with (7 days for a free Apple ID). Nil when there's no profile (simulator, CI).
+    static let signingExpiry: Date? = {
+        guard let url = Bundle.main.url(forResource: "embedded", withExtension: "mobileprovision"),
+              let data = try? Data(contentsOf: url) else { return nil }
+        return profileExpiry(data)
+    }()
+
+    /// The profile is a signed (CMS) file with a plain XML property list inside.
+    static func profileExpiry(_ data: Data) -> Date? {
+        guard let start = data.range(of: Data("<?xml".utf8)),
+              let end = data.range(of: Data("</plist>".utf8), in: start.lowerBound..<data.endIndex),
+              let plist = try? PropertyListSerialization.propertyList(from: data[start.lowerBound..<end.upperBound],
+                                                                       format: nil) as? [String: Any]
+        else { return nil }
+        return plist["ExpirationDate"] as? Date
+    }
+
+    /// Home banner when the install expires within 2 days, else nil.
+    static func expiryWarning(now: Date = .now) -> String? {
+        guard let expiry = signingExpiry, expiry.timeIntervalSince(now) < 2 * 24 * 3600 else { return nil }
+        if expiry <= now { return "This install's signature has expired. Back up, then re-sign with Sideloadly." }
+        return "This install expires \(expiry.formatted(.relative(presentation: .named))). Back up, then re-sign with Sideloadly."
+    }
+
     static var bundleID: String {
         Bundle.main.bundleIdentifier ?? "unknown"
     }

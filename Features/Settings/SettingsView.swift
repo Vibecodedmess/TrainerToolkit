@@ -32,12 +32,13 @@ struct SettingsView: View {
             Section {
                 LabeledContent("Version", value: InstallInfo.versionString)
                 LabeledContent("Bundle ID", value: InstallInfo.bundleID)
+                LabeledContent("Signed until", value: InstallInfo.signingExpiry?.formatted(date: .abbreviated, time: .shortened) ?? "Unknown")
                 LabeledContent("First launch", value: firstLaunchText)
                 LabeledContent("Launch count", value: "\(InstallInfo.launchCount)")
             } header: {
                 Text("Install check")
             } footer: {
-                Text("Stored on this device in the app's data container. If First launch and Launch count are still here after you re-sign and reinstall, your app data survived too.")
+                Text("Stored on this device in the app's data container. If First launch and Launch count are still here after you re-sign and reinstall, your app data survived too. Signed until is when this install stops opening; Home warns 2 days before, with a reminder the day before if notifications are on.")
             }
         }
         .navigationTitle("Settings")

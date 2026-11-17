@@ -78,6 +78,7 @@ enum ReminderScheduler {
     /// Replaces all app reminders with the ones the current plans ask for.
     @MainActor
     static func sync(context: ModelContext, events: [ResolvedEvent]) async {
+        await syncExpiryReminder()
         let plans = (try? context.fetch(FetchDescriptor<EventPlan>())) ?? []
         let wanted = planned(plans: plans, events: events)
         let center = UNUserNotificationCenter.current()
@@ -100,5 +101,24 @@ enum ReminderScheduler {
             let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
             try? await center.add(UNNotificationRequest(identifier: reminder.id, content: content, trigger: trigger))
         }
+    }
+
+    /// One reminder a day before this install's signature expires (`InstallInfo.signingExpiry`).
+    /// Rebuilt on every sync, so a re-signed install gets a fresh one. Never asks for permission itself.
+    private static func syncExpiryReminder() async {
+        let center = UNUserNotificationCenter.current()
+        let id = "app.expiry"
+        center.removePendingNotificationRequests(withIdentifiers: [id])
+        guard let expiry = InstallInfo.signingExpiry else { return }
+        let fire = expiry.addingTimeInterval(-24 * 3600)
+        guard fire > .now else { return }
+        let status = await authorizationStatus()
+        guard status == .authorized || status == .provisional || status == .ephemeral else { return }
+        let content = UNMutableNotificationContent()
+        content.title = "Trainer Toolkit expires tomorrow"
+        content.body = "Back up, then re-sign it with Sideloadly before \(expiry.formatted(date: .omitted, time: .shortened)) tomorrow."
+        content.sound = .default
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: fire.timeIntervalSinceNow, repeats: false)
+        try? await center.add(UNNotificationRequest(identifier: id, content: content, trigger: trigger))
     }
 }
