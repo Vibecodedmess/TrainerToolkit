@@ -32,14 +32,18 @@ struct TrainerWidget: Widget {
 // MARK: - Style setting
 
 enum WidgetStyle: String, AppEnum {
-    case standard, alien, terminal
+    case standard, alien, terminal, alienTerminal
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation = "Style"
     static var caseDisplayRepresentations: [WidgetStyle: DisplayRepresentation] = [
         .standard: "Standard",
         .alien: "Alien signal",
         .terminal: "Terminal",
+        .alienTerminal: "Terminal, alien edition",
     ]
+
+    /// Styles over the moving alien scene, which get one pose per minute.
+    var isAlien: Bool { self == .alien || self == .alienTerminal }
 }
 
 struct WidgetStyleIntent: WidgetConfigurationIntent {
@@ -151,7 +155,7 @@ struct Provider: AppIntentTimelineProvider {
     func timeline(for configuration: WidgetStyleIntent, in context: Context) async -> Timeline<WidgetEntry> {
         let entry = await WidgetData.entry(refresh: true, style: configuration.style)
         let next = WidgetData.nextUpdate(after: entry)
-        guard configuration.style == .alien, context.family != .accessoryRectangular else {
+        guard configuration.style.isAlien, context.family != .accessoryRectangular else {
             return Timeline(entries: [entry], policy: .after(next))
         }
         // Widgets can't animate continuously: iOS shows prepared entries and animates the change
@@ -196,6 +200,9 @@ struct TrainerWidgetView: View {
             case .terminal:
                 TerminalWidgetContent(entry: entry, family: family)
                     .containerBackground(for: .widget) { Color.black }
+            case .alienTerminal:
+                TerminalWidgetContent(entry: entry, family: family, onAlienScene: true)
+                    .containerBackground(for: .widget) { AlienWidgetScene(date: entry.date, dimmed: true) }
             }
         }
     }
@@ -329,4 +336,5 @@ struct TrainerWidgetView: View {
     WidgetEntry.placeholder()
     WidgetEntry.placeholder(style: .alien)
     WidgetEntry.placeholder(style: .terminal)
+    WidgetEntry.placeholder(style: .alienTerminal)
 }

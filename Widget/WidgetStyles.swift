@@ -9,6 +9,10 @@ private enum Alien {
     static let ring = Color(red: 0.88, green: 1.0, blue: 0.47)
     static let sky = [Color(red: 0.48, green: 0.91, blue: 0.31), Color(red: 0.22, green: 0.66, blue: 0.16),
                       Color(red: 0.08, green: 0.36, blue: 0.09)]
+    /// The darker sky behind the alien terminal (same as the app's dimmed scene).
+    static let dimSky = [Color(red: 0.12, green: 0.35, blue: 0.07), Color(red: 0.04, green: 0.16, blue: 0.03),
+                         Color(red: 0.01, green: 0.06, blue: 0.01)]
+    static let dimRing = Color(red: 0.47, green: 1, blue: 0.35)
     static let glow = [Color(red: 0.96, green: 1, blue: 0.69), Color(red: 0.61, green: 0.91, blue: 0.23).opacity(0.9),
                        Color(red: 0.35, green: 0.78, blue: 0.16).opacity(0)]
     static let planet = [Color(red: 0.91, green: 1, blue: 0.6), Color(red: 0.38, green: 0.77, blue: 0.16),
@@ -33,6 +37,8 @@ private enum Alien {
 /// app's version; keep the two in step.
 struct AlienWidgetScene: View {
     let date: Date
+    /// Darker and calmer, for terminal text on top (like the app's alien terminal).
+    var dimmed = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     /// Minutes since a fixed date: the pose. Reduce Motion: always the same pose.
@@ -43,23 +49,27 @@ struct AlienWidgetScene: View {
             let w = geo.size.width, h = geo.size.height
             let s = max(min(w, h), 1) / 160
             let center = CGPoint(x: w / 2, y: h * 0.45)
+            let ring = dimmed ? Alien.dimRing : Alien.ring
             ZStack {
-                RadialGradient(colors: Alien.sky, center: UnitPoint(x: 0.5, y: 0.38),
+                RadialGradient(colors: dimmed ? Alien.dimSky : Alien.sky, center: UnitPoint(x: 0.5, y: 0.38),
                                startRadius: 0, endRadius: max(w, h) * 0.8)
-                stars(w: w, h: h, s: s)
-                Ellipse()
-                    .stroke(Alien.ring.opacity(0.32), lineWidth: 6 * s)
-                    .frame(width: w * 0.95, height: h * 0.42)
-                    .rotationEffect(.degrees(Double(step) * 12))
-                    .position(center)
-                Ellipse()
-                    .stroke(Alien.ring.opacity(0.18), lineWidth: 5 * s)
-                    .frame(width: min(w, h) * 0.85, height: min(w, h) * 0.6)
-                    .rotationEffect(.degrees(Double(step) * -8))
-                    .position(center)
-                orbs(w: w, h: h, s: s)
-                planet(w: w, s: s)
-                saucer(w: w, h: h, s: s)
+                ZStack {
+                    stars(w: w, h: h, s: s)
+                    Ellipse()
+                        .stroke(ring.opacity(0.32), lineWidth: 6 * s)
+                        .frame(width: w * 0.95, height: h * 0.42)
+                        .rotationEffect(.degrees(Double(step) * 12))
+                        .position(center)
+                    Ellipse()
+                        .stroke(ring.opacity(0.18), lineWidth: 5 * s)
+                        .frame(width: min(w, h) * 0.85, height: min(w, h) * 0.6)
+                        .rotationEffect(.degrees(Double(step) * -8))
+                        .position(center)
+                    orbs(w: w, h: h, s: s)
+                    planet(w: w, s: s)
+                    saucer(w: w, h: h, s: s)
+                }
+                .opacity(dimmed ? 0.6 : 1)
             }
             .animation(.smooth(duration: 1.8), value: step)
         }
@@ -259,6 +269,8 @@ private enum Terminal {
 struct TerminalWidgetContent: View {
     let entry: WidgetEntry
     let family: WidgetFamily
+    /// On a see-through dark panel over the dimmed alien scene (the alien terminal).
+    var onAlienScene = false
 
     var body: some View {
         Group {
@@ -273,10 +285,19 @@ struct TerminalWidgetContent: View {
         }
         .font(.system(.caption, design: .monospaced))
         .foregroundStyle(Terminal.green)
+        .padding(onAlienScene ? 8 : 0)
+        .background {
+            if onAlienScene {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Color.black.opacity(0.62))
+                    .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .strokeBorder(Terminal.green.opacity(0.35)))
+            }
+        }
     }
 
     private func prompt(_ command: String) -> Text {
-        let sign: Text = Text(verbatim: "$ ").foregroundStyle(Terminal.dim)
+        let sign: Text = Text(verbatim: onAlienScene ? "ufo$ " : "$ ").foregroundStyle(Terminal.dim)
         let typed: Text = Text(verbatim: command).foregroundStyle(Color.white)
         return sign + typed
     }
