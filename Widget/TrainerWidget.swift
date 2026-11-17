@@ -26,6 +26,8 @@ struct TrainerWidget: Widget {
         .configurationDisplayName("Trainer Toolkit")
         .description("The next Community Day and the current top raid bosses. Touch and hold it to pick a style.")
         .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
+        // The alien scene runs edge to edge in the content; text adds the system margins itself.
+        .contentMarginsDisabled()
     }
 }
 
@@ -181,28 +183,39 @@ let widgetAccent = Color(red: 0.345, green: 0.337, blue: 0.839)
 struct TrainerWidgetView: View {
     let entry: WidgetEntry
     @Environment(\.widgetFamily) private var family
+    /// The system's usual margins (the configuration turns them off for the edge-to-edge scene).
+    @Environment(\.widgetContentMargins) private var margins
 
     var body: some View {
         if family == .accessoryRectangular {
             lockScreen
+                .padding(margins)
                 .containerBackground(for: .widget) { Color.clear }
         } else {
             switch entry.style {
             case .standard:
                 standard
+                    .padding(margins)
                     .containerBackground(for: .widget) {
                         LinearGradient(colors: [widgetAccent.opacity(0.22), widgetAccent.opacity(0.05)],
                                        startPoint: .topLeading, endPoint: .bottomTrailing)
                     }
             case .alien:
-                AlienWidgetContent(entry: entry, family: family)
-                    .containerBackground(for: .widget) { AlienWidgetScene(date: entry.date) }
+                ZStack {
+                    AlienWidgetScene(date: entry.date)
+                    AlienWidgetContent(entry: entry, family: family).padding(margins)
+                }
+                .containerBackground(for: .widget) { AlienWidgetSky() }
             case .terminal:
                 TerminalWidgetContent(entry: entry, family: family)
+                    .padding(margins)
                     .containerBackground(for: .widget) { Color.black }
             case .alienTerminal:
-                TerminalWidgetContent(entry: entry, family: family, onAlienScene: true)
-                    .containerBackground(for: .widget) { AlienWidgetScene(date: entry.date, dimmed: true) }
+                ZStack {
+                    AlienWidgetScene(date: entry.date, dimmed: true)
+                    TerminalWidgetContent(entry: entry, family: family, onAlienScene: true).padding(margins)
+                }
+                .containerBackground(for: .widget) { AlienWidgetSky(dimmed: true) }
             }
         }
     }

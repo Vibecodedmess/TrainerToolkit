@@ -31,10 +31,27 @@ private enum Alien {
 
 // MARK: - Moving scene
 
-/// The app's alien scene (`Shared/AlienBackground.swift`, drawn with Canvas at 30 fps) rebuilt from
-/// SwiftUI shapes. A widget can't run its own animation: each timeline entry is one pose (one per
-/// minute), and iOS animates the shapes from one pose to the next. Same colours and layout as the
-/// app's version; keep the two in step.
+/// The alien sky: the widget's container background (it doesn't move).
+struct AlienWidgetSky: View {
+    var dimmed = false
+
+    var body: some View {
+        GeometryReader { geo in
+            RadialGradient(colors: dimmed ? Alien.dimSky : Alien.sky, center: UnitPoint(x: 0.5, y: 0.38),
+                           startRadius: 0, endRadius: max(geo.size.width, geo.size.height) * 0.8)
+        }
+    }
+}
+
+/// The moving part of the app's alien scene (`Shared/AlienBackground.swift`, drawn with Canvas at
+/// 30 fps), rebuilt from SwiftUI shapes. Same colours and layout; keep the two in step.
+///
+/// A widget can't run its own animation. Two things move anyway:
+/// - **Poses:** each timeline entry is one pose (one per minute) and iOS animates the shapes from
+///   one to the next. This sits in the widget's content, not its container background: on build #37
+///   the user saw no movement with the scene in the background.
+/// - **The signal sweep** at the bottom: a `ProgressView(timerInterval:)`, which iOS keeps filling
+///   live over each minute.
 struct AlienWidgetScene: View {
     let date: Date
     /// Darker and calmer, for terminal text on top (like the app's alien terminal).
@@ -51,26 +68,34 @@ struct AlienWidgetScene: View {
             let center = CGPoint(x: w / 2, y: h * 0.45)
             let ring = dimmed ? Alien.dimRing : Alien.ring
             ZStack {
-                RadialGradient(colors: dimmed ? Alien.dimSky : Alien.sky, center: UnitPoint(x: 0.5, y: 0.38),
-                               startRadius: 0, endRadius: max(w, h) * 0.8)
-                ZStack {
-                    stars(w: w, h: h, s: s)
-                    Ellipse()
-                        .stroke(ring.opacity(0.32), lineWidth: 6 * s)
-                        .frame(width: w * 0.95, height: h * 0.42)
-                        .rotationEffect(.degrees(Double(step) * 12))
-                        .position(center)
-                    Ellipse()
-                        .stroke(ring.opacity(0.18), lineWidth: 5 * s)
-                        .frame(width: min(w, h) * 0.85, height: min(w, h) * 0.6)
-                        .rotationEffect(.degrees(Double(step) * -8))
-                        .position(center)
-                    orbs(w: w, h: h, s: s)
-                    planet(w: w, s: s)
-                    saucer(w: w, h: h, s: s)
+                stars(w: w, h: h, s: s)
+                Ellipse()
+                    .stroke(ring.opacity(0.32), lineWidth: 6 * s)
+                    .frame(width: w * 0.95, height: h * 0.42)
+                    .rotationEffect(.degrees(Double(step) * 30))
+                    .position(center)
+                Ellipse()
+                    .stroke(ring.opacity(0.18), lineWidth: 5 * s)
+                    .frame(width: min(w, h) * 0.85, height: min(w, h) * 0.6)
+                    .rotationEffect(.degrees(Double(step) * -20))
+                    .position(center)
+                orbs(w: w, h: h, s: s)
+                planet(w: w, s: s)
+                saucer(w: w, h: h, s: s)
+                if !reduceMotion {
+                    ProgressView(timerInterval: date...date.addingTimeInterval(60), countsDown: false) {
+                        EmptyView()
+                    } currentValueLabel: {
+                        EmptyView()
+                    }
+                    .progressViewStyle(.linear)
+                    .tint(ring)
+                    .frame(width: w * 0.8)
+                    .opacity(0.8)
+                    .position(x: w / 2, y: h - 4 * s)
                 }
-                .opacity(dimmed ? 0.6 : 1)
             }
+            .opacity(dimmed ? 0.6 : 1)
             .animation(.smooth(duration: 1.8), value: step)
         }
         .accessibilityHidden(true)
@@ -95,7 +120,7 @@ struct AlienWidgetScene: View {
                 .fill(RadialGradient(colors: Alien.glow, center: UnitPoint(x: 0.35, y: 0.3),
                                      startRadius: 0, endRadius: d * 0.6))
                 .frame(width: d, height: d)
-                .position(x: orb.x * w, y: orb.y * h + sin(Double(step) * 0.9 + Double(i) * 1.7) * 6 * s)
+                .position(x: orb.x * w, y: orb.y * h + sin(Double(step) * 1.3 + Double(i) * 1.7) * 10 * s)
         }
     }
 
@@ -116,11 +141,12 @@ struct AlienWidgetScene: View {
         .position(x: w - 26 * s, y: 24 * s + bob)
     }
 
-    /// Crosses in 12 one-minute hops; hidden at both ends so the jump back happens off screen.
+    /// Crosses in 6 one-minute hops (4 on screen); hidden at both ends so the jump back happens off screen.
     private func saucer(w: Double, h: Double, s: Double) -> some View {
-        let k = step % 12
-        let x = -30 * s + Double(k) / 11 * (w + 60 * s)
-        let y = h * 0.2 + (k % 2 == 0 ? -3.0 : 3.0) * s
+        let hops = 6
+        let k = step % hops
+        let x = -30 * s + Double(k) / Double(hops - 1) * (w + 60 * s)
+        let y = h * 0.2 + (k % 2 == 0 ? -6.0 : 6.0) * s
         return ZStack(alignment: .top) {
             SaucerBeam()
                 .fill(LinearGradient(colors: [Color(red: 0.94, green: 1, blue: 0.55).opacity(0.55),
@@ -139,7 +165,7 @@ struct AlienWidgetScene: View {
                 .offset(y: 8 * s)
         }
         .frame(width: 34 * s, height: 44 * s, alignment: .top)
-        .opacity(k == 0 || k == 11 ? 0 : 1)
+        .opacity(k == 0 || k == hops - 1 ? 0 : 1)
         .position(x: x, y: y)
     }
 }
@@ -153,6 +179,18 @@ private struct SaucerBeam: Shape {
         p.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
         p.closeSubpath()
         return p
+    }
+}
+
+/// A countdown that iOS updates every second inside the widget ("52:14:09"), one of the few
+/// things a widget can keep moving. Needs `end` after `start`.
+struct LiveTimer: View {
+    let from: Date
+    let to: Date
+
+    var body: some View {
+        Text(timerInterval: from...to, countsDown: true)
+            .monospacedDigit()
     }
 }
 
@@ -211,11 +249,17 @@ struct AlienWidgetContent: View {
                     Text(cd.name).font(Alien.font(.caption2, .bold)).lineLimit(2)
                     if cd.isLive {
                         Text("Live now!").font(Alien.font(.headline))
+                        if let end = cd.end, end > entry.date {
+                            LiveTimer(from: entry.date, to: end).font(Alien.font(.caption, .heavy))
+                        }
                     } else if let start = cd.start {
                         Text(start, style: .relative)
                             .font(Alien.font(.headline))
                             .lineLimit(2)
                             .minimumScaleFactor(0.6)
+                        if start > entry.date {
+                            LiveTimer(from: entry.date, to: start).font(Alien.font(.caption, .heavy))
+                        }
                     }
                 } else {
                     Text(entry.hasData ? "None announced yet" : "No data yet").font(Alien.font(.caption, .bold))
@@ -309,12 +353,26 @@ struct TerminalWidgetContent: View {
                 Text(verbatim: cd.name).foregroundStyle(Terminal.dim).lineLimit(2)
                 if cd.isLive {
                     Text(verbatim: "LIVE NOW").foregroundStyle(Color.white)
-                } else if let start = cd.start {
-                    let prefix: Text = Text(verbatim: "T-")
-                    (prefix + Text(start, style: .relative))
+                    if let end = cd.end, end > entry.date {
+                        HStack(spacing: 0) {
+                            Text(verbatim: "ends T-")
+                            LiveTimer(from: entry.date, to: end)
+                        }
                         .foregroundStyle(Color.white)
-                        .lineLimit(2)
+                    }
+                } else if let start = cd.start {
+                    if start > entry.date {
+                        // Ticks every second on its own.
+                        HStack(spacing: 0) {
+                            Text(verbatim: "T-")
+                            LiveTimer(from: entry.date, to: start)
+                        }
+                        .foregroundStyle(Color.white)
+                        .lineLimit(1)
                         .minimumScaleFactor(0.7)
+                    } else {
+                        Text(start, style: .relative).foregroundStyle(Color.white)
+                    }
                 }
             } else {
                 Text(verbatim: entry.hasData ? "none announced yet" : "waiting for data...")

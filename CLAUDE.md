@@ -61,7 +61,7 @@ Also:
 | 22 | Recommended (power-ups, events, raids) in More and on every Home look; all open `TODO: verify` items confirmed by the user | Confirmed on build #34 (2026-11-17; user: "Recommended works good!"). See "Recommended" |
 | 23 | Home Screen widget: Community Day countdown and top raid bosses (small, medium, Lock Screen), fetching the feeds itself | Confirmed on build #35 (2026-11-17; user: "Widget works!"). See "Widget" |
 | 24 | Widget styles (Standard, Alien signal, Terminal) picked in the widget's own settings; the alien scene moves a step every minute | Confirmed on build #36 (2026-11-17; user: "almost perfect"). See "Widget" |
-| 25 | Widget style "Terminal, alien edition" (the user's favourite look): terminal on a see-through panel over the dimmed moving scene | Built 2026-11-17, not yet on the phone |
+| 25 | Widget style "Terminal, alien edition" (the user's favourite look): terminal on a see-through panel over the dimmed moving scene | Works on build #37, but the user saw **no movement** in the alien styles. Changed 2026-11-17 (scene moved into the content layer, bigger poses, live ticking countdown and signal sweep), not yet on the phone. See "Widget" |
 
 ## Current state (update this section as work continues)
 
@@ -107,6 +107,7 @@ Also:
   - `AlienWidgetScene`: the app's alien scene rebuilt from SwiftUI shapes (same colours/layout as `Shared/AlienBackground.swift`; keep them in step). **Widgets can't animate continuously**: the alien style's timeline has one entry per minute for an hour (`WidgetData.alienSteps`), each a pose (`step` = minutes since reference date), and iOS animates between poses (`.animation(.smooth(duration: 1.8), value: step)`): rings turn, orbs bob, stars twinkle, the saucer crosses in 12 hops (hidden at both ends). Reduce Motion: one fixed pose. Data is still only downloaded when older than 6 h.
   - `AlienWidgetContent` (outlined rounded text, white stickers) and `TerminalWidgetContent` (green monospaced, `$ cd --next`, `$ raids --top`). Alien terminal (Phase 25): `TerminalWidgetContent(onAlienScene: true)` on a 62% black panel with a green border, over `AlienWidgetScene(dimmed: true)` (dark sky, shapes at 60%, like the app's `AlienBackground(dimmed: true)`).
   - The Lock Screen size ignores the style (iOS tints it).
+  - **Movement fix (after build #37, user: "it doesn't move"):** the moving shapes now sit in the widget's *content* (a `ZStack` under the text), not its `containerBackground` (which now only holds the still `AlienWidgetSky`). The configuration uses `.contentMarginsDisabled()`, and every style pads its text with `@Environment(\.widgetContentMargins)`. Poses are bigger (rings 30°/−20° a step, saucer crosses in 6 hops, orbs bob 10 pt). Live elements iOS updates by itself: `LiveTimer` (`Text(timerInterval:countsDown:)`, ticks every second) in the alien sticker and the terminal (`T-52:14:09`), and a `ProgressView(timerInterval:)` "signal sweep" filling across the bottom of the scene each minute (hidden with Reduce Motion). Not yet confirmed that the per-minute poses show on the phone; if they still don't, the live elements are the fallback.
 
 ## Widget research (2026-11-17)
 
