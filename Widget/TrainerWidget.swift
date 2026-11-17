@@ -1,13 +1,15 @@
 import WidgetKit
 import SwiftUI
+import AppIntents
 import DataSources
 
-// The Home Screen widget (Phase 23): the next Community Day and the current top raid tier.
+// The Home Screen widget (Phases 23–24): the next Community Day and the current top raid tier, in
+// the style picked in the widget's own settings (Standard, Alien signal, Terminal).
 //
 // It downloads the public ScrapedDuck event and raid feeds itself, into its own cache, with the same
 // rules as the app (bundled snapshot first, at most every 6 hours, ETags, minimum interval per
-// source). It can't read the app's data: that would need an App Group, which a free Apple ID can't
-// provide through Sideloadly. Text only, no artwork.
+// source). It can't read the app's data or look: that would need an App Group, which a free Apple ID
+// can't provide through Sideloadly. Text and drawn shapes only, no artwork.
 
 @main
 struct TrainerToolkitWidgets: WidgetBundle {
@@ -18,13 +20,34 @@ struct TrainerToolkitWidgets: WidgetBundle {
 
 struct TrainerWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: "TrainerWidget", provider: Provider()) { entry in
+        AppIntentConfiguration(kind: "TrainerWidget", intent: WidgetStyleIntent.self, provider: Provider()) { entry in
             TrainerWidgetView(entry: entry)
         }
         .configurationDisplayName("Trainer Toolkit")
-        .description("The next Community Day and the current top raid bosses.")
+        .description("The next Community Day and the current top raid bosses. Touch and hold it to pick a style.")
         .supportedFamilies([.systemSmall, .systemMedium, .accessoryRectangular])
     }
+}
+
+// MARK: - Style setting
+
+enum WidgetStyle: String, AppEnum {
+    case standard, alien, terminal
+
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Style"
+    static var caseDisplayRepresentations: [WidgetStyle: DisplayRepresentation] = [
+        .standard: "Standard",
+        .alien: "Alien signal",
+        .terminal: "Terminal",
+    ]
+}
+
+struct WidgetStyleIntent: WidgetConfigurationIntent {
+    static var title: LocalizedStringResource = "Widget style"
+    static var description = IntentDescription("Pick how the widget looks.")
+
+    @Parameter(title: "Style", default: .standard)
+    var style: WidgetStyle
 }
 
 // MARK: - Data
@@ -44,7 +67,8 @@ struct WidgetEntry: TimelineEntry {
         var id: String { name }
     }
 
-    let date: Date
+    var date: Date
+    var style: WidgetStyle
     let communityDay: CommunityDay?
     let liveEvents: Int
     let raidTier: String?
@@ -52,14 +76,23 @@ struct WidgetEntry: TimelineEntry {
     /// False when neither feed could be read at all.
     let hasData: Bool
 
+    /// The same data at another moment (the alien scene's next pose).
+    func at(_ date: Date) -> WidgetEntry {
+        var copy = self
+        copy.date = date
+        return copy
+    }
+
     /// Shown while the widget gallery or Home Screen is loading (WidgetKit greys the text out).
-    static let placeholder = WidgetEntry(
-        date: .now,
-        communityDay: CommunityDay(name: "Community Day", start: .now.addingTimeInterval(2 * 24 * 3600), end: nil, isLive: false),
-        liveEvents: 2, raidTier: "Raids",
-        bosses: [Boss(name: "Raid boss", types: ["type"], canBeShiny: false),
-                 Boss(name: "Another boss", types: ["type"], canBeShiny: false)],
-        hasData: true)
+    static func placeholder(style: WidgetStyle = .standard) -> WidgetEntry {
+        WidgetEntry(
+            date: .now, style: style,
+            communityDay: CommunityDay(name: "Community Day", start: .now.addingTimeInterval(2 * 24 * 3600), end: nil, isLive: false),
+            liveEvents: 2, raidTier: "Raids",
+            bosses: [Boss(name: "Raid boss", types: ["type"], canBeShiny: false),
+                     Boss(name: "Another boss", types: ["type"], canBeShiny: false)],
+            hasData: true)
+    }
 }
 
 enum WidgetData {
@@ -73,7 +106,7 @@ enum WidgetData {
     /// Same default as the app's "Check for new data" setting.
     static let refreshInterval: TimeInterval = 6 * 3600
 
-    static func entry(refresh: Bool, now: Date = .now) async -> WidgetEntry {
+    static func entry(refresh: Bool, style: WidgetStyle, now: Date = .now) async -> WidgetEntry {
         if refresh { _ = await store.refreshIfStale(maxAge: refreshInterval) }
         let feed = await store.decoded(LossyArray<SDEvent>.self, for: .events)?.elements
         let raids = await store.decoded(LossyArray<SDRaidBoss>.self, for: .raids)?.elements
@@ -86,7 +119,8 @@ enum WidgetData {
         let bosses = (raids ?? []).filter { $0.tier == tier }.map {
             WidgetEntry.Boss(name: $0.name, types: ($0.types ?? []).map(\.name), canBeShiny: $0.canBeShiny == true)
         }
-        return WidgetEntry(date: now, communityDay: cd, liveEvents: events.filter { $0.status == .live }.count,
+        return WidgetEntry(date: now, style: style, communityDay: cd,
+                           liveEvents: events.filter { $0.status == .live }.count,
                            raidTier: tier, bosses: bosses, hasData: feed != nil || raids != nil)
     }
 
@@ -101,52 +135,74 @@ enum WidgetData {
         }
         return next
     }
+
+    /// How long one prepared alien timeline lasts: one pose per minute.
+    static let alienSteps = 60
 }
 
-struct Provider: TimelineProvider {
-    func placeholder(in context: Context) -> WidgetEntry { .placeholder }
+struct Provider: AppIntentTimelineProvider {
+    func placeholder(in context: Context) -> WidgetEntry { .placeholder() }
 
-    func getSnapshot(in context: Context, completion: @escaping (WidgetEntry) -> Void) {
-        if context.isPreview {
-            completion(.placeholder)
-            return
-        }
-        Task { completion(await WidgetData.entry(refresh: false)) }
+    func snapshot(for configuration: WidgetStyleIntent, in context: Context) async -> WidgetEntry {
+        if context.isPreview { return .placeholder(style: configuration.style) }
+        return await WidgetData.entry(refresh: false, style: configuration.style)
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<WidgetEntry>) -> Void) {
-        Task {
-            let entry = await WidgetData.entry(refresh: true)
-            completion(Timeline(entries: [entry], policy: .after(WidgetData.nextUpdate(after: entry))))
+    func timeline(for configuration: WidgetStyleIntent, in context: Context) async -> Timeline<WidgetEntry> {
+        let entry = await WidgetData.entry(refresh: true, style: configuration.style)
+        let next = WidgetData.nextUpdate(after: entry)
+        guard configuration.style == .alien, context.family != .accessoryRectangular else {
+            return Timeline(entries: [entry], policy: .after(next))
         }
+        // Widgets can't animate continuously: iOS shows prepared entries and animates the change
+        // between them. One pose per minute for the next hour, then a new timeline (data is only
+        // downloaded when it's older than the refresh interval).
+        let start = entry.date
+        var entries: [WidgetEntry] = []
+        for step in 0..<WidgetData.alienSteps {
+            let date = start.addingTimeInterval(Double(step) * 60)
+            guard date < next else { break }
+            entries.append(entry.at(date))
+        }
+        let end = min(next, start.addingTimeInterval(Double(WidgetData.alienSteps) * 60))
+        return Timeline(entries: entries, policy: .after(end))
     }
 }
 
 // MARK: - Views
 
 /// The app's indigo accent (the widget has no asset catalog of its own).
-private let accent = Color(red: 0.345, green: 0.337, blue: 0.839)
+let widgetAccent = Color(red: 0.345, green: 0.337, blue: 0.839)
 
 struct TrainerWidgetView: View {
     let entry: WidgetEntry
     @Environment(\.widgetFamily) private var family
 
     var body: some View {
-        Group {
-            switch family {
-            case .accessoryRectangular: lockScreen
-            case .systemMedium: medium
-            default: small
+        if family == .accessoryRectangular {
+            lockScreen
+                .containerBackground(for: .widget) { Color.clear }
+        } else {
+            switch entry.style {
+            case .standard:
+                standard
+                    .containerBackground(for: .widget) {
+                        LinearGradient(colors: [widgetAccent.opacity(0.22), widgetAccent.opacity(0.05)],
+                                       startPoint: .topLeading, endPoint: .bottomTrailing)
+                    }
+            case .alien:
+                AlienWidgetContent(entry: entry, family: family)
+                    .containerBackground(for: .widget) { AlienWidgetScene(date: entry.date) }
+            case .terminal:
+                TerminalWidgetContent(entry: entry, family: family)
+                    .containerBackground(for: .widget) { Color.black }
             }
         }
-        .containerBackground(for: .widget) {
-            if family == .accessoryRectangular {
-                Color.clear
-            } else {
-                LinearGradient(colors: [accent.opacity(0.22), accent.opacity(0.05)],
-                               startPoint: .topLeading, endPoint: .bottomTrailing)
-            }
-        }
+    }
+
+    @ViewBuilder
+    private var standard: some View {
+        if family == .systemMedium { medium } else { small }
     }
 
     // MARK: Community Day
@@ -181,7 +237,7 @@ struct TrainerWidgetView: View {
         VStack(alignment: .leading, spacing: 3) {
             Label("Community Day", systemImage: "calendar.badge.clock")
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(accent)
+                .foregroundStyle(widgetAccent)
                 .lineLimit(1)
             if let cd = entry.communityDay {
                 Text(cd.name)
@@ -270,5 +326,7 @@ struct TrainerWidgetView: View {
 #Preview(as: .systemMedium) {
     TrainerWidget()
 } timeline: {
-    WidgetEntry.placeholder
+    WidgetEntry.placeholder()
+    WidgetEntry.placeholder(style: .alien)
+    WidgetEntry.placeholder(style: .terminal)
 }

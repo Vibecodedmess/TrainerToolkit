@@ -67,6 +67,7 @@ A backup holds your collection, Planner goals, event plans and checklists, saved
 
 The app includes a widget with the next Community Day countdown and the current top raid bosses.
 - **Add it:** touch and hold the Home Screen, tap **Edit** > **Add Widget**, search for Trainer Toolkit, pick the small or medium size (or the Lock Screen one) and tap **Add Widget**.
+- **Pick a style:** touch and hold the widget, tap **Edit Widget** and choose Standard, Alien signal or Terminal. In Alien signal the scene moves to a new pose every minute (iOS doesn't let widgets animate all the time); with Reduce Motion on it stands still.
 - **Its data:** the widget downloads the event and raid feeds itself, at most every 6 hours, so it can lag the app a little. It can't show your collection or goals.
 - **Sideloadly and a free Apple ID:** the widget is signed as a second App ID, so each install uses one more of the free account's weekly App IDs.
 - **If the install fails because of the widget:** in Sideloadly's advanced options, turn on the option to remove app extensions and install again. You get the app without the widget; your data stays.

@@ -59,11 +59,12 @@ Also:
 | 20 | More > Looks: pick Standard, Floating dock, Widget board or Timeline (concepts 6, 7, 8) | Confirmed on build #33 (2026-11-17). See "Looks" |
 | 21 | Three more looks: Terminal (17), Alien signal (21), Terminal, alien edition (22), with an original moving alien background | Build #32 had the custom tab bars covering list bottoms and looks only on Home; fixed (bar below the screens, looks app-wide) and confirmed on build #33 (2026-11-17; user: "looks great!"). See "Looks" |
 | 22 | Recommended (power-ups, events, raids) in More and on every Home look; all open `TODO: verify` items confirmed by the user | Confirmed on build #34 (2026-11-17; user: "Recommended works good!"). See "Recommended" |
-| 23 | Home Screen widget: Community Day countdown and top raid bosses (small, medium, Lock Screen), fetching the feeds itself | Built 2026-11-17, not yet on the phone. See "Widget" |
+| 23 | Home Screen widget: Community Day countdown and top raid bosses (small, medium, Lock Screen), fetching the feeds itself | Confirmed on build #35 (2026-11-17; user: "Widget works!"). See "Widget" |
+| 24 | Widget styles (Standard, Alien signal, Terminal) picked in the widget's own settings; the alien scene moves a step every minute | Built 2026-11-17, not yet on the phone. See "Widget" |
 
 ## Current state (update this section as work continues)
 
-- **As of 2026-11-17:** Phases 0–22 are confirmed on the phone (latest: build #33), except the CSV import (untested, the user has no CSV). Phase 22 (Recommended) is confirmed on build #34. Phase 23 (Home Screen widget) is built.
+- **As of 2026-11-17:** Phases 0–23 are confirmed on the phone (latest: build #35), except the CSV import (untested, the user has no CSV). Phase 24 (widget styles, moving alien scene) is built.
 - **Tabs (user's choice, 2026-11-13):** Home, Search, **Rocket**, Events, More. Raids lives under More > Raids, and Home's tile shows the raid boss count instead of the Rocket count. `RaidsView` has no `NavigationStack` of its own (it's pushed); the Rocket tab wraps `RocketView` in one.
 - **Rocket lines:** `Counters/RocketQuotes.swift` + `rocket-quotes.json` (the game's own text, see DATA_SOURCES.md). The list shows each lineup's line, the search (`RocketQuotes.matches`, punctuation- and accent-insensitive) covers lines, names, types and Pokémon, and the lineup screen shows the line at the top.
 - **Look and feel (Phase 16, user's choices):**
@@ -101,6 +102,10 @@ Also:
 - Timeline: one entry; next update when the Community Day starts or ends, else after 6 h. Countdown uses `Text(date, style: .relative)`, which ticks by itself.
 - Families: small (Community Day), medium (plus the top raid tier, up to 4 bosses), accessoryRectangular (Lock Screen). Indigo tint; it can't know the app's look (no App Group).
 - `SDRaidBoss.tiersInDisplayOrder` (DataSources) is the raid tier order shared by the app (`RaidsView.tiers`) and the widget.
+- **Styles (Phase 24, user asked for the alien scene "animated" in the widget):** `AppIntentConfiguration` with `WidgetStyleIntent` (`WidgetStyle`: standard, alien, terminal), picked via touch and hold > Edit Widget. The widget can't see the app's look (no App Group). `Widget/WidgetStyles.swift`:
+  - `AlienWidgetScene`: the app's alien scene rebuilt from SwiftUI shapes (same colours/layout as `Shared/AlienBackground.swift`; keep them in step). **Widgets can't animate continuously**: the alien style's timeline has one entry per minute for an hour (`WidgetData.alienSteps`), each a pose (`step` = minutes since reference date), and iOS animates between poses (`.animation(.smooth(duration: 1.8), value: step)`): rings turn, orbs bob, stars twinkle, the saucer crosses in 12 hops (hidden at both ends). Reduce Motion: one fixed pose. Data is still only downloaded when older than 6 h.
+  - `AlienWidgetContent` (outlined rounded text, white stickers) and `TerminalWidgetContent` (green monospaced, `$ cd --next`, `$ raids --top`).
+  - The Lock Screen size ignores the style (iOS tints it).
 
 ## Widget research (2026-11-17)
 
