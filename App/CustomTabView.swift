@@ -1,14 +1,15 @@
 import SwiftUI
 import UIKit
 
-/// The "Floating dock" look's tabs: the five tab screens with a floating capsule instead of the
-/// system tab bar.
+/// The tabs for looks with their own tab bar (Floating dock, Terminal, Alien signal): the five tab
+/// screens with `bar` at the bottom instead of the system tab bar.
 ///
 /// All five screens stay alive (only the selected one is shown), so each keeps its place and
 /// navigation when you switch, like a normal tab bar. A custom container is used instead of hiding
 /// the system tab bar, because a hidden tab bar comes back on pushed screens.
-struct DockTabView: View {
+struct CustomTabView<Bar: View>: View {
     @Binding var selection: AppTab
+    @ViewBuilder var bar: Bar
     @State private var keyboardShown = false
 
     var body: some View {
@@ -19,13 +20,13 @@ struct DockTabView: View {
                     .opacity(active ? 1 : 0)
                     .allowsHitTesting(active)
                     .accessibilityHidden(!active)
+                    .environment(\.isActiveTab, active)
             }
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             // Hidden while typing, so it doesn't ride up on top of the keyboard.
             if !keyboardShown {
-                FloatingDock(selection: $selection)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                bar.transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
@@ -34,6 +35,18 @@ struct DockTabView: View {
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
             withAnimation(.easeOut(duration: 0.2)) { keyboardShown = false }
         }
+    }
+}
+
+private struct IsActiveTabKey: EnvironmentKey {
+    static let defaultValue = true
+}
+
+extension EnvironmentValues {
+    /// False while `CustomTabView` keeps a tab's screen alive but hidden (for pausing animations).
+    var isActiveTab: Bool {
+        get { self[IsActiveTabKey.self] }
+        set { self[IsActiveTabKey.self] = newValue }
     }
 }
 
@@ -92,6 +105,8 @@ struct FloatingDock: View {
 }
 
 #Preview {
-    DockTabView(selection: .constant(.home))
-        .environment(DataCenter())
+    CustomTabView(selection: .constant(.home)) {
+        FloatingDock(selection: .constant(.home))
+    }
+    .environment(DataCenter())
 }

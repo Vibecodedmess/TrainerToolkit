@@ -35,6 +35,12 @@ struct HomeView: View {
                     WidgetBoardHome(home: home, open: open)
                 case .timeline:
                     TimelineHome(home: home, open: open, scan: { showingScan = true })
+                case .terminal:
+                    TerminalHome(home: home, open: open, scan: { showingScan = true })
+                case .alien:
+                    AlienHome(home: home, open: open, scan: { showingScan = true })
+                case .alienTerminal:
+                    TerminalHome(home: home, open: open, scan: { showingScan = true }, alien: true)
                 }
             }
             .navigationTitle(look == .widgets ? "Today" : "Home")

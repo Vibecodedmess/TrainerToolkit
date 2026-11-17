@@ -43,9 +43,16 @@ struct RootTabView: View {
 
     var body: some View {
         Group {
-            if look == .dock {
-                DockTabView(selection: $selection)
-            } else {
+            switch look {
+            case .dock:
+                CustomTabView(selection: $selection) { FloatingDock(selection: $selection) }
+            case .terminal, .alienTerminal:
+                CustomTabView(selection: $selection) {
+                    TerminalTabBar(selection: $selection, translucent: look == .alienTerminal)
+                }
+            case .alien:
+                CustomTabView(selection: $selection) { AlienTabBar(selection: $selection) }
+            case .standard, .widgets, .timeline:
                 TabView(selection: $selection) {
                     ForEach(AppTab.allCases, id: \.self) { tab in
                         tab.root
@@ -55,7 +62,8 @@ struct RootTabView: View {
                 }
             }
         }
-        .tint(AppTheme.accent)
+        .tint(look.tint)
+        .preferredColorScheme(look.colorScheme)
     }
 }
 

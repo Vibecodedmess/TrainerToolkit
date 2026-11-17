@@ -56,11 +56,12 @@ Also:
 | 17 | Rocket lines (what each member says) shown and searchable; Rocket replaces Raids in the tab bar, Raids moves to More | Confirmed on build #27 (2026-11-16) |
 | 18 | Screenshot import: at least 2 screenshots per Pokémon (misreads merged, majority vote); level/IVs from "L30 80% 12/12/12" nicknames; new app icon | Confirmed on build #29 (2026-11-16; user: "works pretty good") |
 | 19 | Screenshot thumbnails on unsure Pokémon (and in the review, tap to enlarge); ★ on each species' best raid/gym moves | Confirmed on build #30 (2026-11-16). Elite moves now show "(Elite)" in the editor instead of ★ |
-| 20 | More > Looks: pick Standard, Floating dock, Widget board or Timeline (concepts 6, 7, 8 of 10 the user was shown) | Built 2026-11-16, not yet on the phone. See "Looks" |
+| 20 | More > Looks: pick Standard, Floating dock, Widget board or Timeline (concepts 6, 7, 8) | Built as build #31 (2026-11-16); the user hasn't reported a phone test yet. See "Looks" |
+| 21 | Three more looks: Terminal (17), Alien signal (21), Terminal, alien edition (22), with an original moving alien background | Built 2026-11-17, not yet on the phone. See "Looks" |
 
 ## Current state (update this section as work continues)
 
-- **As of 2026-11-16:** Phases 0–19 are confirmed on the phone (latest: build #30), except the CSV import (untested, the user has no CSV). Phase 20 (Looks) is built.
+- **As of 2026-11-16:** Phases 0–19 are confirmed on the phone (latest: build #30), except the CSV import (untested, the user has no CSV). Phase 20 (Looks) is build #31, not yet reported on. Phase 21 (three more looks) is built.
 - **Tabs (user's choice, 2026-11-13):** Home, Search, **Rocket**, Events, More. Raids lives under More > Raids, and Home's tile shows the raid boss count instead of the Rocket count. `RaidsView` has no `NavigationStack` of its own (it's pushed); the Rocket tab wraps `RocketView` in one.
 - **Rocket lines:** `Counters/RocketQuotes.swift` + `rocket-quotes.json` (the game's own text, see DATA_SOURCES.md). The list shows each lineup's line, the search (`RocketQuotes.matches`, punctuation- and accent-insensitive) covers lines, names, types and Pokémon, and the lineup screen shows the line at the top.
 - **Look and feel (Phase 16, user's choices):**
@@ -94,14 +95,18 @@ Also:
 ## Looks (Phase 20): how they work
 
 - **How it came about (2026-11-16):** the user asked for bigger design changes. They were shown 5 cosmetic options (1–5), asked for bolder ones, were shown 6–10, and chose to have 6, 7 and 8 selectable under More > Looks. Not chosen: 1–5, 9 (field notebook), 10 (retro handheld).
-- `Shared/AppLook.swift`: `AppLook` (`standard`, `dock`, `widgets`, `timeline`), stored in `@AppStorage("app.look")`. It's a display preference, so it's **not** in `BackupManager.settingsKeys`.
+- **More looks (2026-11-17):** the user then asked for 10 "way more extreme" concepts (11–20; at least 3 in the chunky cartoon game style of a game player card they showed), liked 17 (Terminal), and asked for a moving background like one from that game. They got 21 and 22 with an **original** animated scene instead: don't copy another game's art or animation, even from a video the user links. They chose 17, 21 and 22. Not chosen: 11–16, 18–20.
+- `Shared/AppLook.swift`: `AppLook` (`standard`, `dock`, `widgets`, `timeline`, `terminal`, `alien`, `alienTerminal`), stored in `@AppStorage("app.look")`. It's a display preference, so it's **not** in `BackupManager.settingsKeys`. `tint` and `colorScheme`: the terminal looks force dark mode and a green tint app-wide.
 - Every look shows the same data: `HomeSnapshot` in `Features/Home/HomeShared.swift`, built once a minute in `HomeView`. `HomeView` owns the navigation (`Destination`), pull to refresh, the warning banner and the screenshot-import sheet, then switches on the look:
   - `StandardHome` (in `HomeView.swift`): the Phase 16 list, unchanged.
   - `DockHome.swift` (look 6): greeting, accent countdown card, round quick buttons (Collection, Goals, Raids, Scan), live events side by side, top raid tier, goals. Hides its own navigation bar.
   - `WidgetBoardHome.swift` (look 7): mixed-size widgets; titled "Today".
   - `TimelineHome.swift` (look 8): Today / This week switch (`home.timeline.week`), dots on a line, round scan button.
-- **Floating dock tab bar:** `App/DockTabView.swift`. All five tab screens stay alive in a `ZStack` (only the selected one is visible), with `FloatingDock` in a bottom safe-area inset. It hides while the keyboard is up. Chosen over hiding the system tab bar, which comes back on pushed screens. `AppTab` (in `RootTabView.swift`) holds each tab's title, icon and screen for both containers.
-- Switching to or from Floating dock swaps the tab container, so the More tab goes back to its first screen.
+  - `TerminalHome.swift` (looks 17 and 22): `TerminalStyle`, the command-line Home (every line that leads somewhere is tappable, blinking cursor) and `TerminalTabBar` ("[1]home [2]srch ..."). With `alien: true` it sits on a dark panel over `AlienBackground(dimmed: true)`.
+  - `AlienHome.swift` (look 21): `Chunky` (colours; font is SF Rounded Black, so no bundled font), `ChunkyOutline`, `ChunkyButtonStyle`, the sticker-style Home and `AlienTabBar`.
+- **Alien background:** `Shared/AlienBackground.swift`, drawn with `TimelineView(.animation)` + `Canvas` at 30 fps: rings, orbs, stars, planet, saucer. No artwork, no video. It stands still with Reduce Motion and pauses when not on screen (`onAppear`/`onDisappear`, the `isActiveTab` environment value, scene phase).
+- **Custom tab bars:** `App/CustomTabView.swift`. `CustomTabView` keeps all five tab screens alive in a `ZStack` (only the selected one is visible, others get `isActiveTab = false`), with the look's bar (`FloatingDock`, `TerminalTabBar`, `AlienTabBar`) in a bottom safe-area inset. The bar hides while the keyboard is up. Chosen over hiding the system tab bar, which comes back on pushed screens. `AppTab` (in `RootTabView.swift`) holds each tab's title, icon and screen for both containers.
+- Switching between looks with different tab containers rebuilds the tabs, so the More tab goes back to its first screen.
 
 ## Collection extras (Phases 12–13): how they work
 
@@ -179,7 +184,7 @@ Also:
 
 ## Where things are
 
-- `App/`: app entry, tab bar (`RootTabView`, `DockTabView`), `DataCenter` (feeds → decoded gamemaster, lookup, events)
+- `App/`: app entry, tab bar (`RootTabView`, `CustomTabView`), `DataCenter` (feeds → decoded gamemaster, lookup, events)
 - `Features/<Feature>/`: SwiftUI screens per feature
 - `Persistence/`: SwiftData models (`AppModelContainer.schema` lists them all) and `BackupManager`
 - `Packages/TrainerKit/`: pure Swift, tested with `swift test` on CI
