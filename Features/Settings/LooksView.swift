@@ -39,10 +39,11 @@ struct LooksView: View {
                     .accessibilityAddTraits(option == look ? .isSelected : [])
                 }
             } footer: {
-                Text("A look changes the Home screen, and some also change the tab bar. The terminal looks switch the app to dark mode. Your collection, goals and settings stay the same. The alien scene stands still when Reduce Motion is on.")
+                Text("A look styles the whole app. Terminal looks are always dark, and Alien signal is always light. Your collection, goals and settings stay the same. The alien scene stands still when Reduce Motion is on.")
             }
         }
         .navigationTitle("Looks")
+        .lookScreen()
     }
 }
 

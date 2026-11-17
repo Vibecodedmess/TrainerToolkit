@@ -16,6 +16,7 @@ struct RaidsView: View {
             }
         }
         .navigationTitle("Raids")
+        .lookScreen()
         .refreshable { await dataCenter.refreshNow() }
         .safeAreaInset(edge: .top) {
             if let warning = dataCenter.warning { WarningBanner(text: warning) }

@@ -36,6 +36,7 @@ struct PlannerView: View {
             }
         }
         .navigationTitle("Planner")
+        .lookScreen()
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {

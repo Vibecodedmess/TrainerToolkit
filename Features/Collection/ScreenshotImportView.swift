@@ -72,6 +72,7 @@ struct ScreenshotImportView: View {
             }
         }
         .navigationTitle("From screenshots")
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {

@@ -55,6 +55,7 @@ struct FriendEditorView: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .navigationTitle(friend == nil ? "Add friend" : "Edit friend")
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {

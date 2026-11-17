@@ -31,6 +31,7 @@ struct ManagePresetsView: View {
                 }
             }
             .navigationTitle("Saved presets")
+            .lookScreen()
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { EditButton() }

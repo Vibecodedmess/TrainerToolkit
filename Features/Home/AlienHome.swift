@@ -10,6 +10,8 @@ enum Chunky {
     static let cyan = Color(red: 0.24, green: 0.88, blue: 0.91)
     static let orange = Color(red: 1.0, green: 0.55, blue: 0.2)
     static let mutedGreen = Color(red: 0.5, green: 0.72, blue: 0.42)
+    /// The alien look's tint: buttons and links on white rows and on the lime navigation bar.
+    static let forest = Color(red: 0.13, green: 0.45, blue: 0.1)
 
     /// The system's rounded font at its heaviest weight: chunky without bundling a font.
     static func font(_ style: Font.TextStyle) -> Font {

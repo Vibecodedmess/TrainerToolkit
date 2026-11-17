@@ -54,6 +54,7 @@ struct RaidBossDetailView: View {
             Section { CounterMethodNote() }
         }
         .navigationTitle(boss.name)
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
         .task(id: TaskKey(inputs: inputs, boss: gmBoss?.speciesId)) { await compute() }
     }

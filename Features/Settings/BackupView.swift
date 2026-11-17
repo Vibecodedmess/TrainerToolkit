@@ -64,6 +64,7 @@ struct BackupView: View {
         }
         .id(refresh)
         .navigationTitle("Backup")
+        .lookScreen()
         .fileImporter(isPresented: $showImporter,
                       allowedContentTypes: importMode == .folder ? [.folder] : [.json]) { result in
             handleImport(result)

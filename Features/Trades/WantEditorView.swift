@@ -91,6 +91,7 @@ struct WantEditorView: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .navigationTitle(want == nil ? (theyWant ? "They want" : "I want") : "Edit entry")
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if want == nil {

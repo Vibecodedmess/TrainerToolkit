@@ -42,6 +42,7 @@ struct SpeciesPicker: View {
         }
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Name or Pokédex number")
         .navigationTitle("Choose Pokémon")
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -27,6 +27,7 @@ struct ScreenshotReviewView: View {
             resultSections
         }
         .navigationTitle(proposal.certainChoice?.option.pokemon.speciesName ?? proposal.reading.name ?? "Review")
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: Binding(get: { enlarged != nil }, set: { if !$0 { enlarged = nil } })) {
             if let index = enlarged, screenshots.indices.contains(index) {
@@ -38,6 +39,7 @@ struct ScreenshotReviewView: View {
                             .frame(maxWidth: .infinity)
                     }
                     .navigationTitle("Screenshot \(index + 1) of \(screenshots.count)")
+                    .lookScreen()
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .confirmationAction) {

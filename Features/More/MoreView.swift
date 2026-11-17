@@ -34,6 +34,7 @@ struct MoreView: View {
                 }
             }
             .navigationTitle("More")
+            .lookScreen()
         }
     }
 }

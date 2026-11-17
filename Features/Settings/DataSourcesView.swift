@@ -63,6 +63,7 @@ struct DataSourcesView: View {
             }
         }
         .navigationTitle("Data sources")
+        .lookScreen()
         .refreshable { await dataCenter.refreshNow() }
     }
 }

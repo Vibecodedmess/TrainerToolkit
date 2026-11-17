@@ -41,6 +41,7 @@ struct BaseTradeCostsView: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .navigationTitle("Base trade costs")
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
@@ -83,6 +84,7 @@ struct FriendshipLevelsView: View {
             }
         }
         .navigationTitle("Friendship levels")
+        .lookScreen()
     }
 
     @ViewBuilder
@@ -165,6 +167,7 @@ struct TradeCalculationNoteView: View {
             }
         }
         .navigationTitle("How this is calculated")
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
     }
 }

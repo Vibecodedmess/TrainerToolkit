@@ -155,6 +155,7 @@ struct OptionsEditor: View {
             }
         }
         .navigationTitle(filter.label)
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -224,6 +225,7 @@ struct TextEntriesEditor: View {
             }
         }
         .navigationTitle(filter.label)
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { fieldFocused = model.entries(filter.id).isEmpty }
     }

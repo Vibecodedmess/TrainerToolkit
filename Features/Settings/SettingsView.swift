@@ -41,6 +41,7 @@ struct SettingsView: View {
             }
         }
         .navigationTitle("Settings")
+        .lookScreen()
     }
 
     private var firstLaunchText: String {

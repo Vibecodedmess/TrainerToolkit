@@ -87,6 +87,7 @@ struct PowerUpValueView: View {
             }
         }
         .navigationTitle("Power up \(pokemon.displayName)")
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
         .task(id: TaskKey(boss: bossIndex, weather: weather, form: form, count: collection.count)) { await compute() }
     }

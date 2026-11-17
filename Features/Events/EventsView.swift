@@ -15,6 +15,7 @@ struct EventsView: View {
                 content(resolved, now: context.date)
             }
             .navigationTitle("Events")
+            .lookScreen()
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Menu {

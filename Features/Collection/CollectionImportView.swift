@@ -81,6 +81,7 @@ struct CollectionImportView: View {
             }
         }
         .navigationTitle("Import CSV")
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {

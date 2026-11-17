@@ -47,6 +47,7 @@ struct CollectionView: View {
             }
         }
         .navigationTitle("Collection")
+        .lookScreen()
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 filterMenu

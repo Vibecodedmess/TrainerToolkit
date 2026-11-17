@@ -44,6 +44,7 @@ struct FriendDetailView: View {
             }
         }
         .navigationTitle(friend.name)
+        .lookScreen()
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("Edit") { editing = true }

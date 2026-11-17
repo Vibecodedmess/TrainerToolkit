@@ -42,6 +42,7 @@ struct EventDetailView: View {
             }
         }
         .navigationTitle(event.event.name)
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
         .task { notificationsDenied = await ReminderScheduler.authorizationStatus() == .denied }
     }

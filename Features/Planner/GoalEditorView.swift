@@ -45,6 +45,7 @@ struct GoalEditorView: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .navigationTitle(goal == nil ? "New goal" : draft.speciesName)
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if goal == nil {

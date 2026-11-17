@@ -157,6 +157,7 @@ struct EvolutionItemView: View {
             }
         }
         .navigationTitle(item.name)
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
     }
 }

@@ -33,6 +33,7 @@ struct RocketView: View {
             }
         }
         .navigationTitle("Rocket")
+        .lookScreen()
         .searchable(text: $query, prompt: "What they said, a name or a Pokémon")
         .refreshable { await dataCenter.refreshNow() }
     }

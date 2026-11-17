@@ -63,6 +63,7 @@ struct CollectionEditorView: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .navigationTitle(pokemon == nil ? "Add Pokémon" : draft.speciesName)
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if pokemon == nil {

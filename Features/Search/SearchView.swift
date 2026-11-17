@@ -20,6 +20,7 @@ struct SearchView: View {
                 }
             }
             .navigationTitle("Search")
+            .lookScreen()
         }
     }
 }

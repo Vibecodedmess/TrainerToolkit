@@ -42,6 +42,8 @@ struct RootTabView: View {
     @AppStorage(AppLook.storageKey) private var look: AppLook = .standard
 
     var body: some View {
+        // Before the tabs are built, so their navigation bars get this look's style.
+        let _ = LookAppearance.apply(look)
         Group {
             switch look {
             case .dock:
@@ -62,7 +64,12 @@ struct RootTabView: View {
                 }
             }
         }
+        // A new look rebuilds every tab, so navigation bars pick up the new appearance.
+        .id(look)
+        // The look for the whole app, including sheets.
         .tint(look.tint)
+        .fontDesign(look.fontDesign)
+        .fontWeight(look.fontWeight)
         .preferredColorScheme(look.colorScheme)
     }
 }

@@ -36,12 +36,12 @@ enum AppLook: String, CaseIterable, Identifiable {
     var summary: String {
         switch self {
         case .standard: "The list-style Home and the usual tab bar."
-        case .dock: "A greeting, a big Community Day countdown, round quick buttons and a floating tab bar."
-        case .widgets: "Home as widgets in mixed sizes, like an iPhone home screen."
+        case .dock: "A greeting, a big Community Day countdown, round quick buttons and a floating tab bar on every screen."
+        case .widgets: "Home as widgets in mixed sizes, like an iPhone home screen, and rounded text throughout."
         case .timeline: "Home as one timeline of what's on now and next, with a button to add from screenshots."
-        case .terminal: "Home as a command line, with a terminal tab bar. The app switches to dark mode with green highlights."
-        case .alien: "Chunky game-style Home over a moving alien space scene, with a matching tab bar."
-        case .alienTerminal: "The terminal over the moving alien scene. Dark mode with green highlights."
+        case .terminal: "Every screen in black and green with monospaced text, Home as a command line and a terminal tab bar."
+        case .alien: "Every screen over a moving alien space scene, with chunky rounded text, a lime title bar and a game-style Home."
+        case .alienTerminal: "The terminal look over the moving alien scene, on every screen."
         }
     }
 
@@ -60,9 +60,36 @@ enum AppLook: String, CaseIterable, Identifiable {
     /// Terminal looks: monospaced Home, terminal tab bar, dark mode, green tint.
     var isTerminal: Bool { self == .terminal || self == .alienTerminal }
 
-    /// The app-wide tint.
-    var tint: Color { isTerminal ? TerminalStyle.green : AppTheme.accent }
+    // MARK: - App-wide style (applied in RootTabView; backgrounds per screen with `lookScreen()`)
 
-    /// Forced appearance, or nil to follow the phone's setting.
-    var colorScheme: ColorScheme? { isTerminal ? .dark : nil }
+    /// The app-wide tint.
+    var tint: Color {
+        switch self {
+        case .terminal, .alienTerminal: TerminalStyle.green
+        case .alien: Chunky.forest
+        case .standard, .dock, .widgets, .timeline: AppTheme.accent
+        }
+    }
+
+    /// Forced appearance, or nil to follow the phone's setting. Alien is light, so lists read as
+    /// white stickers over the green scene.
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .terminal, .alienTerminal: .dark
+        case .alien: .light
+        case .standard, .dock, .widgets, .timeline: nil
+        }
+    }
+
+    /// The app-wide font design, or nil for the system default.
+    var fontDesign: Font.Design? {
+        switch self {
+        case .terminal, .alienTerminal: .monospaced
+        case .alien, .widgets: .rounded
+        case .standard, .dock, .timeline: nil
+        }
+    }
+
+    /// The app-wide font weight, or nil for each text's own weight.
+    var fontWeight: Font.Weight? { self == .alien ? .semibold : nil }
 }

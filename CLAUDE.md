@@ -57,7 +57,7 @@ Also:
 | 18 | Screenshot import: at least 2 screenshots per Pokémon (misreads merged, majority vote); level/IVs from "L30 80% 12/12/12" nicknames; new app icon | Confirmed on build #29 (2026-11-16; user: "works pretty good") |
 | 19 | Screenshot thumbnails on unsure Pokémon (and in the review, tap to enlarge); ★ on each species' best raid/gym moves | Confirmed on build #30 (2026-11-16). Elite moves now show "(Elite)" in the editor instead of ★ |
 | 20 | More > Looks: pick Standard, Floating dock, Widget board or Timeline (concepts 6, 7, 8) | Built as build #31 (2026-11-16); the user hasn't reported a phone test yet. See "Looks" |
-| 21 | Three more looks: Terminal (17), Alien signal (21), Terminal, alien edition (22), with an original moving alien background | Built 2026-11-17, not yet on the phone. See "Looks" |
+| 21 | Three more looks: Terminal (17), Alien signal (21), Terminal, alien edition (22), with an original moving alien background | On build #32 the user found the custom tab bars covered the bottom of lists, and that looks only changed Home. Fixed 2026-11-17 (bar below the screens; looks app-wide), not yet on the phone. See "Looks" |
 
 ## Current state (update this section as work continues)
 
@@ -105,7 +105,12 @@ Also:
   - `TerminalHome.swift` (looks 17 and 22): `TerminalStyle`, the command-line Home (every line that leads somewhere is tappable, blinking cursor) and `TerminalTabBar` ("[1]home [2]srch ..."). With `alien: true` it sits on a dark panel over `AlienBackground(dimmed: true)`.
   - `AlienHome.swift` (look 21): `Chunky` (colours; font is SF Rounded Black, so no bundled font), `ChunkyOutline`, `ChunkyButtonStyle`, the sticker-style Home and `AlienTabBar`.
 - **Alien background:** `Shared/AlienBackground.swift`, drawn with `TimelineView(.animation)` + `Canvas` at 30 fps: rings, orbs, stars, planet, saucer. No artwork, no video. It stands still with Reduce Motion and pauses when not on screen (`onAppear`/`onDisappear`, the `isActiveTab` environment value, scene phase).
-- **Custom tab bars:** `App/CustomTabView.swift`. `CustomTabView` keeps all five tab screens alive in a `ZStack` (only the selected one is visible, others get `isActiveTab = false`), with the look's bar (`FloatingDock`, `TerminalTabBar`, `AlienTabBar`) in a bottom safe-area inset. The bar hides while the keyboard is up. Chosen over hiding the system tab bar, which comes back on pushed screens. `AppTab` (in `RootTabView.swift`) holds each tab's title, icon and screen for both containers.
+- **Looks are app-wide (user's request, 2026-11-17):**
+  - `RootTabView` sets `tint`, `fontDesign`, `fontWeight` and `preferredColorScheme` from the look for the whole app (sheets too). It also calls `LookAppearance.apply` (UIKit `UINavigationBar` appearance: black/green monospaced for terminal, lime with dark rounded titles for alien) and `.id(look)` so every tab is rebuilt with the new bar style.
+  - **Every screen** has `.lookScreen()` right after its `.navigationTitle` (`Shared/LookScreen.swift`): hidden list background plus black or the alien scene behind it. **New screens must add it too.**
+  - Alien signal is forced light (lists read as white stickers on the green scene); the terminal looks are forced dark. Widget board uses rounded text everywhere.
+- **Custom tab bars:** `App/CustomTabView.swift`. `CustomTabView` keeps all five tab screens alive in a `ZStack` (only the selected one is visible, others get `isActiveTab = false`), with the look's bar (`FloatingDock`, `TerminalTabBar`, `AlienTabBar`) **below** it in a `VStack`. Not a safe-area inset or overlay: a bottom inset doesn't reach lists inside a NavigationStack, so on build #32 the bar covered the bottom of lists. The bar hides while the keyboard is up.
+- **The user's screen recordings are HEVC `.MP4`**, which this PC can't decode (no ffmpeg, no HEVC codec; `MediaComposition.GetThumbnailAsync` fails with 0xC00D5212). Ask for screenshots instead. Chosen over hiding the system tab bar, which comes back on pushed screens. `AppTab` (in `RootTabView.swift`) holds each tab's title, icon and screen for both containers.
 - Switching between looks with different tab containers rebuilds the tabs, so the More tab goes back to its first screen.
 
 ## Collection extras (Phases 12–13): how they work

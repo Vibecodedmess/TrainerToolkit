@@ -67,6 +67,7 @@ struct TradesView: View {
             }
         }
         .navigationTitle("Trades")
+        .lookScreen()
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {

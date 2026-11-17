@@ -102,6 +102,7 @@ struct RocketLineupView: View {
             Section { CounterMethodNote() }
         }
         .navigationTitle(lineup.name)
+        .lookScreen()
         .navigationBarTitleDisplayMode(.inline)
         .task(id: TaskKey(inputs: inputs, slots: memberSlots)) { await compute() }
     }
