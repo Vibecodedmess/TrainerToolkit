@@ -34,6 +34,18 @@ final class DataStoreTests: XCTestCase {
         XCTAssertTrue(http.requests.isEmpty, "prepare must not touch the network")
     }
 
+    func testAStoreForSomeSourcesOnlyHandlesThose() async {
+        let clock: TestClock = self.clock
+        let store = DataStore(cacheDirectory: dirs.cache, snapshotDirectory: dirs.snapshots, http: http,
+                              now: { clock.now }, sources: [.events, .raids])
+        let states = await store.prepare()
+        XCTAssertEqual(Set(states.keys), [.events, .raids])
+        XCTAssertTrue(states.values.allSatisfy { $0.origin == .bundled })
+        let refreshed = await store.refreshIfStale(maxAge: 3600 * 1000)
+        XCTAssertEqual(Set(refreshed.keys), [.events, .raids])
+        XCTAssertTrue(http.requests.isEmpty, "both copies are fresh enough")
+    }
+
     func testSuccessfulRefreshCachesNewData() async {
         let store = makeStore()
         http.enqueue(status: 200, body: Fixtures.json(for: .raids), etag: "\"v1\"")

@@ -58,11 +58,12 @@ Also:
 | 19 | Screenshot thumbnails on unsure Pokémon (and in the review, tap to enlarge); ★ on each species' best raid/gym moves | Confirmed on build #30 (2026-11-16). Elite moves now show "(Elite)" in the editor instead of ★ |
 | 20 | More > Looks: pick Standard, Floating dock, Widget board or Timeline (concepts 6, 7, 8) | Confirmed on build #33 (2026-11-17). See "Looks" |
 | 21 | Three more looks: Terminal (17), Alien signal (21), Terminal, alien edition (22), with an original moving alien background | Build #32 had the custom tab bars covering list bottoms and looks only on Home; fixed (bar below the screens, looks app-wide) and confirmed on build #33 (2026-11-17; user: "looks great!"). See "Looks" |
-| 22 | Recommended (power-ups, events, raids) in More and on every Home look; all open `TODO: verify` items confirmed by the user | Built 2026-11-17, not yet on the phone. See "Recommended". Home Screen widget researched, not built (see "Widget research") |
+| 22 | Recommended (power-ups, events, raids) in More and on every Home look; all open `TODO: verify` items confirmed by the user | Confirmed on build #34 (2026-11-17; user: "Recommended works good!"). See "Recommended" |
+| 23 | Home Screen widget: Community Day countdown and top raid bosses (small, medium, Lock Screen), fetching the feeds itself | Built 2026-11-17, not yet on the phone. See "Widget" |
 
 ## Current state (update this section as work continues)
 
-- **As of 2026-11-17:** Phases 0–21 are confirmed on the phone (latest: build #33), except the CSV import (untested, the user has no CSV). Phase 22 (Recommended) is built.
+- **As of 2026-11-17:** Phases 0–22 are confirmed on the phone (latest: build #33), except the CSV import (untested, the user has no CSV). Phase 22 (Recommended) is confirmed on build #34. Phase 23 (Home Screen widget) is built.
 - **Tabs (user's choice, 2026-11-13):** Home, Search, **Rocket**, Events, More. Raids lives under More > Raids, and Home's tile shows the raid boss count instead of the Rocket count. `RaidsView` has no `NavigationStack` of its own (it's pushed); the Rocket tab wraps `RocketView` in one.
 - **Rocket lines:** `Counters/RocketQuotes.swift` + `rocket-quotes.json` (the game's own text, see DATA_SOURCES.md). The list shows each lineup's line, the search (`RocketQuotes.matches`, punctuation- and accent-insensitive) covers lines, names, types and Pokémon, and the lineup screen shows the line at the top.
 - **Look and feel (Phase 16, user's choices):**
@@ -93,12 +94,20 @@ Also:
   - **Raids:** `RaidEstimate` trainers needed with the user's best 6 (easiest first; not-estimated tiers last), top 3 counters, "you don't have it" and shiny flags.
 - Entry points: More > Tools > Recommended, and one link on every Home look (`HomeView.Destination.recommended`).
 
-## Widget research (2026-11-17, not built)
+## Widget (Phase 23): how it works
+
+- `Widget/TrainerWidget.swift`, XcodeGen target `TrainerToolkitWidget` (app extension, bundle id `$(APP_BUNDLE_ID).widget`, Info.plist generated to `Config/Widget-Info.plist`, gitignored), embedded in the app's `PlugIns`. CI fails if the `.appex` is missing.
+- Its own `DataStore` in its Caches folder with `sources: [.events, .raids]` (the `sources` parameter was added for this, so the widget never parses the 940 KB game master). Bundled snapshot first, `refreshIfStale(maxAge: 6 h)`.
+- Timeline: one entry; next update when the Community Day starts or ends, else after 6 h. Countdown uses `Text(date, style: .relative)`, which ticks by itself.
+- Families: small (Community Day), medium (plus the top raid tier, up to 4 bosses), accessoryRectangular (Lock Screen). Indigo tint; it can't know the app's look (no App Group).
+- `SDRaidBoss.tiersInDisplayOrder` (DataSources) is the raid tier order shared by the app (`RaidsView.tiers`) and the widget.
+
+## Widget research (2026-11-17)
 
 - The user asked to look into a Home Screen widget.
 - **App Groups are the problem:** with a free Apple ID, Sideloadly either renames the App Group to a team-unique id or doesn't provision it at all (reports differ; a widget that needs it can crash at launch). So the widget **can't rely on reading the app's data** (collection, goals, Recommended).
 - **Workable plan:** a WidgetKit extension that fetches the public ScrapedDuck events/raids feeds itself (same politeness rules: cache, every few hours, ETags) and shows the Community Day countdown and current raid bosses as text. No App Group needed. Each extension needs its own App ID on the free account (10 new App IDs per 7 days). If an install fails, Sideloadly's advanced option to remove app extensions gets the app back without the widget.
-- Waiting for the user's go-ahead before building it.
+- **Approved and built (2026-11-17)** after the user confirmed build #34. See "Widget" above.
 
 ## Looks (Phase 20): how they work
 
@@ -199,6 +208,7 @@ Also:
 
 - `App/`: app entry, tab bar (`RootTabView`, `CustomTabView`), `DataCenter` (feeds → decoded gamemaster, lookup, events)
 - `Features/<Feature>/`: SwiftUI screens per feature
+- `Widget/`: the Home Screen widget extension (see "Widget")
 - `Persistence/`: SwiftData models (`AppModelContainer.schema` lists them all) and `BackupManager`
 - `Packages/TrainerKit/`: pure Swift, tested with `swift test` on CI
   - `DataSources`: feeds, cache, `EventCalendar`, `EventExtras`, `GamemasterLookup`, snapshots

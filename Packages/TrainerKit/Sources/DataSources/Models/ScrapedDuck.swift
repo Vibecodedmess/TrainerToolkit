@@ -80,3 +80,16 @@ public struct SDRocketLineup: Decodable, Sendable, Hashable {
     public let secondPokemon: [Member]?
     public let thirdPokemon: [Member]?
 }
+
+public extension SDRaidBoss {
+    /// Tiers in display order: highest star count first, named tiers (Mega, Shadow, …) before numbered ones.
+    static func tiersInDisplayOrder(_ bosses: [SDRaidBoss]) -> [String] {
+        var seen: [String] = []
+        for b in bosses where !seen.contains(b.tier) { seen.append(b.tier) }
+        func sortKey(_ tier: String) -> Int { Int(tier.prefix { $0.isNumber }) ?? 100 }
+        return seen.enumerated().sorted { a, b in
+            let ka = sortKey(a.element), kb = sortKey(b.element)
+            return ka != kb ? ka > kb : a.offset < b.offset
+        }.map(\.element)
+    }
+}

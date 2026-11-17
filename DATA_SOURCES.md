@@ -93,6 +93,7 @@ The game master gives the shadow (×1.2), purified (×0.9) and lucky (×0.5) mul
 - **Validation:** every download is decoded before use. It's rejected if it isn't valid JSON, has no entries, or more than 10% of entries don't match the expected format.
   A rejected or failed download never replaces the last good copy. The app shows a small warning instead.
 - **No personal data is sent.** Requests carry only a generic `User-Agent: TrainerToolkit/1.0 (personal iOS app)`.
+- **Home Screen widget:** it can't read the app's cache (that would need an App Group, which a free Apple ID can't provide), so it keeps its own copy of the **events and raids** feeds only, with the same rules: bundled snapshot first, refreshed at most every 6 hours (WidgetKit often waits longer), ETags, and the same minimum interval per source. At worst that's one extra request per feed every 6 hours.
 
 ### PokeMiners game master: battle tables (for Raids)
 

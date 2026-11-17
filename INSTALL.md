@@ -63,6 +63,14 @@ Go to More > **Backup** in the app:
 
 A backup holds your collection, Planner goals, event plans and checklists, saved searches, trade friends and base trade costs.
 
+## The Home Screen widget
+
+The app includes a widget with the next Community Day countdown and the current top raid bosses.
+- **Add it:** touch and hold the Home Screen, tap **Edit** > **Add Widget**, search for Trainer Toolkit, pick the small or medium size (or the Lock Screen one) and tap **Add Widget**.
+- **Its data:** the widget downloads the event and raid feeds itself, at most every 6 hours, so it can lag the app a little. It can't show your collection or goals.
+- **Sideloadly and a free Apple ID:** the widget is signed as a second App ID, so each install uses one more of the free account's weekly App IDs.
+- **If the install fails because of the widget:** in Sideloadly's advanced options, turn on the option to remove app extensions and install again. You get the app without the widget; your data stays.
+
 ## Changing the bundle ID
 
 The bundle ID is set in one place: `Config/Shared.xcconfig` (`APP_BUNDLE_ID`).

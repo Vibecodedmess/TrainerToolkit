@@ -54,15 +54,19 @@ public actor DataStore {
     private let now: @Sendable () -> Date
     private var states: [DataSourceID: SourceState] = [:]
     private var prepared = false
+    /// The datasets this store looks after (the widget only needs events and raids).
+    private let sources: [DataSourceID]
 
     public init(cacheDirectory: URL,
                 snapshotDirectory: URL? = BundledSnapshots.directory,
                 http: HTTPClient = URLSessionHTTPClient(),
-                now: @escaping @Sendable () -> Date = { Date() }) {
+                now: @escaping @Sendable () -> Date = { Date() },
+                sources: [DataSourceID] = DataSourceID.allCases) {
         self.cacheDirectory = cacheDirectory
         self.snapshotDirectory = snapshotDirectory
         self.http = http
         self.now = now
+        self.sources = sources
     }
 
     // MARK: - Reading
@@ -75,7 +79,7 @@ public actor DataStore {
         let saved = loadSavedStates()
         let snapshotDates = snapshotDirectory.map(BundledSnapshots.fetchDates(in:)) ?? [:]
 
-        for id in DataSourceID.allCases {
+        for id in sources {
             var state = saved[id] ?? SourceState(origin: .missing)
             let snapshotDate = snapshotDates[id]
 
@@ -130,7 +134,7 @@ public actor DataStore {
     /// Refreshes every dataset whose copy is older than `maxAge`, one at a time.
     public func refreshIfStale(maxAge: TimeInterval) async -> [DataSourceID: RefreshOutcome] {
         var results: [DataSourceID: RefreshOutcome] = [:]
-        for id in DataSourceID.allCases {
+        for id in sources {
             results[id] = await refresh(id, maxAge: maxAge)
         }
         return results
@@ -139,7 +143,7 @@ public actor DataStore {
     /// Refreshes every dataset now (still respecting each source's minimum interval).
     public func refreshAll() async -> [DataSourceID: RefreshOutcome] {
         var results: [DataSourceID: RefreshOutcome] = [:]
-        for id in DataSourceID.allCases {
+        for id in sources {
             results[id] = await refresh(id, maxAge: nil)
         }
         return results

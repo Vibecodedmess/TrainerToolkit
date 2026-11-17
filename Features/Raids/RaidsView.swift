@@ -44,19 +44,9 @@ struct RaidsView: View {
         }
     }
 
-    /// Tiers in display order: highest star count first, named tiers (Mega, Shadow, …) before numbered ones.
+    /// Tiers in display order (shared with the widget: `SDRaidBoss.tiersInDisplayOrder`).
     static func tiers(_ bosses: [SDRaidBoss]) -> [String] {
-        var seen: [String] = []
-        for b in bosses where !seen.contains(b.tier) { seen.append(b.tier) }
-        return seen.enumerated().sorted { a, b in
-            let ka = sortKey(a.element), kb = sortKey(b.element)
-            return ka != kb ? ka > kb : a.offset < b.offset
-        }.map(\.element)
-    }
-
-    private static func sortKey(_ tier: String) -> Int {
-        let digits = tier.prefix { $0.isNumber }
-        return Int(digits) ?? 100
+        SDRaidBoss.tiersInDisplayOrder(bosses)
     }
 }
 

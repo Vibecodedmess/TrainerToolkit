@@ -46,6 +46,8 @@ targets:
         product: ScreenshotImport
       - package: TrainerKit
         product: BackupFormat
+      # Home Screen widget (Phase 23), embedded in the app's PlugIns folder.
+      - target: TrainerToolkitWidget
     settings:
       base:
         PRODUCT_NAME: TrainerToolkit
@@ -61,6 +63,35 @@ targets:
         ENABLE_PREVIEWS: YES
         # The app-wide tint: Resources/Assets.xcassets/AccentColor.colorset (light and dark).
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+
+  # Home Screen widget: Community Day countdown and current raid bosses. It downloads the public
+  # event and raid feeds itself (no App Group: a free Apple ID can't provide one through Sideloadly),
+  # so it can't read the app's own data.
+  TrainerToolkitWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widget
+    dependencies:
+      - package: TrainerKit
+        product: DataSources
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
+    info:
+      path: Config/Widget-Info.plist
+      properties:
+        CFBundleDisplayName: $(APP_DISPLAY_NAME)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_NAME: TrainerToolkitWidget
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID).widget
+        MARKETING_VERSION: $(APP_VERSION)
+        CURRENT_PROJECT_VERSION: "1"
+        TARGETED_DEVICE_FAMILY: "1"
+        SKIP_INSTALL: YES
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
 
 schemes:
   TrainerToolkit:

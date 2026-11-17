@@ -83,6 +83,8 @@ jobs:
         run: |
           APP=build/Build/Products/Release-iphoneos/TrainerToolkit.app
           test -d "$APP"
+          # The Home Screen widget must be embedded in the app.
+          test -d "$APP/PlugIns/TrainerToolkitWidget.appex"
           mkdir -p dist/Payload
           cp -R "$APP" dist/Payload/
           cd dist
