@@ -5,6 +5,9 @@ struct MoreView: View {
         NavigationStack {
             List {
                 Section("Tools") {
+                    NavigationLink { RecommendedView() } label: {
+                        Label("Recommended", systemImage: "wand.and.stars")
+                    }
                     NavigationLink { PlannerView() } label: {
                         Label("Planner", systemImage: "chart.line.uptrend.xyaxis")
                     }

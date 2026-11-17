@@ -82,7 +82,7 @@ Both are **checked in unit tests against PvPoke's own numbers**:
 - `level25CP` matches for 483 of 484 non-Mega species. The odd one out is Hisuian Electrode, where PvPoke's value looks stale.
 - None of 5,256 PvPoke rank-1 league IV sets exceeds its league CP cap.
 
-`TODO: verify`: the game master gives the shadow (×1.2), purified (×0.9) and lucky (×0.5) multipliers, but not how fractional results are rounded. The app rounds **up** per power-up (for example, 1 Candy becomes 2 for a shadow). It also assumes a lucky purified Pokémon gets both stardust discounts.
+The game master gives the shadow (×1.2), purified (×0.9) and lucky (×0.5) multipliers, but not how fractional results are rounded. The app rounds **up** per power-up (for example, 1 Candy becomes 2 for a shadow), and a lucky purified Pokémon gets both stardust discounts. **Confirmed in game by the user on 2026-11-17.**
 
 ## How the app uses them
 
@@ -127,9 +127,10 @@ The damage formula (`floor(0.5 × Power × Atk/Def × multipliers) + 1`) and the
 - **Friendship level names.** The app numbers the levels as in the template ids.
 - **The base stardust cost of a trade.** No official Niantic source was found either. So the trainer types the base costs in once (Trades > Base trade costs: regular/special, registered or not), copied from the trade screen in the game. They are stored on the device only and empty by default; without them the planner shows "Enter base costs".
 
-The planner's estimate is base cost × (1 − `tradingDiscount`). `TODO: verify`:
+The planner's estimate is base cost × (1 − `tradingDiscount`). **Confirmed in game by the user on 2026-11-17:**
 - the rounding (the app rounds to the nearest whole stardust)
 - the mapping of the planner's trade kinds to `unlockedTrading` ids, which is read from the id names (`IN_POKEDEX` = registered, `NON_POKEDEX` = not registered)
+- the attack bonus shown as a multiplier, the category names and the friendship levels shown as "Level N"
 
 ### PokeMiners game master + game text: evolution requirements (for My Collection)
 
@@ -144,13 +145,13 @@ The user approved the game's own English text as a source on 2026-11-12.
   - only `item_*_name` and `item_*_desc` for the evolution items and lures
   - the quest display text, with `{0}` replaced by the goal number
 
-**Not in either file: how to get an item.** The user chose a cited community source, shown as unverified.
+**Not in either file: how to get an item.** The user chose a cited community source. They checked it against the game on 2026-11-17.
 - It is in `Packages/TrainerKit/Sources/GameMath/Resources/evolution-items-community.json`, written by hand as a short paraphrase.
 - Source: the Pokémon GO Wiki on Fandom, retrieved 2026-11-12, licensed CC BY-SA:
   - [Evolution Items](https://pokemongo.fandom.com/wiki/Evolution_Items)
   - [Lure Modules](https://pokemongo.fandom.com/wiki/Lure_Modules)
   - [Zygarde Cube](https://pokemongo.fandom.com/wiki/Zygarde_Cube)
-- The app shows the source, licence and date, labelled "Not verified". Shop prices are left out.
+- The app shows the source, licence and date, and says it was checked against the game on 17 November 2026. Shop prices are left out.
 - Community guides disagree on some items (for example the Sinnoh Stone), and methods change with events.
 
 ### Game text: what Rocket members say (for Rocket)
@@ -164,7 +165,7 @@ The user approved the game's own English text as a source on 2026-11-12.
 
 ### Bulbapedia: raid tier numbers (for the trainers-needed estimate)
 
-The user chose a cited community table on 2026-11-12. It's in `Packages/TrainerKit/Sources/Counters/Resources/raid-tiers.json`, all `TODO: verify`.
+The user chose a cited community table on 2026-11-12. It's in `Packages/TrainerKit/Sources/Counters/Resources/raid-tiers.json`. The user checked it against the game on 2026-11-17, including the 3-star Shadow time limit.
 - **What:** boss HP, the boss's Attack/Defense multiplier and the time limit, per raid tier.
 - **Why a community source:** the game's servers hold these; the game master has none of them (`RAID_CLIENT_SETTINGS` only has lobby settings).
 - **Source:** Bulbapedia, retrieved 2026-11-12, licensed CC BY-NC-SA 2.5. Fine for this personal, never-published app, and cited in the app.
@@ -174,14 +175,14 @@ The user chose a cited community table on 2026-11-12. It's in `Packages/TrainerK
 - **Not estimated:**
   - Shadow raids: the boss is enraged at 60% HP, unless Purified Gems are used.
   - Super Mega raids: shields.
-  - The 3-star Shadow time limit isn't shown separately in the source table.
+  - (The 3-star Shadow time limit isn't shown separately in the source table; the user confirmed it in game.)
 - **The estimate** (`Counters/RaidEstimate.swift`) is a best case: boss HP ÷ (the party's average best-moveset DPS × time limit), rounded up. Boss defence uses the tier multiplier with 15 IVs. No fainting, dodging, relobbying, or friendship or Mega bonuses.
 
 ## Decided questions
 
-1. **Raid boss HP and boss CP multiplier per tier:** answered 2026-11-12. The user chose a cited community table, Bulbapedia (see "raid tier numbers" above), marked `TODO: verify`.
+1. **Raid boss HP and boss CP multiplier per tier:** answered 2026-11-12. The user chose a cited community table, Bulbapedia (see "raid tier numbers" above), and confirmed it in game on 2026-11-17.
 2. **Trade stardust costs:** answered. The discounts come from the game master; the base costs are typed in by the trainer (see "trade tables" above).
-3. **How to get evolution items:** answered 2026-11-12. The user chose a cited community wiki, marked unverified (see "evolution requirements" above).
+3. **How to get evolution items:** answered 2026-11-12. The user chose a cited community wiki and checked it against the game on 2026-11-17 (see "evolution requirements" above).
 
 ## Not used
 

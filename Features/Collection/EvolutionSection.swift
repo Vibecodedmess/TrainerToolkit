@@ -146,7 +146,7 @@ struct EvolutionItemView: View {
             } footer: {
                 if let guide {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Community information from the \(guide.name) (\(guide.license)), retrieved \(guide.retrieved). Not verified: methods change with events and updates.")
+                        Text("Community information from the \(guide.name) (\(guide.license)), retrieved \(guide.retrieved), checked against the game on 17 November 2026. Methods can change with events and updates.")
                         ForEach(guide.pages, id: \.self) { page in
                             if let url = URL(string: page) {
                                 Link(page, destination: url)

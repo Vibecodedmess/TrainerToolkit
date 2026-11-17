@@ -64,6 +64,7 @@ struct AlienHome: View {
                 header
                 countdown
                 tiles
+                recommended
                 live
                 raids
                 goals
@@ -157,6 +158,28 @@ struct AlienHome: View {
                 open(.backup)
             }
         }
+    }
+
+    private var recommended: some View {
+        Button {
+            open(.recommended)
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "wand.and.stars").font(Chunky.font(.title3))
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Recommended for you").font(Chunky.font(.headline))
+                    Text("Power-ups, events and raids").font(.caption.weight(.semibold))
+                }
+                Spacer()
+                Image(systemName: "chevron.right").font(.subheadline.weight(.heavy))
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(ChunkyButtonStyle(fill: .white))
+        .rotationEffect(.degrees(-1))
     }
 
     private var backupText: String {

@@ -28,7 +28,7 @@ enum TradeKind: String, CaseIterable, Identifiable {
     /// The game master `unlockedTrading` id that matches this kind, when there is exactly one.
     /// "Special, not registered" has no single id (the data splits it into regional, form,
     /// legendary, shiny, ... ids), so the unlock list is shown instead.
-    /// TODO: verify: this mapping is read from the id names, the game master doesn't define it.
+    /// Read from the id names (the game master doesn't define it); confirmed in game by the user, 2026-11-17.
     var unlockCategoryId: String? {
         switch self {
         case .regularRegistered: return "REGULAR_IN_POKEDEX"
@@ -99,7 +99,7 @@ enum TradeFormat {
     }
 
     /// The game master's attackBonusPercentage values are multipliers (1.0 = no bonus).
-    /// TODO: verify that the game applies it as a plain multiplier.
+    /// The game applies it as a plain multiplier (confirmed in game by the user, 2026-11-17).
     static func multiplier(_ value: Double) -> String {
         "×" + value.formatted(.number.precision(.fractionLength(0...2)))
     }

@@ -176,7 +176,7 @@ final class PowerUpCalculatorTests: XCTestCase {
         let shadow = cost(1, 1.5, CostModifiers(isShadow: true))
         XCTAssertEqual(shadow.stardust, PowerUpCalculator.scaled(normal.stardust, by: tables.shadowStardustMultiplier))
         XCTAssertGreaterThan(shadow.stardust, normal.stardust)
-        // 1 Candy x 1.2 rounds up to 2 (rounding direction: TODO verify in game).
+        // 1 Candy x 1.2 rounds up to 2 (rounding direction confirmed in game, 2026-11-17).
         XCTAssertEqual(normal.candy, 1)
         XCTAssertEqual(shadow.candy, 2)
     }

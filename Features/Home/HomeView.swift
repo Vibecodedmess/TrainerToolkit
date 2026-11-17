@@ -16,7 +16,7 @@ struct HomeView: View {
 
     /// Where a tile or quick button leads.
     enum Destination: Hashable {
-        case collection, planner, raids, backup
+        case collection, planner, raids, backup, recommended
     }
 
     var body: some View {
@@ -50,6 +50,7 @@ struct HomeView: View {
                 case .planner: PlannerView()
                 case .raids: RaidsView()
                 case .backup: BackupView()
+                case .recommended: RecommendedView()
                 }
             }
             .refreshable { await dataCenter.refreshNow() }
@@ -77,6 +78,23 @@ private struct StandardHome: View {
     var body: some View {
         List {
             tilesSection
+            Section {
+                Button {
+                    open(.recommended)
+                } label: {
+                    HStack {
+                        Label("Recommended for you", systemImage: "wand.and.stars")
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            } footer: {
+                Text("What to power up, which events to join and which raids to do.")
+            }
             communityDaySection
             liveSection
             raidSection

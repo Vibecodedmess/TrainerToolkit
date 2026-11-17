@@ -108,6 +108,7 @@ struct TimelineHome: View {
         }
 
         // Your things.
+        list.append(Entry(color: .purple, hollow: true, content: AnyView(recommendedStep)))
         if !home.goals.isEmpty {
             list.append(Entry(color: .green, hollow: true, content: AnyView(goalsStep)))
         }
@@ -205,6 +206,17 @@ struct TimelineHome: View {
                 }
             }
             .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var recommendedStep: some View {
+        Button {
+            open(.recommended)
+        } label: {
+            stepText("For you", title: "Recommended", color: .purple,
+                     detail: "What to power up, which events to join and which raids to do")
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }

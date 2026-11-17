@@ -85,7 +85,7 @@ public struct TradeTables: Decodable, Sendable {
     }
 
     /// base × (1 − discount), rounded to the nearest whole stardust. Discounts outside 0...1 are clamped.
-    /// TODO: verify the rounding against the game (the game master gives only the discount).
+    /// The game master gives only the discount; the rounding was confirmed in game by the user, 2026-11-17.
     public static func discountedCost(base: Int, discount: Double) -> Int {
         let share = 1 - min(max(discount, 0), 1)
         return Int((Double(base) * share).rounded(.toNearestOrAwayFromZero))

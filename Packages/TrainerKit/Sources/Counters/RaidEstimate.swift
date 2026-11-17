@@ -4,8 +4,8 @@ import GameMath
 /// A rough "how many trainers" estimate for a raid.
 ///
 /// Raid boss HP, stat multiplier and time limit per tier are held by the game's servers. They come
-/// from a cited community table (Resources/raid-tiers.json, Bulbapedia, `TODO: verify`), shown as
-/// unverified in the app. The estimate is a best case: the party's average DPS for the whole time
+/// from a cited community table (Resources/raid-tiers.json, Bulbapedia), checked in game by the
+/// user on 2026-11-17. The estimate is a best case: the party's average DPS for the whole time
 /// limit, with no fainting, dodging, relobbying, friendship or party bonuses.
 public enum RaidEstimate {
     public struct Tier: Decodable, Sendable, Hashable, Identifiable {

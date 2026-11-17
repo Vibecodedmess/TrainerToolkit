@@ -134,8 +134,8 @@ public struct EvolutionTables: Decodable, Sendable {
     }
 }
 
-/// How to get each evolution item, from a community wiki (paraphrased, cited, marked unverified in
-/// the app). Hand-written in Resources/evolution-items-community.json; not game data.
+/// How to get each evolution item, from a community wiki (paraphrased, cited, checked in game by the
+/// user on 2026-11-17). Hand-written in Resources/evolution-items-community.json; not game data.
 public struct EvolutionItemGuide: Decodable, Sendable {
     public struct Source: Decodable, Sendable, Hashable {
         public let name: String

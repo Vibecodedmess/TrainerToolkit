@@ -30,6 +30,19 @@ struct WidgetBoardHome: View {
 
                 raidWidget
 
+                Button {
+                    open(.recommended)
+                } label: {
+                    widget(tint: .purple) {
+                        widgetTitle("Recommended for you", "wand.and.stars", .purple)
+                        Text("What to power up, which events to join and which raids to do.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+                .buttonStyle(.plain)
+
                 HStack(alignment: .top, spacing: spacing) {
                     eventsWidget.frame(maxHeight: .infinity)
                     backupWidget.frame(maxHeight: .infinity)

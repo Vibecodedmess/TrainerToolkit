@@ -208,8 +208,7 @@ struct GoalEditorView: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Costs from the game master (PokeMiners, commit \(String(tables.source.commit.prefix(7))), extracted \(tables.source.extracted)).")
                 if draft.isShadow || draft.isPurified || draft.isLucky {
-                    Text("TODO: verify. Fractional shadow/purified/lucky costs are rounded up per power-up; the game master doesn't say how the game rounds.")
-                        .foregroundStyle(.orange)
+                    Text("Shadow, purified and lucky costs are rounded up per power-up, as in the game.")
                 }
             }
         }

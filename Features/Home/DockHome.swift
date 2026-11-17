@@ -21,6 +21,7 @@ struct DockHome: View {
                     .buttonStyle(.plain)
                 }
                 quickButtons
+                recommendedCard
                 liveStrip
                 raids
                 goals
@@ -121,6 +122,32 @@ struct DockHome: View {
     }
 
     // MARK: - Quick buttons
+
+    private var recommendedCard: some View {
+        Button {
+            open(.recommended)
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "wand.and.stars")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .frame(width: 40, height: 40)
+                    .background(AppTheme.accent, in: Circle())
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Recommended for you").font(.headline)
+                    Text("Power-ups, events and raids").font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .homeCard(cornerRadius: 18)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
 
     private var quickButtons: some View {
         HStack(alignment: .top, spacing: 8) {

@@ -58,10 +58,11 @@ Also:
 | 19 | Screenshot thumbnails on unsure Pokémon (and in the review, tap to enlarge); ★ on each species' best raid/gym moves | Confirmed on build #30 (2026-11-16). Elite moves now show "(Elite)" in the editor instead of ★ |
 | 20 | More > Looks: pick Standard, Floating dock, Widget board or Timeline (concepts 6, 7, 8) | Confirmed on build #33 (2026-11-17). See "Looks" |
 | 21 | Three more looks: Terminal (17), Alien signal (21), Terminal, alien edition (22), with an original moving alien background | Build #32 had the custom tab bars covering list bottoms and looks only on Home; fixed (bar below the screens, looks app-wide) and confirmed on build #33 (2026-11-17; user: "looks great!"). See "Looks" |
+| 22 | Recommended (power-ups, events, raids) in More and on every Home look; all open `TODO: verify` items confirmed by the user | Built 2026-11-17, not yet on the phone. See "Recommended". Home Screen widget researched, not built (see "Widget research") |
 
 ## Current state (update this section as work continues)
 
-- **As of 2026-11-17:** Phases 0–21 are confirmed on the phone (latest: build #33), except the CSV import (untested, the user has no CSV).
+- **As of 2026-11-17:** Phases 0–21 are confirmed on the phone (latest: build #33), except the CSV import (untested, the user has no CSV). Phase 22 (Recommended) is built.
 - **Tabs (user's choice, 2026-11-13):** Home, Search, **Rocket**, Events, More. Raids lives under More > Raids, and Home's tile shows the raid boss count instead of the Rocket count. `RaidsView` has no `NavigationStack` of its own (it's pushed); the Rocket tab wraps `RocketView` in one.
 - **Rocket lines:** `Counters/RocketQuotes.swift` + `rocket-quotes.json` (the game's own text, see DATA_SOURCES.md). The list shows each lineup's line, the search (`RocketQuotes.matches`, punctuation- and accent-insensitive) covers lines, names, types and Pokémon, and the lineup screen shows the line at the top.
 - **Look and feel (Phase 16, user's choices):**
@@ -77,20 +78,27 @@ Also:
   - PokeMiners pins checked: still the latest commits.
   - CI writes a "Compiler warnings" summary on each run page. Build #24 (`3c146c8`) had 0 warnings and was green.
 - **No open feature ideas.** The user is **not interested in PvP** (declined PvP league IV ranks on 2026-11-12): do not suggest PvP features again. Wait for the user to name what they want next.
-- **Open `TODO: verify` items** (each one is also marked in code and in DATA_SOURCES.md):
-  - shadow/purified/lucky power-up cost rounding
-  - Trade Planner:
-    - cost rounding
-    - trade kind → `unlockedTrading` mapping
-    - attack bonus shown as a multiplier
-    - readable category names
-    - friendship levels shown as "Level N", since the names aren't in the data
-  - raid tier numbers (Bulbapedia), including the 3-star Shadow time limit
-  - evolution "how to get" texts (Pokémon GO Wiki)
+- **Open `TODO: verify` items: none.** On 2026-11-17 the user confirmed all of them in game: shadow/purified/lucky cost rounding; the Trade Planner's cost rounding, trade kind → `unlockedTrading` mapping, attack bonus as a multiplier, category names and "Level N" friendship levels; the Bulbapedia raid tier numbers (including the 3-star Shadow time limit); and the Pokémon GO Wiki "how to get" texts. Code, JSON notes, in-app footers and DATA_SOURCES.md now say "checked against the game on 17 November 2026"; the source credits stay (licences require them). New unsure values still get `TODO: verify`.
 - **CI tips:**
   - Build times vary from 4 to 10 minutes.
   - Read results on the run page, including the warnings summary.
   - Artifact downloads sometimes land in Downloads as random `*.tmp` files instead of `TrainerToolkit-ipa-N.zip`. Check each candidate is a zip containing `TrainerToolkit.ipa`, then use it and delete the leftovers.
+
+## Recommended (Phase 22): how it works
+
+- User's request (2026-11-17): recommend Pokémon to upgrade, events to join "with what rewards", and bosses to clear.
+- Logic in `Packages/TrainerKit/Sources/Counters/Recommender.swift` (tests in `RecommenderTests`, bundled data and made-up events only); screen in `Features/Recommended/RecommendedView.swift`, computed off the main thread.
+  - **Power-ups:** My Collection entries with a fast move (`CounterPools.mine`). Each is taken to its next level step (`nextTarget`: next of 40/45/50) while the others stay put; picked when that gets it into the best 6 (`joinsTeam`) or makes it #1 (`becomesBest`) against a current raid boss. Needs more than 6 counters. Row links to `PowerUpValueView`; cost from `PowerUpCalculator`.
+  - **Events:** live, or starting within 7 days. Reasons only from the feed (`EventExtras`): featured Pokémon in a goal's family (`GMPokemon.family`), Pokémon not in the collection (by dex), shinies, bonuses (incl. spotlight bonus), Special Research rewards. Events with no reason are left out.
+  - **Raids:** `RaidEstimate` trainers needed with the user's best 6 (easiest first; not-estimated tiers last), top 3 counters, "you don't have it" and shiny flags.
+- Entry points: More > Tools > Recommended, and one link on every Home look (`HomeView.Destination.recommended`).
+
+## Widget research (2026-11-17, not built)
+
+- The user asked to look into a Home Screen widget.
+- **App Groups are the problem:** with a free Apple ID, Sideloadly either renames the App Group to a team-unique id or doesn't provision it at all (reports differ; a widget that needs it can crash at launch). So the widget **can't rely on reading the app's data** (collection, goals, Recommended).
+- **Workable plan:** a WidgetKit extension that fetches the public ScrapedDuck events/raids feeds itself (same politeness rules: cache, every few hours, ETags) and shows the Community Day countdown and current raid bosses as text. No App Group needed. Each extension needs its own App ID on the free account (10 new App IDs per 7 days). If an install fails, Sideloadly's advanced option to remove app extensions gets the app back without the widget.
+- Waiting for the user's go-ahead before building it.
 
 ## Looks (Phase 20): how they work
 

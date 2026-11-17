@@ -43,7 +43,7 @@ enum BestMoveCache {
     }
 }
 
-/// Raid tier numbers (community table, unverified) for the trainers-needed estimate.
+/// Raid tier numbers (community table, checked in game 2026-11-17) for the trainers-needed estimate.
 enum RaidData {
     static let table: RaidEstimate.Table? = try? RaidEstimate.Table.bundled()
 }

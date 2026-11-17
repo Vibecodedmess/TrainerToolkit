@@ -8,7 +8,7 @@
     ],
     "retrieved": "2026-11-12",
     "license": "CC BY-NC-SA 2.5",
-    "note": "Community numbers, not from the game's data. TODO: verify. Raid boss HP, stat multiplier and time limit are held by the game's servers."
+    "note": "Community numbers, not from the game's data; checked against the game on 2026-11-17. Raid boss HP, stat multiplier and time limit are held by the game's servers."
   },
   "tiers": [
     { "id": "one_star", "name": "1-star raid", "bossHP": 600, "cpMultiplier": 0.5974, "timeLimitSeconds": 180, "estimate": true, "note": null },
@@ -23,7 +23,7 @@
     { "id": "elite", "name": "Elite raid", "bossHP": 20000, "cpMultiplier": 0.985, "timeLimitSeconds": 300, "estimate": true, "note": null },
     { "id": "super_mega", "name": "Super Mega raid", "bossHP": 25000, "cpMultiplier": 0.79, "timeLimitSeconds": 300, "estimate": false, "note": "Super Mega bosses use shields, which this estimate doesn't model." },
     { "id": "shadow_one_star", "name": "1-star Shadow raid", "bossHP": 600, "cpMultiplier": 0.5974, "timeLimitSeconds": 180, "estimate": false, "note": "Shadow raid bosses become enraged at 60% HP (much stronger unless Purified Gems are used), which this estimate doesn't model." },
-    { "id": "shadow_three_star", "name": "3-star Shadow raid", "bossHP": 4000, "cpMultiplier": 0.76, "timeLimitSeconds": 180, "estimate": false, "note": "Shadow raid bosses become enraged at 60% HP (much stronger unless Purified Gems are used), which this estimate doesn't model. TODO: verify the time limit (not shown separately in the source table)." },
+    { "id": "shadow_three_star", "name": "3-star Shadow raid", "bossHP": 4000, "cpMultiplier": 0.76, "timeLimitSeconds": 180, "estimate": false, "note": "Shadow raid bosses become enraged at 60% HP (much stronger unless Purified Gems are used), which this estimate doesn't model. The time limit isn't shown separately in the source table; it was checked in game on 2026-11-17." },
     { "id": "shadow_five_star", "name": "Legendary Shadow raid", "bossHP": 15000, "cpMultiplier": 0.82, "timeLimitSeconds": 300, "estimate": false, "note": "Shadow raid bosses become enraged at 60% HP (much stronger unless Purified Gems are used), which this estimate doesn't model." }
   ]
 }

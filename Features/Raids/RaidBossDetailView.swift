@@ -115,7 +115,7 @@ struct RaidBossDetailView: View {
         }
     }
 
-    /// Rough trainers-needed estimate for the suggested party (community tier numbers, unverified).
+    /// Rough trainers-needed estimate for the suggested party (community tier numbers, checked in game 2026-11-17).
     @ViewBuilder
     private var trainersSection: some View {
         if let table = RaidData.table, let tier = table.tier(forFeedTier: boss.tier) {
@@ -146,7 +146,7 @@ struct RaidBossDetailView: View {
             } footer: {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Best case: everyone brings this party, nobody faints or dodges, and the full time limit is used. Real raids usually need more. No friendship or Mega bonuses.")
-                    Text("\(tier.name): boss HP, stat multiplier and time limit are community numbers from \(table.source.name) (\(table.source.license)), retrieved \(table.source.retrieved). Not verified.")
+                    Text("\(tier.name): boss HP, stat multiplier and time limit are community numbers from \(table.source.name) (\(table.source.license)), retrieved \(table.source.retrieved), checked against the game on 17 November 2026.")
                     if let url = URL(string: table.source.pages.first ?? "") {
                         Link("Source: \(table.source.name)", destination: url)
                     }

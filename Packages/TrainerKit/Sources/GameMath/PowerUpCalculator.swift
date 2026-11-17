@@ -36,9 +36,10 @@ public struct PowerUpCost: Hashable, Sendable {
 /// `candyCost[L-1]` and, from level 40, `xlCandyCost[L-40]` (tables from the game master).
 /// Shadow / purified / lucky multipliers come from the game master too.
 ///
-/// TODO: verify. The game master gives the multipliers but not how fractional results are rounded
+/// The game master gives the multipliers but not how fractional results are rounded
 /// (e.g. 1 Candy x 1.2 for a shadow, or 17 XL x 1.2 = 20.4). This rounds UP each power-up.
-/// It also assumes a lucky purified Pokémon gets both stardust discounts, multiplied together.
+/// A lucky purified Pokémon gets both stardust discounts, multiplied together. Both confirmed in game
+/// by the user on 2026-11-17.
 public enum PowerUpCalculator {
     public static func cost(from start: PokemonLevel, to target: PokemonLevel,
                             modifiers: CostModifiers = .none, tables: LevelTables) -> PowerUpCost {
@@ -80,7 +81,7 @@ public enum PowerUpCalculator {
         return 1
     }
 
-    /// value x multiplier, rounded up (TODO: verify rounding, see above). The small epsilon keeps
+    /// value x multiplier, rounded up (as in the game, see above). The small epsilon keeps
     /// exact results like 1300 x 1.2 = 1560.0000000000002 from rounding up to 1561.
     static func scaled(_ value: Int, by multiplier: Double) -> Int {
         guard value > 0, multiplier != 1 else { return value }

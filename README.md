@@ -18,6 +18,7 @@ It is sideloaded, never published.
 | Rocket | Giovanni, leader and grunt lineups with what each one says (a grunt's line gives away its type), searchable by those words, names or Pokémon; counters per possible Pokémon and per slot; works offline |
 | More > Trades | Friends, want lists and an estimated stardust cost per trade |
 | More > Backup | Back up everything to iCloud Drive (or anywhere in Files), automatic daily backups to a folder you choose, and restore with undo |
+| More > Recommended (and on Home) | Which of your Pokémon to power up next (the next level step that gets it into your best 6, or makes it your best, against the current raid bosses), events in the next 7 days with something for you (candy for your goals, Pokémon you don't have, shinies, bonuses, research rewards) and the raid bosses that are easiest for your collection |
 | More > Looks | Pick how the whole app looks: Standard, Floating dock (greeting, big countdown, round quick buttons, floating tab bar), Widget board (Home as mixed-size widgets), Timeline (Home as one "what's next" line with a scan button), Terminal (Home as a command line), Alien signal (chunky game style over a moving space scene) or Terminal, alien edition |
 
 Counter rankings use the PvE damage formula with the game master's type chart, weather and move stats. The opponent's real stats are server-side, so percentages are relative to the best counter (each screen has a "How this is calculated" note).

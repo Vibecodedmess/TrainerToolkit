@@ -239,6 +239,17 @@ struct TerminalHome: View {
 
     @ViewBuilder
     private var scanLines: some View {
+        prompt("recommend")
+        Button {
+            open(.recommended)
+        } label: {
+            Text(verbatim: " > power-ups, events, raids for you")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(TerminalRowStyle())
+        .accessibilityLabel("Recommended for you")
+        blank
         prompt("scan")
         Button(action: scan) {
             Text(verbatim: "[ add from screenshots ]")
